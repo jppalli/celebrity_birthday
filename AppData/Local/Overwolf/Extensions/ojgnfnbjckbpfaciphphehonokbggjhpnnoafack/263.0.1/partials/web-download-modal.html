@@ -1,0 +1,90 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>Overwolf</title>
+
+        <link href="https://fonts.googleapis.com/css?family=Lato:400,400i,700" rel="stylesheet"> 
+
+        <link rel="stylesheet" href="../styles/web-dl.css">
+    </head>
+<body style="background:#0C0C0C;">
+
+<!-- web download modal START -->
+<div class="lightbox-wrap" ng-click="dismissModal($event)">
+    <div class="web-dl-modal" ng-class="isHidden ? 'hidden' : ''">
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+	<symbol id="window-control_close" viewBox="0 0 30 30">
+		<path d="M15.7,15l4.1-4.1c0.2-0.2,0.2-0.5,0-0.7c-0.2-0.2-0.5-0.2-0.7,0L15,14.3l-4.1-4.1c-0.2-0.2-0.5-0.2-0.7,0
+		c-0.2,0.2-0.2,0.5,0,0.7l4.1,4.1l-4.1,4.1c-0.2,0.2-0.2,0.5,0,0.7c0.1,0.1,0.2,0.1,0.4,0.1s0.3,0,0.4-0.1l4.1-4.1l4.1,4.1
+		c0.1,0.1,0.2,0.1,0.4,0.1s0.3,0,0.4-0.1c0.2-0.2,0.2-0.5,0-0.7L15.7,15z"></path>
+	</symbol>
+	
+	<symbol id="overwolf-logo" viewBox="0 0 40 40">
+    <path d="M37.9999 20.6677C38.0276 20.6677 29.2952 15.7394 29.2695 15.5945C29.072 14.547 28.8232 12.8172 27.6186 11.9224C26.5819 11.159 19.5833 8.0087 19.5695 7.97584C18.2809 6.06955 17.1389 4.07209 16.1531 2C15.2169 2.68961 14.4555 3.58087 13.9278 4.60474C13.4001 5.62861 13.1203 6.75762 13.11 7.90433C9.67208 8.38655 6.44536 9.81638 3.80691 12.0267C10.6495 10.4922 12.6203 11.9069 12.6203 11.9069C10.38 12.2975 8.22138 13.0485 6.23192 14.1295C3.31519 15.6988 2 17.5832 2 17.5832C2 17.5832 8.62335 15.7297 13.7064 17.5329C11.336 17.8602 9.13265 18.9144 7.41283 20.5441C17.9482 21.8216 23.1438 30.7698 25.3299 38C26.1336 25.14 19.5912 20.2561 19.5912 20.2561C21.4909 20.3894 23.8804 21.8351 25.4088 23.9862C30.0693 23.4721 32.6641 24.8694 32.6424 24.8694C32.5911 24.8694 35.1622 24.0963 36.975 23.2788C36.819 23.0488 36.1634 22.2506 35.7902 21.8042C35.8415 21.808 37.2752 21.7249 37.9999 20.6677ZM23.4479 14.976C23.5506 14.9509 25.8334 14.3228 26.4851 14.5643C27.0775 14.7827 27.0894 16.4332 27.0894 16.4332C27.0894 16.4332 25.7367 16.6188 23.4479 14.976Z" fill="#EFEFEF"/>      
+	</symbol>
+
+</svg>
+        <div class="app-window">
+            <article>
+              <div class="download-illustration-area">
+                <img src=".content/assets/images/global/web_app_install.png" />
+              </div>
+              <h1>Your app download should start right away...</h1>
+              <p>if it doesn't, <a ng-href="//{{owStoreWebAppDownloadBase}}&Name={{appName}}&ExtensionId={{appId}}">download here</a></p>
+            
+              <footer>
+                <p>
+                  <strong>Trouble downloading?</strong> Try our 
+                  <a href="https://support.overwolf.com/en/support/solutions/articles/9000177154-overwolf-installation-troubles" target="_blank">troubleshooting guide</a>,
+                  or get help on
+                  <a href="https://discord.gg/34KnxUX" target="_blank">Discord</a>
+                </p>
+                <p>Overwolf is an epic apps platform for PC games. It's easy and free, and used by millions of gamers </p>
+              </footer>
+            </article>
+
+            <div class="window-controls" ng-click="dismissModal()">
+                <a class="close">
+                    <svg class="icon">
+                        <use xlink:href="#window-control_close"></use>
+                    </svg>
+
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+
+        //fix SVG ref which are broken because we use <base> tag
+        (function(document, window) {
+
+            var baseUrl = window.location.href
+                    .replace(window.location.hash, "");
+
+
+            [].slice.call(document.querySelectorAll("use[*|href]"))
+
+
+                    .filter(function(element) {
+                        return (element.getAttribute("xlink:href").indexOf("#") === 0);
+                    })
+
+                    .forEach(function(element) {
+                        element.setAttribute("xlink:href", baseUrl + element.getAttribute("xlink:href"));
+                    });
+
+
+
+        }(document, window));
+
+    </script>
+</div>
+
+<!-- web download modal END -->
+
+</body>
+
+</html>

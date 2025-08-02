@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>
+<html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>
+<html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>
+<html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Overwolf</title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  <base href="/"/>
+
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Orbitron" rel="stylesheet">
+
+  <link rel="stylesheet" href="styles/main.css">
+  <link rel="stylesheet" href="styles/main-non-critical.css">
+
+  <link rel="stylesheet" href="styles/fonts.css">
+  <link rel="stylesheet" href="styles/vars.css">
+
+  <link rel="stylesheet" href="styles/menu.css">
+  <link rel="stylesheet" href="styles/tiles.css">
+  <link rel="stylesheet" href="styles/slider.css">
+  <link rel="stylesheet" href="styles/library-page.css">
+  <link rel="stylesheet" href="styles/search.css">
+  <link rel="stylesheet" href="styles/tooltip.css">
+
+  <link rel="stylesheet" href="styles/modal-page.css">
+  <link rel="stylesheet" href="styles/app-page.css">
+  <link rel="stylesheet" href="styles/login-page.css">
+  <link rel="stylesheet" href="styles/subscription-page.css">
+
+  <link rel="stylesheet" href="styles/store-03-global.css">
+  <link rel="stylesheet" href="styles/store-03-tooltip.css">
+
+  <link rel="stylesheet" href="styles/appstore-header.css">
+  <link rel="stylesheet" href="styles/mega-nav.css">
+  <link rel="stylesheet" href="styles/appstore-banners.css">
+  <link rel="stylesheet" href="styles/appstore-shelf.css">
+  <link rel="stylesheet" href="styles/appstore-search-shelf.css">
+  <link rel="stylesheet" href="styles/appstore-tile.css">
+  <link rel="stylesheet" href="styles/appstore-carousel.css">
+  <link rel="stylesheet" href="styles/appstore-library-settings.css">
+
+  <link rel="stylesheet" href="styles/appstore-ftue-tooltip.css">
+
+  <link rel="stylesheet" href="styles/web-only.css">
+
+
+  <!--  Google Analytics -->
+
+  <script>
+    (function (i, s, o, g, r, a, m) {
+      i['GoogleAnalyticsObject'] = r;
+      i[r] = i[r] || function () {
+        (i[r].q = i[r].q || []).push(arguments)
+      }, i[r].l = 1 * new Date();
+      a = s.createElement(o),
+        m = s.getElementsByTagName(o)[0];
+      a.async = 1;
+      a.src = g;
+      m.parentNode.insertBefore(a, m)
+    })(window, document, 'script', 'https://ssl.google-analytics.com/analytics.js', 'ga');
+
+    ga('create', 'UA-58041593-1', 'auto');
+    ga('set', 'checkProtocolTask', null);
+    ga('send', 'pageview', '/');
+
+    // Mixpanel analytics
+    window.storePlatform = 'Client';
+    (function(f,b){if(!b.__SV){var e,g,i,h;window.mixpanel=b;b._i=[];b.init=function(e,f,c){function g(a,d){var b=d.split(".");2==b.length&&(a=a[b[0]],d=b[1]);a[d]=function(){a.push([d].concat(Array.prototype.slice.call(arguments,0)))}}var a=b;"undefined"!==typeof c?a=b[c]=[]:c="mixpanel";a.people=a.people||[];a.toString=function(a){var d="mixpanel";"mixpanel"!==c&&(d+="."+c);a||(d+=" (stub)");return d};a.people.toString=function(){return a.toString(1)+".people (stub)"};i="disable time_event track track_pageview track_links track_forms track_with_groups add_group set_group remove_group register register_once alias unregister identify name_tag set_config reset opt_in_tracking opt_out_tracking has_opted_in_tracking has_opted_out_tracking clear_opt_in_out_tracking start_batch_senders people.set people.set_once people.unset people.increment people.append people.union people.track_charge people.clear_charges people.delete_user people.remove".split(" ");
+    for(h=0;h<i.length;h++)g(a,i[h]);var j="set set_once union unset remove delete".split(" ");a.get_group=function(){function b(c){d[c]=function(){call2_args=arguments;call2=[c].concat(Array.prototype.slice.call(call2_args,0));a.push([e,call2])}}for(var d={},e=["get_group"].concat(Array.prototype.slice.call(arguments,0)),c=0;c<j.length;c++)b(j[c]);return d};b._i.push([e,f,c])};b.__SV=1.2;e=f.createElement("script");e.type="text/javascript";e.async=!0;e.src="undefined"!==typeof MIXPANEL_CUSTOM_LIB_URL?
+    MIXPANEL_CUSTOM_LIB_URL:"file:"===f.location.protocol&&"//cdn.mxpnl.com/libs/mixpanel-2-latest.min.js".match(/^\/\//)?"https://cdn.mxpnl.com/libs/mixpanel-2-latest.min.js":"//cdn.mxpnl.com/libs/mixpanel-2-latest.min.js";g=f.getElementsByTagName("script")[0];g.parentNode.insertBefore(e,g)}})(document,window.mixpanel||[]);
+
+    mixpanel.init('7f5cd212660fa0bc40eb2cd1335ede5c');
+    overwolf.profile.getCurrentUser(info => {
+      if (info.success) {
+        mixpanel.identify(info.machineId);
+      }
+    });
+  </script>
+
+<script src="scripts/non-ng/strings-loader.js"></script>
+<script src="vendors/jquery.min.js"></script>
+<script src="vendors/jquery.mousewheel.js"></script>
+<script src="vendors/jquery.dotdotdot.min.js"></script>
+<script src="vendors/perfect-scrollbar.js"></script>
+<script src="vendors/angular.min.js"></script>
+<script src="vendors/angular-animate.min.js"></script>
+<script src="vendors/md5.js"></script>
+<script src="vendors/ngProgress.min.js"></script>
+<script src="vendors/angular-recaptcha.min.js"></script>
+
+<script src="vendors/angular-route.js"></script>
+<script src="vendors/moment.min.js"></script>
+<script src="vendors/jquery.tinysort.min.js"></script>
+
+<script src="scripts/Polyfills.js"></script>
+
+<script src="scripts/overwolf.js"></script>
+<script src="scripts/services/tracking.js"></script>
+<script src="scripts/helpers/preload.js"></script>
+<script src="scripts/helpers/debounce.js"></script>
+<script src="scripts/helpers/position.js"></script>
+<script src="scripts/helpers/block.js"></script>
+<script src="scripts/helpers/event.js"></script>
+
+<script src="scripts/services/redeem.js"></script>
+<script src="scripts/services/reviews.js"></script>
+<script src="scripts/services/ow-modal.js"></script>
+<script src="scripts/factories/modal.js"></script>
+<script src="scripts/services/skins.js"></script>
+<script src="scripts/services/ItemsServiceBase.js"></script>
+<script src="scripts/services/apps.js"></script>
+<script src="scripts/services/games.js"></script>
+<script src="scripts/services/user.js"></script>
+<script src="scripts/services/logs.js"></script>
+<script src="scripts/services/search.js"></script>
+<script src="scripts/services/error-messages.js"></script>
+<script src="scripts/services/connection.js"></script>
+<script src="scripts/services/geolocation.js"></script>
+<script src="scripts/services/moment.js"></script>
+<script src="scripts/services/category-retain.js"></script>
+<script src="scripts/services/subscription.js"></script>
+
+<script src="scripts/directives/menu.js"></script>
+<script src="scripts/directives/dropdown.js"></script>
+<script src="scripts/directives/select.js"></script>
+<script src="scripts/directives/radio-group.js"></script>
+<script src="scripts/directives/dimming.js"></script>
+<script src="scripts/directives/slide.js"></script>
+<script src="scripts/directives/slider.js"></script>
+<script src="scripts/directives/carousel.js"></script>
+<script src="scripts/directives/modal.js"></script>
+<script src="scripts/directives/tabs.js"></script>
+<script src="scripts/directives/scrollbar.js"></script>
+<script src="scripts/directives/rating.js"></script>
+<script src="scripts/directives/read-more.js"></script>
+<script src="scripts/directives/auto-read-more.js"></script>
+<script src="scripts/directives/trim-text.js"></script>
+<script src="scripts/directives/share-tooltip.js"></script>
+<script src="scripts/directives/capitalize.js"></script>
+<script src="scripts/directives/keep-content.js"></script>
+<script src="scripts/directives/promotions.js"></script>
+<script src="scripts/directives/internal-link.js"></script>
+<script src="scripts/directives/shelf.js"></script>
+<script src="scripts/directives/page-background.js"></script>
+<script src="scripts/directives/content-style.js"></script>
+<script src="scripts/directives/img-regressive.js"></script>
+<script src="scripts/directives/smart-viewall.js"></script>
+<script src="scripts/directives/bind-html-compile.js"></script>
+<script src="scripts/directives/force-focus.js"></script>
+<script src="scripts/directives/get-focus.js"></script>
+<script src="scripts/directives/scroll-on-select.js"></script>
+<script src="scripts/directives/scroll-columns-workaround.js"></script>
+<script src="scripts/directives/meganav.js"></script>
+<script src="scripts/directives/background-blur.js"></script>
+<script src="scripts/directives/ftue-tooltip.js"></script>
+<script src="scripts/directives/delayed-hover.js"></script>
+
+<script src="scripts/controllers/app-modal.js"></script>
+<script src="scripts/controllers/redeem-modal.js"></script>
+<script src="scripts/controllers/profile-modal.js"></script>
+<script src="scripts/controllers/subscription-modal.js"></script>
+<script src="scripts/controllers/apps.js"></script>
+<script src="scripts/controllers/skins.js"></script>
+<script src="scripts/controllers/library/library.js"></script>
+<script src="scripts/controllers/library/library-games.js"></script>
+
+<script src="scripts/controllers/giveaways.js"></script>
+<script src="scripts/controllers/page.js"></script>
+<script src="scripts/controllers/user.js"></script>
+<script src="scripts/controllers/login.js"></script>
+<script src="scripts/controllers/login-blink.js"></script>
+<script src="scripts/controllers/search.js"></script>
+<script src="scripts/controllers/window.js"></script>
+<script src="scripts/controllers/connection.js"></script>
+<script src="scripts/controllers/error.js"></script>
+<script src="scripts/controllers/splash.js"></script>
+
+<script src="scripts/filters/translate.js"></script>
+
+<script src="scripts/global.js"></script>
+
+
+<script src="https://www.google.com/recaptcha/api.js?onload=vcRecaptchaApiLoaded&render=explicit" async></script>
+
+
+</head>
+<body>
+
+<article id="main-wrapper">
+
+  <div class="no-connection" ng-controller="ConnectionController" ng-cloak ng-class="{'not-hidden': !hasConnection}">
+    <span class="highlighted">{{'not connected' | translate}}</span> {{'connecting in' | translate}} {{ retryTimeLeft }}{{'seconds ellipsis' | translate}}<a ng-click="tryNow()"
+                                           style="text-decoration: underline; cursor: pointer">Try
+    now</a>
+  </div>
+
+  <!-- BLOCK: TOP BAR -->
+  <div class="appstore-header-wrapper store-03-css" ng-controller="WindowController" ng-mousedown="onMouseDown($event)"
+       ng-mouseup="onMouseUp()" ng-mousemove="onMouseMove($event)">
+
+    <!-- carousel new "top-blur" div location -->
+    <div id="appstore-header-background"
+         class="appstore-header-background"
+         data-background-root=""
+         ow-background-blur>
+      <img src="images/global/store-bg-blurred.jpg" class="active">
+      <img src="">
+    </div>
+
+    <nav id="top-menu" ow-menu="horizontal">
+
+      <!-- header - app -->
+      <div class="appstore-header">
+
+        <section class="appstore-header-group-divided dropdown-container menu-overwolf"
+                 ow-dropdown>
+          <a href="">
+            <i class="appstore-header-logo">
+              <svg class="svg-icon-fill svg-icon-logo">
+                <use xlink:href=".content/assets/svg/sprite.svg#main-header-icon_logo"/>
+              </svg>
+              <svg class="svg-icon-fill svg-icon-dropdown-arrow">
+                <use xlink:href=".content/assets/svg/sprite.svg#bottom-arrow-indicator"/>
+              </svg>
+            </i>
+          </a>
+
+          <div class="dropdown">
+            <ul ng-click="owDropdown.containerClick($event)">
+              <li class="disabled" ng-class="$root.splashShowing ? 'disabled' : ''"><a ng-click="showSettings()">{{'settings' | translate }}</a></li>
+              <li class="disabled" ng-class="$root.splashShowing ? 'disabled' : ''"><a ng-click="showDock()"
+                                                                                       ng-hide="isDockVisibile">{{'show dock' | translate}}</a></li>
+              <li class="disabled" ng-class="$root.splashShowing ? 'disabled' : ''"><a ng-click="hideDock()"
+                                                                                       ng-show="isDockVisibile">{{'hide dock' | translate}}</a></li>
+              <li class="disabled" ng-class="$root.splashShowing ? 'disabled' : ''"><a ng-click="showSupport()">{{'support' | translate}}</a></li>
+              <li class="divi"></li>
+              <li><a ng-click="shutDownOverwolf()">{{'exit' | translate }}</a></li>
+            </ul>
+          </div>
+        </section>
+
+        <section class="appstore-header-nav">
+                    <span ow-menu-item class="menu-category static ng-cloak" active="true" ow-menu-item-id="store">
+                        <a ng-class="$root.splashShowing ? 'disabled' : ''"
+                           ng-hide="$root.splashShowing"
+                           ng-click="changeSection('store')">
+                            {{ 'store' | translate }}
+                        </a>
+                    </span>
+
+          <span ow-menu-item class="menu-category static ng-cloak" ow-menu-item-id="library">
+                        <a ng-class="$root.splashShowing ? 'disabled' : ''"
+                           ng-hide="$root.splashShowing"
+                           ng-click="changeSection('library')">
+                            {{ 'my library' | translate }}
+                        </a>
+                    </span>
+        </section>
+
+        <section class="appstore-header-group-divided">
+
+                    <span ng-controller="UserController">
+                        <span class="user-menu logged-in" ng-show="isLoggedIn && !$root.splashShowing" ng-cloak>
+                            <div class="dropdown-container" ow-dropdown="{{ avatar }}">
+                                <a href="">
+                                    <i class="main-header-icon">
+                                        <div class="user-avatar">
+                                            <img ng-src="{{ owDropdown.picture }}" alt=""/>
+                                        </div>
+                                    </i>
+                                </a>
+
+                                <div class="welcome-user-container" ng-show="welcomeTooltipActive">
+                                  <div class="welcome-user active" > <!-- add class active-->
+                                      <div class="welcome-user-text">
+                                          <!-- text after new user creat account-->
+                                          <h2>{{ welcomeTooltipTitle }}</h2>
+                                          <span>{{welcomeTooltipText}}</span>
+                                      </div>
+                                      <div class="welcome-user-deco">
+                                          <!-- <img src="images/login/stars.svg"> -->
+                                          <div class="stars-anim">
+                                              <div class="star1">
+                                                  <img class="single-star-img" src="images/login/single-star.svg">
+                                                  <img class="slim-star-img" src="images/login/slim-star.svg">
+                                              </div>
+                                              <div class="star2">
+                                                  <img class="single-star-img" src="images/login/single-star.svg">
+                                                  <img class="slim-star-img" src="images/login/slim-star.svg">
+                                              </div>
+                                          </div>
+                                      </div>
+                                  </div>
+                                </div>
+
+                                <div class="dropdown">
+                                    <ul ng-click="owDropdown.containerClick($event)">
+                                        <li>{{ displayName }}
+                                            <small>{{ email }}</small>
+                                        </li>
+                                        <li class="divi"></li>
+                                        <li><a ng-click="logOut()">{{ 'log out' | translate }}</a></li>
+                                        <li><a ng-click="manageUserAccount()">{{'manage account' | translate }}</a></li>
+                                    </ul>
+                                </div>
+
+                                <!-- add class name "is-open" to display -->
+                                <div class="edit-profile-tooltip">
+                                  <h2>
+                                    <img src="images/global/edit-profile-stars.webp" />
+                                    Edit Your Profile
+                                  </h2>
+                                  <span>Go to “Manage Account” to edit your profile.</span>
+                                </div>
+                            </div>
+                        </span>
+
+                        <span class="user-menu" ng-hide="isLoggedIn || $root.splashShowing" ng-cloak>
+                            <a ow-modal-trigger="templates/login-modal.html"
+                               ow-modal-trigger-container="login"
+                               ow-controller-scope-params='{"openSource": "login", "source": "user"}'>
+                                <i class="main-header-icon main-header-icon-log-in">
+                                    <svg class="svg-icon-fill">
+                                        <use xlink:href=".content/assets/svg/sprite.svg#main-header-icon_log-in"/>
+                                    </svg>
+                                    <span>{{'login' | translate}}</span>
+                                </i>
+
+                            </a>
+
+                        </span>
+                    </span>
+
+        </section>
+
+        <section class="window-controls-group"
+                 ng-cloak>
+          <a ng-click="showDiscord()" class="window-control-social-btn discord">
+            <i class="window-control">
+              <svg class="svg-icon-fill">
+                <use xlink:href=".content/assets/svg/sprite.svg#window-control_discord"></use>
+              </svg>
+            </i>
+          </a>
+          <a ng-click="showSettings()">
+            <i class="window-control">
+              <svg class="svg-icon-fill">
+                <use xlink:href=".content/assets/svg/sprite.svg#window-control_settings"/>
+              </svg>
+            </i>
+          </a>
+          <a ng-click="showSupport()">
+            <i class="window-control">
+              <svg class="svg-icon-fill">
+                <use xlink:href=".content/assets/svg/sprite.svg#window-control_support"/>
+              </svg>
+            </i>
+          </a>
+
+          <a href="#" ng-click="minimize()">
+            <i class="window-control">
+              <svg class="svg-icon-fill">
+                <use xlink:href=".content/assets/svg/sprite.svg#window-control_minimize"/>
+              </svg>
+            </i>
+          </a>
+
+          <a href="#" ng-click="toggleMaximize()">
+            <i class="window-control">
+              <input type="checkbox" class="toggle-icons" ng-checked="!isMaximized"/>
+              <svg class="svg-icon-fill">
+                <use xlink:href=".content/assets/svg/sprite.svg#window-control_restore"/>
+              </svg>
+              <svg class="svg-icon-fill">
+                <use xlink:href=".content/assets/svg/sprite.svg#window-control_maximize"/>
+              </svg>
+            </i>
+          </a>
+
+          <a href="#" ng-click="close()">
+            <i class="window-control window-control-close">
+              <svg class="svg-icon-fill">
+                <use xlink:href=".content/assets/svg/sprite.svg#window-control_close"/>
+              </svg>
+            </i>
+          </a>
+        </section>
+
+      </div>
+      <!-- end header - app -->
+
+    </nav>
+
+
+    <ng-include ng-if="!$root.hideMenuNav && serverBase != null"
+                src="serverBase  + 'ContentExtract/NavBar/'+ urlLocalizationPart  + 'apps/' "
+                onload="navBarLoaded = true;"></ng-include>
+
+
+    <div class="please-verify-bar collapsed"
+         ng-class="{'collapsed': $root.splashShowing || !$root.showVerificationBanner}"
+    >
+            <span>{{'please verify long' | translate}}<a href="#" ng-click="resendVerification()">{{'resend' | translate}}</a></span>
+    </div>
+  </div>
+
+  <div id="dvScrollWrapper" ng-hide="$root.splashShowing || hasError" ow-scrollbar scroll-top-y-offset="104"
+       ng-class="{'hide-menu-nav': hideMenuNav}">
+    <div ng-cloak ow-content-style>
+      <!--<ow-page-background ng-hide="$root.splashShowing"></ow-page-background>-->
+      <div id="dvView" ng-view></div>
+
+      <a id="createBanner" onclick="openCreateBanner()">
+        <img src="https://www.overwolf.com/system/modules/com.overwolf.store/resources/images/temp/cbaner.webp"  />
+      </a>
+
+    </div>
+  </div>
+
+
+
+  <div ng-show="hasError && !$root.splashShowing" ng-cloak style="position: absolute; top:0px; left:0px; width: 100%">
+    <ow-page-background section="default" ng-hide="$root.splashShowing"></ow-page-background>
+    <section class="starting-background error-fullpage"
+             ng-controller="ErrorController">
+
+
+      <div class="error-content">
+        <img src="images/global/no_results.png" style="margin-left: 50px;">
+        <span> <div ng-bind-html="errorMessage"></div></span>
+        <input type="button" class="btn-standard" value="RESTART OVERWOLF" ng-click="retry()"
+               ng-show="errorButtons.Retry">
+      </div>
+    </section>
+  </div>
+
+  <div ng-hide="hasError">
+    <div ow-modal="app" ow-modal-controller="AppModalCtrl" ow-modal-controller-as="app"></div>
+    <div ow-modal="redeem" ow-modal-controller="RedeemModalCtrl" ow-modal-controller-as="redeem"></div>
+    <div ow-modal="subscription" ow-modal-controller="SubscriptionController"
+         ow-modal-controller-as="subscription"></div>
+    <div ow-modal="login" ow-modal-controller="LoginController" ow-modal-controller-as="login"></div>
+    <div ow-modal="profile" ow-modal-controller="ProfileController"></div>
+    <!--<div ow-promotions></div>-->
+  </div>
+
+
+  <div id="owIntro" ng-controller="SplashController" ng-show="splashShowing"
+       ng-mousedown="onMouseDown($event)" ng-mouseup="onMouseUp()" ng-mousemove="onMouseMove($event)">
+    <section class="main-content" class="starting-background">
+      <div class="bg-slide bg-slide-full-height"
+           ow-slide
+           ow-slide-data="{img: ''}"
+           ow-slide-active="true">
+
+      </div>
+      <video id="vidSplash" src="images/global/ftue.webm"></video>
+
+    </section>
+  </div>
+
+</article>
+<div id="dvEnvironment" ng-cloak ng-show="currentEnv"> Current Environment: {{ currentEnv }}</div>
+
+
+</body>
+</html>

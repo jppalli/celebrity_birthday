@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Overwolf GameEvents Provider index</title>
+
+  <script>
+    (function (i, s, o, g, r, a, m) {
+      i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {
+        (i[r].q = i[r].q || []).push(arguments)
+      }, i[r].l = 1 * new Date(); a = s.createElement(o),
+        m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)
+    })(window, document, 'script', 'https://ssl.google-analytics.com/analytics.js', 'ga');
+
+    ga('create', 'UA-132870778-1', 'auto');
+    ga('set', 'checkProtocolTask', null);
+    ga('send', 'pageview', '/');
+  </script>
+
+  <script>
+
+    function _safeSendTrack(id, extra) {
+      let URL_TRACKING = "https://tracking.overwolf.com/tracking/InsertStats?Stats=true";
+      let payload = {
+        Kind: id
+      };
+
+      if (extra) {
+        payload.Extra = extra;
+      }
+
+      let xmlhttp = new XMLHttpRequest();
+      xmlhttp.open("POST", URL_TRACKING);
+      xmlhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+      xmlhttp.send(JSON.stringify(payload));
+    }
+
+    function SafeSendTrack(id, extra) {
+      if (!overwolfInternal.settings.privacy || !overwolfInternal.settings.privacy.get) {
+        _safeSendTrack(id, extra);
+      }
+
+      overwolfInternal.settings.privacy.get(({ flags }) => {
+        if (!flags.usage) {
+          return;
+        }
+
+        _safeSendTrack(id, extra);
+      });
+    }
+
+    window.addEventListener('error', function (e) {
+      console.log(`[ERROR] reporting error to grafana ${e.message} ${e.filename} ${e.lineno}`);
+      let message = `${e.filename} ${e.lineno} ${e.colno} ${e.message}`;
+      SafeSendTrack(40023);
+      let version = localStorage.getItem("appVersion");
+      if (!version) {
+        version = "";
+      }
+      let userId = localStorage.getItem("userId");
+      if (!userId) {
+        userId = null;
+      }
+      ga('send', 'event', version, message, userId);
+    });
+
+
+  </script>
+
+  <script src="/libs/underscore-min.js" defer></script>
+  <script src="/libs/marmottajax.js" defer></script>
+  <script src="libs/require.min.js" onload="onLoad()" defer></script>
+  <script src="/main.js" defer></script>
+  <script
+  src="https://code.jquery.com/jquery-3.6.0.min.js"
+  integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+  crossorigin="anonymous"></script>
+  <!-- 3.26.4 -->
+  <script src="/libs/bundle.min.js" crossorigin="anonymous"></script>
+  <script>
+
+   function initSentry() {
+      try {
+        let sampleRate = 0.1;
+        if (localStorage) {
+          appVersion = localStorage.getItem("appVersion") || "0.0.0.0";
+          const sentrySampleRateOverride =
+            localStorage.getItem('SentrySampleOverRide');
+          sampleRate = sentrySampleRateOverride ? 1.0 : sampleRate;
+          console.log('Sentry sample rate sent to: ', sampleRate);
+        }
+
+        Sentry.init({
+          dsn: "https://4e0a354160ca43c7a411542b2a5b6d6e@client-errors.overwolf.com/68",
+          sampleRate: sampleRate,
+          autoSessionTracking: false,
+          maxBreadcrumbs: 20,
+          beforeSend(event, hint) {
+            return sentryBeforeSend(event, hint)
+          },
+        });
+        console.log("[GEP] Sentry initialized");
+      } catch (e) {
+        console.warn("[GEP] Fail to init Sentry", e);
+      }
+    }
+
+    function onLoad() {
+      initSentry();
+
+      require.config({
+        waitSeconds: 30
+      });
+
+      require(["main"], function () {
+         console.log(`[INIT] main module loaded`);
+      }, function (error) {
+        console.log(`[INIT] failed to load main ${error}. Closing app...`);
+        SafeSendTrack(40022);
+
+        // NOTE(eefrat): We want to close GEP in this case, so that it won't
+        // stay "stuck" until the next Overwolf restart.
+        //
+        // The 5000 timeout is so that |SafeSendTrack| has enough time to
+        // actually send the tracking to Grafana.
+        setTimeout(window.close, 5000);
+      });
+
+    }
+
+    function sentryBeforeSend(event, hint) {
+      let appVersion = "0.0.0.0";
+      let gameId = 0;
+      event.release = window.__appVersion__  || appVersion;
+
+      if (!event.extra) {
+        event.extra = {};
+      }
+
+      if (!window.__gameDetails__) {
+        event.extra.gameId = gameId;
+        event.extra.game = '';
+        return event
+      }
+
+      event.extra.gameId = window.__gameDetails__.gameId || gameId
+      event.extra.game = window.__gameDetails__.game || ''
+      event.extra.userId = window.__userId__ || ''
+      return event;
+    };
+  </script>
+</head>
+
+<body>
+</body>
+
+</html>

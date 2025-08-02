@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Word Quest - Deploy Instructions</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .method {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 4px solid #667eea;
+        }
+        .code {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            overflow-x: auto;
+        }
+        .button {
+            background: #667eea;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            display: inline-block;
+            margin: 10px 5px;
+        }
+        .warning {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>🚀 Deploy Word Quest for Arkadium Sandbox</h1>
+    
+    <div class="warning">
+        <strong>⚠️ Issue:</strong> Arkadium sandbox can't access localhost URLs. You need to make your game publicly accessible.
+    </div>
+
+    <div class="method">
+        <h2>🌐 Method 1: Use ngrok (Recommended)</h2>
+        <p>Ngrok creates a secure tunnel to your localhost:</p>
+        
+        <h3>Quick Setup:</h3>
+        <div class="code">python expose_server.py</div>
+        
+        <h3>Manual Setup:</h3>
+        <ol>
+            <li>Install ngrok: <a href="https://ngrok.com/download" target="_blank">https://ngrok.com/download</a></li>
+            <li>Run your local server: <code>python start_server.py</code></li>
+            <li>In another terminal: <code>ngrok http 8000</code></li>
+            <li>Copy the https URL (e.g., https://abc123.ngrok.io)</li>
+            <li>Use that URL in Arkadium sandbox</li>
+        </ol>
+    </div>
+
+    <div class="method">
+        <h2>📁 Method 2: GitHub Pages (Free)</h2>
+        <p>Deploy your game to GitHub Pages for permanent hosting:</p>
+        
+        <ol>
+            <li>Create a new GitHub repository</li>
+            <li>Upload all your game files (index.html, game.js, words.js, style.css)</li>
+            <li>Go to Settings → Pages</li>
+            <li>Select "Deploy from a branch" → main</li>
+            <li>Your game will be at: https://yourusername.github.io/repository-name</li>
+        </ol>
+        
+        <a href="https://github.com/new" class="button" target="_blank">Create GitHub Repo</a>
+    </div>
+
+    <div class="method">
+        <h2>⚡ Method 3: Netlify Drop (Easiest)</h2>
+        <p>Drag and drop deployment:</p>
+        
+        <ol>
+            <li>Go to <a href="https://app.netlify.com/drop" target="_blank">Netlify Drop</a></li>
+            <li>Drag your game folder to the drop zone</li>
+            <li>Get instant public URL</li>
+            <li>Use that URL in Arkadium sandbox</li>
+        </ol>
+        
+        <a href="https://app.netlify.com/drop" class="button" target="_blank">Open Netlify Drop</a>
+    </div>
+
+    <div class="method">
+        <h2>🔧 Method 4: Local Network Access</h2>
+        <p>If you're on the same network as the Arkadium sandbox:</p>
+        
+        <ol>
+            <li>Find your local IP: <code>ipconfig</code> (Windows) or <code>ifconfig</code> (Mac/Linux)</li>
+            <li>Start server: <code>python start_server.py</code></li>
+            <li>Use: http://YOUR_LOCAL_IP:8000</li>
+        </ol>
+        
+        <div class="code">
+# Windows
+ipconfig | findstr IPv4
+
+# Mac/Linux  
+ifconfig | grep inet
+        </div>
+    </div>
+
+    <div class="method">
+        <h2>🎯 Testing with Arkadium Sandbox</h2>
+        <p>Once you have a public URL:</p>
+        
+        <ol>
+            <li>Go to: <a href="https://arkadiumsdk.z19.web.core.windows.net/sandbox" target="_blank">Arkadium Sandbox</a></li>
+            <li>Enter your public URL</li>
+            <li>Click "Load Game"</li>
+            <li>Test SDK integration features</li>
+        </ol>
+        
+        <a href="https://arkadiumsdk.z19.web.core.windows.net/sandbox" class="button" target="_blank">Open Arkadium Sandbox</a>
+    </div>
+
+    <div class="warning">
+        <strong>💡 Pro Tip:</strong> The <code>expose_server.py</code> script will automatically handle ngrok setup and open both your local game and the Arkadium sandbox for easy testing!
+    </div>
+</body>
+</html>

@@ -1,0 +1,74 @@
+
+<div ow-slider="slides" scroll-pause-element="dvScrollWrapper" ow-slider-interval="9000">
+    <div class="top-blur">
+        <img src="" class="active"><img src="">
+    </div>
+    <div class="top-blur-dimmer" ow-dimming></div>
+    <div class="bg-slide" ng-repeat="slide in owSlider.slides track by $index" ow-slide ow-slide-data="slide"
+         ow-slide-active="slide.active" ng-show="slide.active"></div>
+    <div class="bg-slide-dimming" ow-dimming="250"></div>
+    <div id="slider-container" ng-class="hoverClass">
+        <a href="#" class="slider-nav-arrow prev" ng-click="owSlider.prev($event)"
+           ng-mouseenter="owSlider.stopAutoRotate()" ng-mouseleave="owSlider.startAutoRotate()"><i>&#xe60b;</i></a>
+        <a href="#" class="slider-nav-arrow next" ng-click="owSlider.next($event)"
+           ng-mouseenter="owSlider.stopAutoRotate()" ng-mouseleave="owSlider.startAutoRotate()"><i>&#xe608;</i></a>
+
+        <div class="container">
+            <div class="slide" ng-repeat="slide in owSlider.slides track by $index" ng-show="slide.active">
+
+                                    <span class="logo-container" ng-mouseenter="owSlider.stopAutoRotate();"
+                                          ng-mouseleave="owSlider.startAutoRotate();">
+                                        <img class="logo" ng-src="{{ slide.logo }}"/>
+                                        <div class="slide-info" ow-modal-trigger="{{$root.serverBase + slide.link}}" ow-modal-trigger-container="app" ng-mouseenter="$parent.$parent.hoverClass='hide-nav'"
+                                             ng-mouseleave="$parent.$parent.hoverClass=''">
+
+                                            <aside>
+
+                                                <!--  <div class="overlay" style="background: url({{slide.blurredImg}}) no-repeat top 0 right -50%; background-attachment: fixed; background-position-x: 50%; "></div> -->
+
+                                                <div class="bg" style="background-image: url({{slide.blurredImg}});"></div>
+                                                <div class="overlay"></div>
+                                                <h6>
+                                                    <span class="tile-thumb">
+                                                        <img ng-src="{{ slide.tileIcon }}"/>
+                                                    </span>
+                                                    <span class="app-title">{{slide.title}}</span>
+                                                    <div class="app-description">
+                                                        <p>{{slide.description}}</p>
+                                                    </div>
+
+                                                </h6>
+
+                                                <a class="btn-slide-info" ng-style="slide.buttonStyle"
+                                                   ng-click="owSlider.trackCarouselClick(slide)"
+                                                   ng-class="slide.style"
+                                                   ow-modal-trigger="{{$root.serverBase + slide.link}}"
+                                                   ow-modal-trigger-container="app">{{$parent.$parent.$parent.$parent.getText || translate}}
+                                                    <!-- <i class="icon-ui_link-arrow"></i> -->
+                                                </a>
+
+                                            </aside>
+
+
+                                        </div>
+
+
+
+                                    </span>
+                <!--  <a class="btn-carousel" ng-style="slide.buttonStyle"
+                    ng-click="owSlider.trackCarouselClick(slide.link)"
+                    ng-class="slide.style" ng-mouseenter="owSlider.stopAutoRotate()"
+                    ng-mouseleave="owSlider.startAutoRotate()"
+                    ow-modal-trigger="{{$root.serverBase + slide.link}}"
+                    ow-modal-trigger-container="app"></a> -->
+            </div>
+        </div>
+
+        <ul class="slider-nav-circles" ng-mouseenter="owSlider.stopAutoRotate()"
+            ng-mouseleave="owSlider.startAutoRotate()">
+            <li ng-repeat="slide in owSlider.slides track by $index" ng-class="{'current': slide.active}"
+                ng-click="owSlider.select(slide)"></li>
+        </ul>
+    </div>
+
+</div>

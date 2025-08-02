@@ -1,0 +1,460 @@
+<div class="lightbox-wrap" ng-click="owModal.close($event)">
+    <div class="block" ng-click="owModal.close($event)">
+        <!-- app IDs for testing:
+            kpaejaacomnkenpbmclnglmblpmfiapjlebhpcom
+            flkgdpkkjcoapbgmgpidhepajgkhckpgpibmlclb
+        -->
+      <section class="modal-page app-page ng-scope above-the-fold-hide"
+               ow-tabs=""
+               ng-init="app.setApp('flkgdpkkjcoapbgmgpidhepajgkhckpgpibmlclb')">
+
+  <header>
+      <span class="app-thumb" >
+        <img src="http://store2cdn1-overwolf-com.akamaized.net/.galleries/app-icons/game-summary-Icon.png"
+                       alt="Game Summary"
+                       title="Game Summary" />
+        </span>
+
+      <h2 >Game Summary</h2>
+
+      <button class="modal-page-control close" ng-click="onClickClose($event)" ng-if="$root.iteration && $root.iteration > 117">
+          <svg class="icon">
+              <use xlink:href=".content/assets/svg/sprite.svg#window-control_close" />
+          </svg>
+      </button>
+
+      <ul>
+        <li>From&nbsp;Overwolf</li>
+        <li class="ng-hide" ng-hide="app.curApp.totalNumOfReviews || !$root.supportedFeatures.reviews">
+          Fetching score...</li>
+        <li ng-show="app.curApp.totalNumOfReviews && $root.supportedFeatures.reviews"
+            ng-cloak>
+            <span class="rating"
+                  ng-class="'rating-' + app.curApp.reviewScoreForCssClass"
+                  ng-click="owTabs.panes[1].select($event)">
+                <i></i>
+                <i></i>
+                <i></i>
+                <i></i>
+                <i></i>
+            </span>
+            ({{app.curApp.totalNumOfReviews | number}})
+        </li>
+        <li id="downloads-count">
+              <span ng-hide="app.curApp.totalDownloads"> Fetching downloads...</span>
+              <span ng-show="app.curApp.totalDownloads" class="ng-hide"> {{app.curApp.totalDownloads }} Downloads</span>
+          </li>
+      </ul>
+      <ul class="indications-list" ng-if="$root.iteration && $root.iteration >= 155">
+          <li>Free</li>
+          <li>Contains ads</li>
+          <li>Subscription available</li> <!--<a href="#">Subscription available</a>-->
+      </ul>
+
+        <span class="app-controls web-only">
+            <a class="btn-standard" target="dlIframe" href="//download.overwolf.com/install/Download?Name=Game+Summary&ExtensionId=flkgdpkkjcoapbgmgpidhepajgkhckpgpibmlclb&Channel=website" ng-click="app.webAppInstall('flkgdpkkjcoapbgmgpidhepajgkhckpgpibmlclb', 'Game Summary')">Download</a>
+      </span>
+      <span class="app-controls client-only">
+      <div class="app-modal-btn-settings" ng-show="app.uninstallApp && !app.curApp.installError && !app.curApp.isInstalling && !app.curApp.isUninstalling && app.curApp.isInstalled">
+           <i class="icon-ui_settings"></i>
+
+           <div class="app-modal-dropdown">
+             <ul>
+               <li ng-click="$root.$broadcast('openOverlaySettings', {'UID': app.curApp.UID});" ng-show="$root.overlaySettingsSupported"><a>Overlay settings</a></li>
+               <li ng-click="app.manageSubscriptions()" ng-show="app.subscription.activeSubscription && !app.curApp.isUninstalling"><a>Manage subscriptions</a></li>
+
+               <li class="divi" ng-show="$root.overlaySettingsSupported"></li>
+
+               <li ng-click="app.removeAppFromDock()" ng-show="app.curApp.IsCurrentlyInDock"><a>Remove dock shortcut</a></li>
+               <li ng-click="app.addAppToDock()" ng-show="!app.curApp.IsCurrentlyInDock"><a>Add dock shortcut</a></li>
+
+               <li ng-click="app.removeDesktopShortcut()" ng-show="app.desktopShortCutSupported && app.desktopShortCutSupported() && app.hasDesktopShortcuts()"><a>Remove desktop shortcut</a></li>
+               <li ng-click="app.addDesktopShortcut()" ng-show="app.desktopShortCutSupported && app.desktopShortCutSupported() && !app.hasDesktopShortcuts()"><a>Add desktop shortcut</a></li>
+
+               <li class="divi"></li>
+
+               <li ng-click="app.uninstallApp()"><a>Uninstall</a></li>
+             </ul>
+           </div>
+        </div>
+
+        <span ng-if="app.subscription && app.curApp.isInstalled">
+            <a ng-if="!app.subscription.activeSubscription && !app.curApp.isUninstalling"
+                   class="btn-subscription" ng-click="app.openSubscriptionPage()">
+                <svg class="subscription-icon"><use xlink:href=".content/assets/svg/sprite.svg#subscription-icon" /></svg>
+                <span>Subscribe</span>
+            </a>
+            <a ng-if="app.subscription.activeSubscription && !app.curApp.isUninstalling"
+               class="btn-subscription subscribed" ng-click="app.openSubscriptionPage()">
+                <svg class="subscription-icon"><use xlink:href=".content/assets/svg/sprite.svg#subscription-icon" /></svg>
+                <span>Subscribed</span>
+            </a>
+        </span>
+
+
+        <a class="btn-standard" ng-show="!app.curApp.installError && !app.curApp.isInstalling && !app.curApp.isUninstalling && app.curApp.isInstalled" ng-click="app.launchApp($event)">Launch</a>
+        <a class="btn-standard" ng-show="!app.curApp.installError && app.curApp.isInstalling" >Installing</a>
+        <a class="btn-standard" ng-show="!app.curApp.installError && app.curApp.isInstalled && app.curApp.isUninstalling" >Removing</a>
+        <a ng-click="app.resetInstallError()" class="btn-standard ng-hide" ng-show='app.curApp.installError'>Error<i class="icon-window-controls_close"></i></a>
+        <a class="btn-standard" ng-hide="app.curApp.installError || app.curApp.isInstalling || app.curApp.isInstalled" ng-click="app.installApp($event)">Install</a>
+      </span>
+
+    </header>
+
+    <nav>
+        <ul>
+            <li>
+                <a ng-class="{'active': owTabs.panes[0].selected}"
+                   ng-click="owTabs.panes[0].select($event)">Overview
+                </a>
+            </li>
+            <li ow-dropdown
+                ow-trigger-action="hover"
+                ng-show="$root.supportedFeatures.reviews">
+                <a ng-class="{'active': owTabs.panes[1].selected}"
+                   ng-click="owTabs.panes[1].select($event)">Reviews
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+  <script>window.loadedOneAppPageCategory = "/browse-by-game/"</script>
+  <div class="app-page-inner">
+          <article id="app-overview"
+                   ow-pane="Overview"
+                   ow-pane-style="icon-app-page_overview"
+                   class="active">
+
+                <div class="app-overview ow-slider-animation-next">
+  <!--{ vimeoId : '385932102', autoplay: true },  -->
+    <div ow-slider="[
+    { youtubeId : '7iPyz6Yqwl4', autoplay: true },
+    { img: 'https://store2cdn5-overwolf-com.akamaized.net/.galleries/app-screenshots/gearupScreenshot1.jpg' },
+    { img: 'https://store2cdn1-overwolf-com.akamaized.net/.galleries/app-screenshots/gearupScreenshot2.jpg' },
+    { img: 'https://store2cdn2-overwolf-com.akamaized.net/.galleries/app-screenshots/gearupScreenshot3.jpg' },
+    { img: 'https://store2cdn3-overwolf-com.akamaized.net/.galleries/app-screenshots/gearupScreenshot4.jpg' },
+    { img: 'https://store2cdn4-overwolf-com.akamaized.net/.galleries/app-screenshots/gearupScreenshot5.jpg' },
+    ]" slider-ready="onSliderReady"
+         ng-if="!appModalScope || appModalScope.showSmallSlide"
+    >
+
+    <div class="app-slider">
+      <a href="#" class="slider-nav-arrow prev" ng-click="owSlider.prev($event)"
+         ng-mouseenter="owSlider.stopAutoRotate()" ng-mouseleave="owSlider.startAutoRotate()"><i>
+          &#xe60b;</i></a>
+      <a href="#" class="slider-nav-arrow next" ng-click="owSlider.next($event)"
+         ng-mouseenter="owSlider.stopAutoRotate()" ng-mouseleave="owSlider.startAutoRotate()"><i>
+          &#xe608;</i></a>
+
+      <div class="container">
+        <div class="slide" ng-repeat="slide in owSlider.slides track by $index" ow-slide=""
+             ow-slide-data="slide" ow-slide-active="slide.active"
+             ng-show="slide.active">
+        </div>
+      </div>
+
+      <button class="resize-slider"
+              ng-if="$root.appModalScope"
+              ng-click="owSlider.showBigSlider($event)">
+        <svg class="icon">
+            <use xlink:href=".content/assets/svg/sprite.svg#resize-big" />
+        </svg>
+      </button>
+
+      <ul class="slider-nav-circles" ng-mouseenter="owSlider.stopAutoRotate()"
+          ng-mouseleave="owSlider.startAutoRotate()">
+        <li ng-repeat="slide in owSlider.slides track by $index" ng-class="{'current': slide.active}"
+            ng-click="owSlider.select(slide)"></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="app-text ps-container ps-active-y" ow-scrollbar>
+      <div class="ow-scrollbar-content" >
+        <h3>Home of your highlights and in-game analytics</h3>
+  <p>The wait is over! <strong>Apex Legends</strong> is here. Get Game Summary - your one stop shop for game highlights and post-game analytics!</p>
+  <p>The app tracks your games, and presents you with automatic and manual captured highlights ready to be shared. The app will even tell you about awesome events and competitions you can join.</p>
+  <p>Beyond highlights, Game Summary offers you a slew of useful analytics and in-game stats to research and explore - from actions per minute (APM), through Kill/Death ratio, to relative performance, you can learn how to improve your game easily and quickly using the Game Summary app.</p>
+  <p>This is just the beginning, and Game Summary is being upgraded with new features and more advanced analytics constantly - there is plenty to look forward to!</p>
+  <p><br />The Overwolf Game Summary supports the following games:</p>
+  <ul>
+  <li>League of Legends</li>
+  <li>CS:GO</li>
+  <li>Apex Legends</li>
+  <li>Hearthstone</li>
+  <li>Fortnite</li>
+  <li>PUBG</li>
+  <li>Dota 2</li>
+  <li>Rainbow 6 Siege</li>
+  <li>World of Tanks</li>
+  <li>World of Warships</li>
+  <li>Splitgate</li>
+  <li>Rocket League</li>
+  </ul>
+  <p>We’d like to hear from you - we’ve opened a brand new shiny <a href="https://discord.gg/qA3hBKz" target="_blank">Discord channel</a> for Game Summary support, questions, and disco parties, stop by and say hello :)</p></div>
+
+      <div class="ps-scrollbar-x-rail"
+           style="width: 270px;
+                  display: none;
+                  left: 0px;
+                  bottom: 0px;">
+        <div class="ps-scrollbar-x" style="left: 0px; width: 0px;"></div>
+      </div>
+      <div class="ps-scrollbar-y-rail"
+           style="top: 0px;
+                  height: 320px;
+                  display: inherit;
+                  right: 0px;">
+        <div class="ps-scrollbar-y" style="top: 0px; height: 295px;"></div>
+      </div>
+    </div>
+    </div>
+  </article>
+
+          <!-- REVIEW -->
+
+  <article id="app-review" ow-pane="Review" ow-pane-style="icon-app-page_review" ow-pane-visible="!app.curApp.isInstalled"
+           class="app-review">
+      <h3 ng-show="app.curApp.isInstalled">
+          User reviews
+      </h3>
+
+      <div class="scroll-wrap" ow-scrollbar next-page-function="getNextReviewPage" next-page-distance="40" ow-scroll-columns-workaround>
+          <section class="user-reviews cf">
+              <article ng-repeat="review in $parent.app.curApp.reviews">
+                  <header class="cf">
+                      <span class="user-pic"><img ng-src="{{review.comment_author_url}}" alt="{{review.comment_author}}" onerror="this.src=`https:/\/avatar.overwolf.com/DefaultAvatarEnjoyWinning_m.jpg`;this.onerror='';"></span>
+                      <h5>{{review.comment_author}}</h5>
+                                  <span class="rating" ng-class="'rating-' + review.rate">
+                                      <i></i>
+                                      <i></i>
+                                      <i></i>
+                                      <i></i>
+                                      <i></i>
+                                  </span>
+                      <span class="date">{{review.comment_date}}</span>
+                  </header>
+                  <p ow-auto-read-more class="read-more" text="review.comment_content" length="180" class="wide">
+                      <!--<span ow-read-more-text>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean bibendum eros a ultricies tempus. Vestibulum nulla urnal.</span>-->
+                  </p>
+                  <a ow-read-more-trigger hidden>Read more</a>
+                  <div class="comment-response" ng-repeat="response in review.replies" ng-show="$root.repliesSupported">
+                    <h6>{{$root.author}}
+                      <span class="date">{{response.editedAt}}</span>
+                    </h6>
+                    <p ow-auto-read-more class="read-more" text="response.body">
+                    </p>
+                    <a ow-read-more-trigger hidden>Read more</a>
+                  </div>
+              </article>
+
+              <div class="no-reviews" ng-show="$parent.app.curApp.reviews.length <= 0">
+              <h1>No reviews yet...</h1>Secure your spot in heaven,<br /> be the first to rate this app!<br /><footer>(you must first install it)</footer></div>
+
+          </section>
+      </div>
+  </article>
+  <!--*************************************************************REVIEW ADD -->
+  <article id="app-review-add" ow-pane="Review" ow-pane-style="icon-app-page_review" ow-pane-visible="app.curApp.isInstalled"
+           class="app-review">
+
+      <div class="app-content-column app-review-add">
+          <!-- Add review -->
+          <div ng-show="app.editMode || !userService.isLoggedIn">
+              <div>
+                  <h3>Rate this app</h3> <h2 ng-show="!userService.isLoggedIn">| To rate this app please <a ng-click="openLoginPage()">log in</a></h2>
+              </div>
+
+
+                          <span class="rating rating-editable" ng-class="['rating-' + app.myReview.stars, !$parent.userService.isLoggedIn ? 'disabled' : '']" ow-rating="app.myReview.stars"
+                                ow-rating-hover="app.myReview.hover" ow-rating-editable="true" ng-disabled="">
+                              <i></i>
+                              <i></i>
+                              <i></i>
+                              <i></i>
+                              <i></i>
+                          </span>
+
+                          <span class="rating-word" ng-pluralize
+                                count="app.myReview.hover > 0 ? app.myReview.hover : app.myReview.stars" when="{
+                              '0': '',
+                              '1': 'A bag of nope',
+                              '2': 'Meh...',
+                              '3': 'It\'s decent',
+                              '4': 'OOh... shiny!',
+                              '5': 'Flawless victory',
+                              'other': '{} Skulls'
+                          }"></span>
+
+              <form>
+                  <div id="dvSupport" class="review-support" style="display: none;">
+                    <div id='appNameHidden' style='display:none;'>{{app.curApp.Name}}</div>
+                    <script>function getAppName() { return document.getElementById('appNameHidden').innerText; }</script>
+                    <span class="review-support__text">Having trouble? We've got your back!</span><br>Send us a quick <span class="review-support__link" onclick="OverwolfStore.openBugWindow(getAppName());">support request</span> and we'll help you out
+                    </div>
+                    <script>
+                      if(typeof OverwolfStore != 'undefined' && typeof OverwolfStore.openBugWindow == 'function')
+                      {
+                          $("#dvSupport").show();
+                      }
+                    </script>
+
+                  <textarea ng-disabled="!app.myReview.stars"
+                            placeholder="{{ app.myReview.stars ? 'Write a review (optional)' : 'To write a review, first rate this app' }}"
+                            ng-model="app.myReview.text"
+                            ng-class="{'unrated': !app.myReview.stars}"
+                          ></textarea>
+
+                  <div class="form-actions cf" ng-class="{'disabled': !app.myReview.stars, 'connecting': app.reviewSubmitInProgress}">
+
+                      <a class="btn-standard" ng-click="app.sendReview($event)">Publish</a>
+                      <a class="sub-action" ng-click="app.clearReview($event)">Cancel</a>
+                  </div>
+              </form>
+
+          </div>
+          <!-- Add review -->
+
+          <!-- View review -->
+          <div ng-show="!app.editMode && !app.deletedReview && userService.isLoggedIn">
+              <h3>My review</h3>
+                          <span class="rating" ow-rating="app.myReview.stars" ng-class="'rating-' + app.myReview.stars">
+                              <i></i>
+                              <i></i>
+                              <i></i>
+                              <i></i>
+                              <i></i>
+                          </span>
+                          <span class="rating-word" ng-pluralize count="app.myReview.stars" when="{
+                              '0': '',
+                              'one': '1 Skull',
+                              'other': '{} Skulls'
+                          }"></span>
+
+
+              <div ow-scrollbar class="own-review-scrollbar">
+                  <p class="with-newlines" ng-bind-html="$parent.app.myReview.safeText" ng-show="$parent.app.myReview.safeText"></p>
+                  <p class="with-newlines" ng-bind="$parent.app.myReview.text" ng-show="$parent.app.myReview.text.length && !$parent.app.myReview.safeText"></p>
+                      <!--
+                      Pretty dang fun. Maybe it's because I just suck and can't get any further... but it seems to be just one level.
+                      -->
+              </div>
+
+              <div class="form-actions cf" ng-class="{'form-actions-single': !app.myReview.text.length}">
+                  <a class="btn-standard" ng-click="app.editMyReview($event)">Edit</a>
+                  <a class="sub-action" ng-click="app.deleteMyReview($event)">Delete</a>
+              </div>
+          </div>
+          <!-- View review -->
+
+          <!-- Deleted review -->
+          <div ng-show="app.deletedReview">
+              <h3>My review</h3>
+
+              <p>
+                  Your review is about to be deleted. Are you sure?</p>
+
+              <div class="form-actions cf">
+                  <a class="btn-standard" ng-click="app.restoreMyReview($event)">Undo</a>
+                  <a class="sub-action" ng-click="app.forgetMyReview($event)">Delete</a>
+              </div>
+          </div>
+          <!-- Deleted review -->
+
+      </div>
+
+      <div class="app-content-column">
+          <h3>
+              User reviews
+          </h3>
+
+          <div class="no-reviews" ng-show="$parent.app.curApp.reviews.length <= 0">
+          <h1>No reviews yet...</h1>Secure your spot in heaven,<br /> be the first to rate this app!<br /><footer>(you must first install it)</footer></div>
+
+          <div class="scroll-wrap" ow-scrollbar next-page-function="getNextReviewPage" next-page-distance="40">
+              <section class="user-reviews cf">
+                  <article ng-repeat="review in $parent.app.curApp.reviews">
+                      <header clfass="cf">
+                          <span class="user-pic"><img ng-src="{{review.comment_author_url}}" alt="{{review.comment_author}}" onerror="this.src=`https:/\/avatar.overwolf.com/DefaultAvatarEnjoyWinning_m.jpg`;this.onerror='';"></span>
+                          <h5>{{review.comment_author}}</h5>
+                                  <span class="rating" ng-class="'rating-' + review.rate">
+                                      <i></i>
+                                      <i></i>
+                                      <i></i>
+                                      <i></i>
+                                      <i></i>
+                                  </span>
+                          <span class="date">{{review.comment_date}}</span>
+                      </header>
+                      <p ow-auto-read-more class="read-more" text="review.comment_content" length="180"></p>
+                      <a ow-read-more-trigger hidden>Read more</a>
+
+                        <div class="comment-response" ng-repeat="response in review.replies" ng-show="$root.repliesSupported">
+                          <h6>{{$root.author}}
+                            <span class="date">{{response.editedAt}}</span>
+                          </h6>
+                          <p ow-auto-read-more class="read-more" text="response.body">
+                          </p>
+                          <a ow-read-more-trigger hidden>Read more</a>
+                        </div>
+                  </article>
+
+              </section>
+          </div>
+      </div>
+  </article>
+  <!-- END REVIEW --></div>
+
+      </section>
+
+    </div>
+   </div>
+
+
+<!-- large slider popUp -->
+<div class="big-slider-bg"
+     ng-if="appModalScope && appModalScope.showLargeSlide"
+     ng-click="onClickCloseSliderPopUp($event)"></div>
+<div class="large-sizes-slider-popup app-page"
+     ng-if="appModalScope && appModalScope.showLargeSlide">
+    <div class="slider-popup-inner" ow-slider="[
+    { youtubeId : '7iPyz6Yqwl4', autoplay: true },
+    { img: 'https://store2cdn5-overwolf-com.akamaized.net/.galleries/app-screenshots/gearupScreenshot1.jpg' },
+    { img: 'https://store2cdn1-overwolf-com.akamaized.net/.galleries/app-screenshots/gearupScreenshot2.jpg' },
+    { img: 'https://store2cdn2-overwolf-com.akamaized.net/.galleries/app-screenshots/gearupScreenshot3.jpg' },
+    { img: 'https://store2cdn3-overwolf-com.akamaized.net/.galleries/app-screenshots/gearupScreenshot4.jpg' },
+    { img: 'https://store2cdn4-overwolf-com.akamaized.net/.galleries/app-screenshots/gearupScreenshot5.jpg' },
+]" slider-ready="onSliderReady">
+
+        <div class="app-slider">
+            <a href="#" class="slider-nav-arrow prev" ng-click="owSlider.prev($event)"
+            ng-mouseenter="owSlider.stopAutoRotate()" ng-mouseleave="owSlider.startAutoRotate()"><i>
+                &#xe60b;</i></a>
+            <a href="#" class="slider-nav-arrow next" ng-click="owSlider.next($event)"
+            ng-mouseenter="owSlider.stopAutoRotate()" ng-mouseleave="owSlider.startAutoRotate()"><i>
+                &#xe608;</i></a>
+
+            <div class="container">
+            <div class="slide" ng-repeat="slide in owSlider.slides track by $index" ow-slide=""
+                ow-slide-data="slide" ow-slide-active="slide.active"
+                ng-show="slide.active">
+            </div>
+            </div>
+
+            <button class="resize-slider"  ng-click="owSlider.hideBigSlider($event)">
+                <svg class="icon">
+                    <use xlink:href=".content/assets/svg/sprite.svg#resize-small" />
+                </svg>
+            </button>
+
+            <ul class="slider-nav-circles" ng-mouseenter="owSlider.stopAutoRotate()"
+                ng-mouseleave="owSlider.startAutoRotate()">
+            <li ng-repeat="slide in owSlider.slides track by $index" ng-class="{'current': slide.active}"
+                ng-click="owSlider.select(slide)"></li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+
+

@@ -1,0 +1,266 @@
+<section id="main-content-wide" class="starting-background" ng-class="{'main-content-library-settings': mode == 'games' || mode == 'scan' || mode =='scan-error'}" ng-hide="$root.splashShowing">
+
+    <div class="store-03-css">
+        <section class="appstore-shelf" ng-class="{'library-settings-header': mode == 'games' || mode == 'scan' || mode =='scan-error'}" ng-hide="mode=='loading'">
+
+            <!-- main header nav -->
+            <header class="appstore-shelf-sub-section library-header">
+                <ul class="tab-selector" ow-menu="horizontal">
+                    <li ow-menu-item select-on-click ow-menu-item-id="library_apps">
+                        <a ng-click="setMode('apps')">{{'apps' | translate}}</a>
+                    </li>
+                    <li ow-menu-item select-on-click ow-menu-item-id="library_skins">
+                        <a ng-click="setMode('skins')">{{'skins' | translate}}</a>
+                    </li>
+                </ul>
+                
+                <div class="sort-dropdown-wrapper" ng-show="mode =='apps'">
+                    <h4>{{'show' | translate}}</h4>
+
+                    <div class="sort-dropdown" ow-select="installFilter">
+                        <span class="sort-dropdown-selected-item">
+                            <span ng-bind="owSelect.name"></span>
+                            <i>
+                                <svg class="svg-icon-fill">
+                                    <use xlink:href=".content/assets/svg/sprite.svg#bottom-arrow-indicator" />
+                                </svg>
+                            </i>
+                        </span>
+                        <ul>
+                            <li ow-select-option="">{{'all' | translate}}</li>
+                            <li ow-select-option="Installed">{{'installed' | translate}}</li>
+                            <li ow-select-option="removed">{{'uninstalled' | translate}}</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="sort-dropdown-wrapper" ng-show="mode =='skins'">
+                    <h4>{{'show' | translate}}</h4>
+
+                    <div class="sort-dropdown" ow-select="skinInstallFilter">
+                        <span class="sort-dropdown-selected-item">
+                            <span ng-bind="owSelect.name"></span>
+                            <i>
+                                <svg class="svg-icon-fill">
+                                    <use xlink:href=".content/assets/svg/sprite.svg#bottom-arrow-indicator" />
+                                </svg>
+                            </i>
+                        </span>
+                        <ul>
+                            <li ow-select-option="">{{'all' | translate}}</li>
+                            <li ow-select-option="Installed">{{'installed' | translate}}</li>
+                            <li ow-select-option="removed">{{'uninstalled' | translate}}</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="sort-dropdown-wrapper ng-hide" ng-show="(mode =='games' || mode=='scan-error') && userService.isLoggedIn">
+                    <h4>{{'sort' | translate}}</h4>
+
+                    <div class="sort-dropdown" ow-select="gamesSort">
+                        <span class="sort-dropdown-selected-item">
+                            <span ng-bind="owSelect.name"></span>
+                            <i>
+                                <svg class="svg-icon-fill">
+                                    <use xlink:href=".content/assets/svg/sprite.svg#bottom-arrow-indicator" />
+                                </svg>
+                            </i>
+                        </span>
+                        <ul>
+                            <li ow-select-option="GameName">{{'name' | translate}}</li>
+                            <li ow-select-option="LastPlayed">{{'recently played' | translate}}</li>
+                            <li ow-select-option="TotalTimeInSeconds">{{'most played' | translate}}</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <a href="/skins"
+                   class="btn get-more-skins"
+                   ng-show="mode == 'skins'"
+                   ow-internal-link
+                   ng-click="$root.$broadcast('owSelectMenuItem', 'store'); $root.$broadcast('owSelectMenuItemByHref', '/skins');">
+                    <span>{{'get more skins' | translate}}</span>
+                </a>
+            </header>
+
+            <!-- searh bar -->
+            <!--<section class="search-section" ng-class="mode=='scan-error' ? 'disabled' : ''" ng-show="mode !=='games'"> &lt;!&ndash; demo: hide search for games - gai &ndash;&gt;-->
+            <section class="search-section" ng-show="mode !=='games' && mode !=='scan'">
+                <i>
+                    <svg class="svg-icon-fill">
+                        <use xlink:href=".content/assets/svg/sprite.svg#search-big" />
+                    </svg>
+                </i>
+                <input class="search-bar" type="search" placeholder="{{'search your' | translate }} {{displayMode | translate:'plaintext' | lowercase}}" ng-model="search">
+            </section>
+        </section>
+    </div>
+
+    <!-- apps section -->
+    <section class="library-tiles" ng-show="mode == 'apps'">
+        <div class="no-result" ng-show="filteredApps.length <=0 ">
+            <img src="images/global/no_results.png" style="margin-left: 50px;">
+            <span>{{'sorry no results' | translate}}</span>
+        </div>
+
+        <article class="shorter" ng-repeat="app in filteredApps = ( getApps() | filter:{InstallState: installFilter} | filter:{Name: search} | filter: filterUninstalledUnpackedApps)">
+            <h6>
+                <span class="tile-thumb">
+                    <img ng-src="overwolf://store-resources/app/{{app.UID}}/icon"
+                         alt="{{app.Name}} logo"
+                         width="55"
+                         height="55">
+                </span>
+                {{app.Name}}
+                <span class="meta">
+                    <a>Ver {{app.Version}}</a>
+                </span>
+            </h6>
+
+            <div class="bottom-elements">
+                <span class="tile-controls">
+                    <a class="btn-standard" ng-show="app.InstallState == 'Installed'"
+                       ng-click="launchApp(app.UID)">{{'launch' | translate}}</a>
+                    <a class="btn-standard reinstall" ng-show="app.InstallState == 'Removed'"
+                       ng-click="installApp(app.UID)"><i class="icon-ui_reinstall"></i></a>
+                </span>
+            </div>
+
+            <!-- new settings dropdown -->
+            <div class="settings store-03-css">
+                <i class="store-03-tooltip-container-clickble" ow-dropdown ng-click="owDropdown.containerClick($event)">
+                    <svg class="svg-icon-fill">
+                        <use xlink:href=".content/assets/svg/sprite.svg#window-control_settings" />
+                    </svg>
+                    <div class="store-03-tooltip store-03-tooltip-large bottom">
+                        <ul>
+                            <!-- overlay settings -->
+                            <li ng-click="appOverlaySettingsClick(app)" ng-show="app.InstallState === 'Installed'"><a>{{'overlay settings' | translate}}</a></li>
+                            <li ng-click="openOneAppPage(app.UID)"" ng-show="app.InstallState === 'Installed'"><a>{{'View in Appstore' | translate}}</a></li>
+
+                            <!-- dock -->
+                            <li class="divided" ng-click="removeAppFromDock(app.UID)" ng-show="app.InstallState == 'Installed' && app.IsCurrentlyInDock"><a>{{'remove from dock' | translate}}</a></li>
+                            <li class="divided" ng-click="addAppToDock(app.UID)" ng-show="app.InstallState == 'Installed' && !app.IsCurrentlyInDock"><a>{{'add to dock' | translate}}</a></li>
+
+                            <!-- desktop -->
+                            <li ng-click="addDesktopShortcutForApp(app.UID)" ng-show="desktopShortCutSupported(app) && !hasDesktopShortcuts(app)"><a>{{'add desktop shortcuts' | translate}}</a></li>
+                            <li ng-click="removeDesktopShortcutForApp(app.UID)"ng-show="desktopShortCutSupported(app) && hasDesktopShortcuts(app)"><a>{{'remove desktop shortcuts' | translate}}</a></li>
+
+                            <!-- install -->
+                            <li ng-click="installApp(app.UID)" ng-show="app.InstallState == 'Removed'"><a>{{'install' | translate}}</a></li>
+                            <li class="divided" ng-click="uninstallApp(app.UID)" ng-show="app.InstallState == 'Installed'"><a>{{'uninstall' | translate}}</a></li>
+                        </ul>
+                        <svg class="store-03-tooltip-arrow">
+                            <use xlink:href=".content/assets/svg/sprite.svg#tooltip-arrow" />
+                        </svg>
+                    </div>
+                </i>
+            </div>
+        </article>
+    </section>
+    
+    <!-- skins section -->
+    <section class="library-tiles" ng-show="mode == 'skins'" ng-mouseleave="previewSkin = selectedSkin">
+        <div class="no-result" ng-show="filteredSkins.length <= 0">
+            <img src="images/global/no_results.png" style="margin-left: 50px;">
+            <span>{{'sorry no results' | translate}}</span>
+        </div>
+            <article ng-repeat="skin in filteredSkins = (getSkins()  | filter:{InstallState: skinInstallFilter} | filter:{Name: search})" class="shorter skin"
+                     ng-class="{'selected': skin.IsActive, 'selecting': skin.isSelecting, 'installed': skin.InstallState == 'Installed', 'uninstalled': skin.InstallState == 'Removed'}"
+                     ng-click="$parent.launchSkin(skin.UID)" ng-mouseenter="$parent.setPreviewSkin(skin.UID)">
+                <h6>
+                    <span class="tile-thumb">
+                        <img ng-src="overwolf://store-resources/skin/{{skin.UID}}/icon" alt="{{skin.Name}} logo" width="55" height="55">
+                    </span>
+                    {{skin.Name}}
+                    <span class="meta">
+                        <span class="skin-elements">
+                            <i ng-show="skin.Components.HasDock" class="icon-skin_dock"></i>
+                            <i ng-show="skin.Components.HasFps" class="icon-skin_fps"></i>
+                            <i ng-show="skin.Components.HasCursors" class="icon-skin_cursors"></i>
+                            <i ng-show="skin.Components.HasSounds" class="icon-skin_sounds"></i>
+                            <i ng-show="skin.Components.HasWindows" class="icon-skin_windows"></i>
+                            <div class="vertical-ruler"></div>
+                        </span>
+                        <a>Ver {{skin.Version}}</a>
+                    </span>
+                </h6>
+
+                <div class="bottom-elements">
+                    <span class="tile-controls">
+                        <a class="btn-standard reinstall" ng-show="skin.InstallState == 'Removed'"
+                           ng-click="$parent.installSkin(skin.UID)"><i class="icon-ui_reinstall"></i></a>
+                    </span>
+                </div>
+
+                <div class="settings store-03-css">
+                    <i class="store-03-tooltip-container-clickble"
+                       ow-dropdown
+                       ng-click="owDropdown.containerClick($event)">
+                        <svg class="svg-icon-fill">
+                            <use xlink:href=".content/assets/svg/sprite.svg#window-control_settings" />
+                        </svg>
+                        <div class="store-03-tooltip store-03-tooltip-large bottom">
+                            <ul>
+                                <li ng-click="$parent.$parent.uninstallSkin(skin.UID)" ng-show="skin.InstallState == 'Installed'" ng-class="{'disabled' : skin.Name == 'Default'}"><a>{{'uninstall' | translate}}</a></li>
+                                <li ng-click="$parent.installSkin(skin.UID)" ng-show="skin.InstallState == 'Removed'"><a>Install</a></li>
+                            </ul>
+                            <svg class="store-03-tooltip-arrow">
+                                <use xlink:href=".content/assets/svg/sprite.svg#tooltip-arrow" />
+                            </svg>
+                        </div>
+                    </i>
+                </div>
+            </article>
+
+        <div class="skin-preview">
+            <header> {{previewSkin.Name}} | {{'skin elements' | translate}}</header>
+            <section>
+                <div class="skin-element-container">
+                    <div class="skin-image">
+                        <img ng-src="overwolf://store-resources/skin/{{previewSkin.UID}}/preview/dock">
+                    </div>
+                    <span class="skin-element">{{'dock' | translate}}</span>
+                    <span class="skin-name">({{previewSkin.Name}})</span>
+                </div>
+                <div class="skin-element-container">
+                    <div class="skin-image">
+                        <img ng-src="overwolf://store-resources/skin/{{previewSkin.UID}}/preview/windows">
+                    </div>
+                    <span class="skin-element">{{'windows' | translate}}</span>
+                    <span class="skin-name">({{'default' | translate}})</span>
+                </div>
+                <div class="skin-element-container">
+                    <div class="skin-image fps">
+                        <img ng-src="overwolf://store-resources/skin/{{previewSkin.UID}}/preview/fps">
+                        </div>
+                    <span class="skin-element">{{'fps' | translate}}</span>
+                    <span class="skin-name">({{previewSkin.Name}})</span>
+                </div>
+                <div class="skin-element-container">
+                    <div class="skin-image">
+                        <img ng-src="overwolf://store-resources/skin/{{previewSkin.UID}}/preview/cursors">
+                    </div>
+                    <span class="skin-element">{{'cursors' | translate}}</span>
+                    <span class="skin-name">({{previewSkin.Name}})</span>
+                </div>
+                <div class="skin-element-container">
+                    <a href="overwolf://settings/sound">
+                        <div class="skin-image">
+                            <img ng-src="overwolf://store-resources/skin/{{previewSkin.UID}}/preview/sounds">
+                        </div>
+                        <span class="skin-element">{{'sound' | translate}}</span>
+                        <span class="skin-name">({{previewSkin.Name}})</span>
+                    </a>
+                </div>
+                <div class="skin-element-container">
+                    <div class="skin-image">
+                        <img ng-src="overwolf://store-resources/skin/{{previewSkin.UID}}/preview/games">
+                    </div>
+                    <span class="skin-element">{{'games' | translate}}</span>
+                    <span class="skin-name">({{'coming soon' | translate}})</span>
+                </div>
+            </section>
+        </div>
+    </section>
+</section>

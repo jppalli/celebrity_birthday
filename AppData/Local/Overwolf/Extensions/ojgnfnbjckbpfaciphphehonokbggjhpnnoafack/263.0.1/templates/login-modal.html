@@ -1,0 +1,381 @@
+<div class="lightbox-wrap" ng-class="splashShowing ? 'transparent' : ''"
+      ng-click="owModal.closeIfNotStrict($event)">
+    <div class="block">
+        <section class="modal-page login-page" ng-keydown="keyPress($event)">
+
+            <div id="state_login"
+                 ng-if="state !== 'verification'"
+            >
+                <div id="login-background"
+                     ng-class="{'collapsed': !active}"
+                >
+                    <video src="/.content/assets/videos/gate_open_loop.webm" muted loop>
+                    </video>
+                    <video src="/.content/assets/videos/gate_open.webm" autoplay muted
+                      onended="this.previousElementSibling.play(); this.remove();">
+                    </video>
+                </div>
+
+                <!-- login modal -->
+                <div class="login-box"
+                     ng-class="{'collapsed': !active || state === 'suspended'}"
+                >
+                    <div class="header">
+                        <!-- title -->
+                        <div class="main-title-container">
+                            <h1 id="title-login"
+                                ng-if="source !== 'user'"
+                                ng-class="{'collapsed': state !== 'login'}">
+                                {{'log in title app' | translate}}
+                            </h1>
+
+                            <h1 id="title-login" class="not-app-state"
+                                ng-if="source === 'user'"
+                                ng-class="{'collapsed': state !== 'login'}">
+                                {{'log in title other' | translate}}
+                            </h1>
+
+                            <h1 id="title-register"
+                                ng-class="{'collapsed': state !== 'signup'}">{{'create an account title' | translate}}
+                            </h1>
+                        </div>
+
+                        <!-- subtitle -->
+                        <p class="subtitle"
+                           ng-if="source !== 'user'"
+                           ng-class="{'collapsed': state !== 'login'}"
+                           >{{'log in subtitle app' | translate}}</p>
+                    </div>
+
+                    <!-- login container -->
+                    <div class="login-register-social"
+                         ng-class="{'disabled': Login.IsInProgress || Signup.IsInProgress || openState === 'change-password', 'app-state-register': source === 'user', 'create-account': state !== 'login'}"
+                    >
+                        <!-- social logins -->
+                        <div class="login-services"
+                             ng-class="{'collapsed': state !== 'login'}"
+                        >
+                            <button class="login-service-google"
+                                    ng-click="onClickSocialLogin('Google')"
+                            >
+                                <div class="login-service-icon">
+                                    <svg><use xlink:href=".content/assets/svg/sprite.svg#login-social-google" /></svg>
+                                </div>
+                                {{'log in Google' | translate}}
+                            </button>
+                            <!-- <button class="login-service-facebook"
+                                    ng-click="onClickSocialLogin('Facebook')"
+                            >
+                                <div class="login-service-icon">
+                                    <svg><use xlink:href=".content/assets/svg/sprite.svg#login-social-facebook" /></svg>
+                                </div>
+                                {{'log in Facebook' | translate}}
+                            </button> -->
+                            <button class="login-service-discord"
+                                    ng-click="onClickSocialLogin('Discord')"
+                            >
+                                <div class="login-service-icon">
+                                    <svg><use xlink:href=".content/assets/svg/sprite.svg#login-social-discord" /></svg>
+                                </div>
+                                {{'log in Discord' | translate}}
+                            </button>
+                            <button class="login-service-twitch"
+                              ng-click="onClickSocialLogin('Twitch')">
+                              <div class="login-service-icon">
+                                <svg>
+                                  <use xlink:href=".content/assets/svg/sprite.svg#login-social-twitch" />
+                                </svg>
+                              </div>
+                              {{'log in Twitch' | translate}}
+                            </button>
+                        </div>
+                        <div class="or"
+                             ng-class="{'collapsed': state !== 'login'}"
+                        >
+                            {{'or' | translate}}
+                        </div>
+                    </div>
+
+                    <!-- login with overwolf -->
+                    <form class="login-register-direct" novalidate>
+                        <div class="input-fields"
+                             ng-class="{'disabled':Login.IsInProgress || Signup.IsInProgress}"
+                        >
+                            <!-- username -->
+                            <div id="username"
+                                 class="input-wrapper"
+                                 ng-class="{'collapsed': state !== 'signup'}"
+                            >
+                                <input type="text"
+                                       class="username"
+                                       placeholder="Username"
+                                       ng-model="form.username"
+                                       ng-disabled="Login.IsInProgress || Signup.IsInProgress"
+                                       ng-blur="onUsernameBlur()"
+                                />
+                                <svg class="input-icon"><use xlink:href=".content/assets/svg/sprite.svg#login-user" /></svg>
+
+                                <!-- username invalid message -->
+                                <div class="validation-tooltip"
+                                     ng-class="{'shown': form.wasUsernameValidated && !form.isUsernameValid}"
+                                >
+                                    <div class="validation-tooltip-box">
+                                        {{form.usernameReason | translate}}
+                                    </div>
+                                    <svg><use xlink:href=".content/assets/svg/sprite.svg#login-validation-tooltip-arrow" /></svg>
+                                </div>
+                            </div>
+
+                            <!-- email -->
+                            <div class="input-wrapper email-input-wrapper">
+                                <input type="text"
+                                       placeholder="Email"
+                                       ng-model="form.email"
+                                       ng-disabled="Login.IsInProgress || Signup.IsInProgress"
+                                       ng-blur="onEmailBlur()"
+                                />
+
+                                <svg class="input-icon"><use xlink:href=".content/assets/svg/sprite.svg#login-email" /></svg>
+
+                                <!-- email invalid message -->
+                                <div class="validation-tooltip"
+                                     ng-class="{'shown': form.wasEmailValidated && !form.isEmailValid}">
+                                    <div class="validation-tooltip-box email-required">
+                                        {{form.emailValidText | translate}}
+                                    </div>
+                                    <svg><use xlink:href=".content/assets/svg/sprite.svg#login-validation-tooltip-arrow" /></svg>
+                                </div>
+                            </div>
+
+                            <!-- password -->
+                            <div class="input-wrapper"
+                                 ng-show="openState !== 'change-password'"
+                            >
+                                <input type="password"
+                                       required
+                                       placeholder="Password"
+                                       ng-model="form.password"
+                                       ng-disabled="Login.IsInProgress || Signup.IsInProgress"
+                                       ng-blur="onPasswordBlur()"
+                                />
+
+                                <svg class="input-icon"><use xlink:href=".content/assets/svg/sprite.svg#login-password" /></svg>
+
+                                <div class="validation-tooltip"
+                                     ng-class="{'shown': form.wasPasswordValidated && !form.isPasswordValid}">
+                                    <div class="validation-tooltip-box">
+                                        {{form.passwordValidText | translate}}
+                                    </div>
+                                    <svg><use xlink:href=".content/assets/svg/sprite.svg#login-validation-tooltip-arrow" /></svg>
+                                </div>
+                            </div>
+
+                            <!-- confirm password -->
+                            <div id="confirm-password"
+                                 class="input-wrapper"
+                                 ng-class="{'collapsed': state !== 'signup'}"
+                            >
+                                <input type="password"
+                                       placeholder="Confirm password"
+                                       ng-model="form.confirmPassword"
+                                       ng-disabled="Login.IsInProgress || Signup.IsInProgress"
+                                       ng-blur="onConfirmPasswordBlur()"
+                                />
+                                <svg class="input-icon"><use xlink:href=".content/assets/svg/sprite.svg#login-password" /></svg>
+                                <div class="validation-tooltip"
+                                     ng-class="{'shown': form.wasConfirmPasswordValidated && form.isPasswordValid && !form.isConfirmPasswordValid}"
+                                >
+                                    <div class="validation-tooltip-box">
+                                        {{'confirm password no match' | translate}}
+                                    </div>
+                                    <svg><use xlink:href=".content/assets/svg/sprite.svg#login-validation-tooltip-arrow" /></svg>
+                                </div>
+                            </div>
+
+                            <!-- captcha -->
+                            <div id="captcha-wrapper"
+                                 class="captcha-small-wrapper"
+                                 ng-class="{'collapsed': state === 'login'}">
+
+                                <div vc-recaptcha key="'6LcBtEUUAAAAANEN8_EB6xA-j4QxQqBg41d2_b5H'"
+                                     ng-model="form.captchaResponseData"
+                                     on-create="form.setCaptchaWidgetId(widgetId)"
+                                     on-expire="form.cbExpiration()"
+                                ></div>
+
+                            </div>
+
+                            <!-- checkboxes -->
+                            <div class="checboxes-container"
+                                 ng-class="{'collapsed': state !== 'signup'}"
+                            >
+                                <label class='cbox-consent' for='email-consent'>
+                                    <input class='checkbox'
+                                           type='checkbox'
+                                           name='emailme-consent'
+                                           id='email-consent'
+                                           checked hidden
+                                           ng-model="form.promotionalEmailsConsented"
+                                    />
+                                    <b></b>
+                                    <span>Email me about Overwolf updates, apps, and challenges for my favorite games</span>
+                                </label>
+                                <!-- <label class='cbox-consent' for='terms-consent'>
+                                    <input class='checkbox' type='checkbox' name='terms-consent' id='terms-consent' hidden/>
+                                    <b></b>
+                                    <span>I have read and accept Overwolf’s <a href="https://www.overwolf.com/legal/terms" target="_blank">Terms</a> and <a href="https://www.overwolf.com/legal/privacy" target="_blank">Privacy Policy</a></span>
+                                </label> -->
+                            </div>
+
+                        </div>
+
+
+                        <!-- button -->
+                        <button type="submit"
+                                ng-disabled="Login.IsInProgress || Signup.IsInProgress"
+                                ng-class="{'loading': Login.IsInProgress || Signup.IsInProgress}"
+                                ng-click="onClickSubmit()"
+                                ng-show="openState !== 'change-password'"
+                        >
+                            <div class="loader">
+                                <svg><use xlink:href=".content/assets/svg/sprite.svg#button-loading-ring" /></svg>
+                            </div>
+                            <div class="submit-button-text"
+                                 id="submit-button-text-login"
+                                 ng-class="{'collapsed': state !== 'login'}">{{'log in' | translate }}</div>
+                            <div class="submit-button-text"
+                                 id="submit-button-text-register"
+                                 ng-class="{'collapsed': state !== 'signup'}">{{'create an account' | translate}}</div>
+                        </button>
+
+                        <div class="validation-big-box"
+                             ng-class="{'shown': form.userError || form.connectionError || (Signup.afterSubmit &&  !form.isCaptchaValid)}"
+                        >
+                            {{form.errorText | translate}}
+                        </div>
+
+                    </form>
+
+                    <!-- footer -->
+                    <div class="footer"
+                         ng-class="{'disabled': Login.IsInProgress || Signup.IsInProgress}"
+                    >
+                        <div ng-class="{'collapsed': state !== 'login'}"
+                             id="footer-login"
+                             class="footer-content">
+
+                            <!-- forgot password -->
+                            <a class="forgot-password"
+                               ng-click="forgotPassword()"
+                            >{{'forgot password' | translate}}</a>
+
+                            <!-- signup link -->
+                            <span>{{'new to overwolf?' | translate}}
+                                <a ng-click="changeState('signup')">{{'create an account' | translate}}</a>
+                            </span>
+
+                            <div class="buttonless-loader"
+                                 ng-class="{'loading': form.forgotPasswordInProgress}">
+                                <div class="loader">
+                                    <svg><use xlink:href=".content/assets/svg/sprite.svg#button-loading-ring" /></svg>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="footer-register"
+                             class="footer-content register"
+                             ng-class="{'collapsed': state !== 'signup'}"
+                        >
+                            <!-- login link -->
+                            <span>{{'already have an account?' | translate}}
+                                <a ng-click="changeState('login');">{{'log in' | translate}}</a>
+                            </span>
+                        </div>
+
+                        <div
+                        class="terms-container"
+                        ng-class="{'collapsed': state !== 'signup'}"
+                        >
+                            <span>By clicking “Create an acccount", <br> you agree to Overwolf’s <a href="https://www.overwolf.com/legal/terms" target="_blank">Terms</a> and <a href="https://www.overwolf.com/legal/privacy" target="_blank">Privacy Policy</a></span>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- account suspended -->
+                <div class="account-suspended"
+                     ng-class="{'collapsed': state !== 'suspended'}">
+                    <h1>{{'account scheduled for deletion' | translate}}</h1>
+                    <p>
+                        {{'suspended message' | translate}}
+                    </p>
+                    <button ng-click="backToLogin()">{{'back to login' |
+                        translate}}</button>
+                    <p>
+                        <span>{{'ive changed my mind' | translate}}</span>
+                        <a href="#"
+                           ng-click="onClickRestoreAccount()">{{'restore my account' | translate }}</a>
+                    </p>
+                    <div class="buttonless-loader"
+                         ng-class="{'loading': restoreAccountLoader}">
+                        <div class="loader">
+                            <svg><use xlink:href=".content/assets/svg/sprite.svg#button-loading-ring" /></svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- email verification -->
+            <div id="state_verification"
+                 ng-class="{'collapsed': state !== 'verification'}">
+                <div class="verification">
+                    <div class="graphic-stuff">
+                      <video id="verification-video" src="images/global/shield_animation.webm" autoplay loop />
+                    </div>
+                    <div class="main-message">
+                        <h1>{{'almost ready please verify your email' | translate}}</h1>
+                        <p
+                          ng-bind-html="'verify message app' | translate"></p>
+                        <div class="footer">
+                            <p>
+                                {{'cant find email?' | translate}}
+                                <span id="sent-ghost"
+                                      ng-class="{'active': showResendAnimation}"
+                                >{{'sent!' | translate}}</span>
+                                <a id="resend-link"
+                                   ng-click="resendVerification();">
+                                    {{'here' | translate}}
+                                </a> {{'to send it again' | translate}}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button class="modal-page-control close" ng-click="closeLogin()">
+                <svg class="icon">
+                    <use xlink:href=".content/assets/svg/sprite.svg#window-control_close" />
+                </svg>
+            </button>
+            <button class="modal-page-control back"
+                    ng-if="source === 'app'"
+                    ng-click="goBack()">
+                <svg class="icon">
+                    <use xlink:href=".content/assets/svg/sprite.svg#back" />
+                </svg>
+            </button>
+            <div class="forgot-password-message-lightbox-wrapper"
+                 ng-class="{'collapsed': !showMailSent}"
+            >
+                <div class="forgot-password-message">
+                    <h1>{{'email Sent!' | translate}}</h1>
+                    <p>{{'email sent message' | translate}}{{form.email}}{{'email sent message end' | translate}}</p>
+                    <button ng-click="showMailSent = false;">{{'ok' |
+                        translate}}</button>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+</div>

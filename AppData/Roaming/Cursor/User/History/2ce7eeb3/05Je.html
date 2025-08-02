@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>The Camino</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <style>
+        body { 
+            margin: 0;
+            overflow: hidden;
+            background: #000;
+        }
+        #game-container {
+            width: 100vw;
+            height: 100vh;
+        }
+        #hud {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            color: white;
+            font-family: Arial;
+            font-size: 24px;
+            z-index: 100;
+            text-shadow: 2px 2px 2px rgba(0,0,0,0.5);
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container"></div>
+    <div id="hud">
+        <div id="speed">Speed: 0 mph</div>
+        <div id="gear">Gear: 1</div>
+    </div>
+
+    <!-- Load Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    
+    <!-- Load game script -->
+    <script src="src/game.js"></script>
+</body>
+</html>

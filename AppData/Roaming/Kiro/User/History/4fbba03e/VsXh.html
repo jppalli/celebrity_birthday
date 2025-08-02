@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Object Hunter - Semantic Word Game</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/animations.css">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <div id="game-container">
+        <div id="loading-screen" class="loading-screen">
+            <div class="loading-spinner"></div>
+            <p>Loading Object Hunter...</p>
+        </div>
+
+        <div id="game-app" style="display: none;"></div>
+    </div>
+
+    <!-- Audio elements for sound effects -->
+    <audio id="correct-sound" preload="auto">
+        <source src="assets/sounds/correct.mp3" type="audio/mpeg">
+        <source src="assets/sounds/correct.wav" type="audio/wav">
+    </audio>
+
+    <audio id="close-sound" preload="auto">
+        <source src="assets/sounds/close.mp3" type="audio/mpeg">
+        <source src="assets/sounds/close.wav" type="audio/wav">
+    </audio>
+
+    <audio id="wrong-sound" preload="auto">
+        <source src="assets/sounds/wrong.mp3" type="audio/mpeg">
+        <source src="assets/sounds/wrong.wav" type="audio/wav">
+    </audio>
+
+    <!-- Scripts -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <!-- Load game data and logic first -->
+    <script>
+        // Error handling
+        window.addEventListener('error', function (e) {
+            console.error('Script error:', e.filename, e.lineno, e.message);
+            document.getElementById('loading-screen').innerHTML =
+                '<div style="color: red; text-align: center; padding: 20px;">' +
+                '<h2>Loading Error</h2>' +
+                '<p>Error: ' + e.message + '</p>' +
+                '<p>Check the browser console for more details.</p>' +
+                '</div>';
+        });
+    </script>
+    <script src="js/gameData.js" onerror="console.error('Failed to load gameData.js')"></script>
+    <script src="js/gameLogic.js" onerror="console.error('Failed to load gameLogic.js')"></script>
+    <script src="js/audioManager.js" onerror="console.error('Failed to load audioManager.js')"></script>
+    <script src="js/animationManager.js" onerror="console.error('Failed to load animationManager.js')"></script>
+
+    <!-- Load React components -->
+    <script type="text/babel" src="js/components/HintSystem.jsx"></script>
+    <script type="text/babel" src="js/components/StatsModal.jsx"></script>
+    <script type="text/babel" src="js/components/SettingsModal.jsx"></script>
+    <script type="text/babel" src="js/components/GameApp.jsx"></script>
+
+    <!-- Initialize the game -->
+    <script type="text/babel">
+        // Main game initialization with error handling
+        document.addEventListener('DOMContentLoaded', function () {
+            console.log('DOM loaded, initializing game...');
+
+            // Check if required dependencies are loaded
+            if (typeof React === 'undefined') {
+                console.error('React not loaded');
+                document.getElementById('loading-screen').innerHTML =
+                    '<div style="color: red; text-align: center; padding: 20px;">Error: React library failed to load</div>';
+                return;
+            }
+
+            if (typeof ReactDOM === 'undefined') {
+                console.error('ReactDOM not loaded');
+                document.getElementById('loading-screen').innerHTML =
+                    '<div style="color: red; text-align: center; padding: 20px;">Error: ReactDOM library failed to load</div>';
+                return;
+            }
+
+            if (typeof GameLogic === 'undefined') {
+                console.error('GameLogic not loaded');
+                document.getElementById('loading-screen').innerHTML =
+                    '<div style="color: red; text-align: center; padding: 20px;">Error: Game logic failed to load</div>';
+                return;
+            }
+
+            // Hide loading screen and show game
+            const loadingScreen = document.getElementById('loading-screen');
+            const gameApp = document.getElementById('game-app');
+
+            try {
+                // Simulate loading time for better UX
+                setTimeout(() => {
+                    loadingScreen.style.display = 'none';
+                    gameApp.style.display = 'block';
+
+                    // Initialize React app
+                    const root = ReactDOM.createRoot(gameApp);
+                    root.render(React.createElement(GameApp));
+
+                    console.log('Game initialized successfully! 🎯');
+
+                }, 1000);
+
+            } catch (error) {
+                console.error('Error initializing game:', error);
+                loadingScreen.innerHTML =
+                    '<div style="color: red; text-align: center; padding: 20px;">' +
+                    '<h2>Initialization Error</h2>' +
+                    '<p>' + error.message + '</p>' +
+                    '</div>';
+            }
+        });
+
+        // Global game utilities
+        window.gameUtils = {
+            formatNumber: (num) => num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+            getOrdinal: (num) => {
+                const suffixes = ["th", "st", "nd", "rd"];
+                const v = num % 100;
+                return num + (suffixes[(v - 20) % 10] || suffixes[v] || suffixes[0]);
+            },
+            debounce: (func, wait) => {
+                let timeout;
+                return function executedFunction(...args) {
+                    const later = () => {
+                        clearTimeout(timeout);
+                        func(...args);
+                    };
+                    clearTimeout(timeout);
+                    timeout = setTimeout(later, wait);
+                };
+            }
+        };
+    </script>
+</body>
+
+</html>

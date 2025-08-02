@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Outrun JS</title>
+  <style>
+    canvas { border: 1px solid white; background: black; }
+    body { display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background: #111; }
+  </style>
+</head>
+<body>
+  <canvas id="gameCanvas" width="800" height="600"></canvas>
+  <script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+  
+    // Player car
+    let carX = 400; // Center of canvas
+    const carY = 500; // Near bottom
+    const carWidth = 40;
+    const carHeight = 20;
+    let speed = 1;
+  
+    // Input
+    let leftPressed = false;
+    let rightPressed = false;
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft') leftPressed = true;
+      if (e.key === 'ArrowRight') rightPressed = true;
+    });
+    document.addEventListener('keyup', (e) => {
+      if (e.key === 'ArrowLeft') leftPressed = false;
+      if (e.key === 'ArrowRight') rightPressed = false;
+    });
+  
+    // Road setup
+    const roadSegments = [];
+    const segmentHeight = 20; // Height of each road segment
+    const maxSegments = Math.ceil(canvas.height / segmentHeight) + 1; // Extra segment for overlap
+    let roadOffset = 0; // Continuous scroll offset
+    let curveOffset = 0; // For sine wave curve
+  
+    // Initialize road segments
+    function initRoad() {
+      for (let i = 0; i < maxSegments; i++) {
+        roadSegments.push({
+          y: i * segmentHeight, // Position from top to bottom
+          curve: Math.sin(curveOffset + i * 0.1) * 100 // Pre-calculate initial curve
+        });
+      }
+    }
+    initRoad();
+  
+    // Game loop
+    function update() {
+      // Move car
+      if (leftPressed && carX > 0) carX -= 5;
+      if (rightPressed && carX < canvas.width - carWidth) carX += 5;
+  
+      // Speed increases slowly
+      speed += 0.01;
+      if (speed > 10) speed = 10; // Cap speed to avoid chaos
+  
+      // Update road
+      roadOffset += speed; // Continuous scroll
+      curveOffset += 0.02; // Smooth curve progression
+  
+      // Update segment positions
+      for (let i = 0; i < roadSegments.length; i++) {
+        roadSegments[i].y -= speed; // Move all segments up
+        roadSegments[i].curve = Math.sin(curveOffset + i * 0.1) * 100; // Update curve dynamically
+      }
+  
+      // Recycle segments smoothly
+      if (roadSegments[0].y < -segmentHeight) {
+        const lastSegment = roadSegments.pop(); // Take from end
+        lastSegment.y = roadSegments[roadSegments.length - 1].y + segmentHeight; // Place at bottom
+        lastSegment.curve = Math.sin(curveOffset + (roadSegments.length - 1) * 0.1) * 100;
+        roadSegments.unshift(lastSegment); // Add to top
+      }
+    }
+  
+    function draw() {
+      // Clear canvas
+      ctx.fillStyle = 'black';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+  
+      // Draw horizon
+      ctx.fillStyle = '#ff00ff'; // Neon pink
+      ctx.fillRect(0, 200, canvas.width, 5);
+  
+      // Draw road
+      ctx.strokeStyle = '#00ffff'; // Neon cyan
+      ctx.lineWidth = 2;
+      for (let i = 0; i < roadSegments.length - 1; i++) {
+        const segment = roadSegments[i];
+        const nextSegment = roadSegments[i + 1];
+  
+        // Perspective: narrower at top, wider at bottom
+        const width = 200 + (i / maxSegments) * 400;
+        const x1 = canvas.width / 2 - width / 2 + segment.curve;
+        const x2 = canvas.width / 2 + width / 2 + segment.curve;
+        const nextWidth = 200 + ((i + 1) / maxSegments) * 400;
+        const nextX1 = canvas.width / 2 - nextWidth / 2 + nextSegment.curve;
+        const nextX2 = canvas.width / 2 + nextWidth / 2 + nextSegment.curve;
+  
+        // Draw trapezoid for road segment
+        ctx.beginPath();
+        ctx.moveTo(x1, segment.y - (roadOffset % segmentHeight)); // Smooth offset
+        ctx.lineTo(x2, segment.y - (roadOffset % segmentHeight));
+        ctx.lineTo(nextX2, nextSegment.y - (roadOffset % segmentHeight));
+        ctx.lineTo(nextX1, nextSegment.y - (roadOffset % segmentHeight));
+        ctx.closePath();
+        ctx.stroke();
+      }
+  
+      // Draw car
+      ctx.fillStyle = 'red';
+      ctx.fillRect(carX, carY, carWidth, carHeight);
+  
+      // Draw speed
+      ctx.fillStyle = 'white';
+      ctx.font = '20px Arial';
+      ctx.fillText(`Speed: ${Math.floor(speed)}`, 10, 20);
+    }
+  
+    function gameLoop() {
+      update();
+      draw();
+      requestAnimationFrame(gameLoop);
+    }
+  
+    gameLoop();
+  </script>
+</body>
+</html>

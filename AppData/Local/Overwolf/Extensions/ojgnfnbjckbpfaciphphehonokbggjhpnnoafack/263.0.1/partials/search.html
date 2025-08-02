@@ -1,0 +1,149 @@
+<section id="main-content" class="starting-background">
+      <div class="main-content-inner store-03-css">
+          <!-- search -->
+          <section class="appstore-shelf">
+              <header class="search-section">
+                  <i>
+                      <svg class="svg-icon-fill">
+                          <use xlink:href=".content/assets/svg/sprite.svg#search-big" />
+                      </svg>
+                  </i>
+                  <input class="search-bar" type="search" placeholder="Search the store..." ng-model="search.query" autofocus="true" ow-force-focus>
+              </header>
+
+              <section class="appstore-shelf-sub-section" ow-menu="horizontal" ow-menu-border-size="40">
+                  <ul class="tab-selector" ow-radio-group="search.filter">
+                      <li ow-menu-item ow-menu-item-active="$parent.$parent.search.filter === 'all'">
+                          <a ow-radio="all">All</a>
+                      </li>
+                      <li ow-menu-item ow-menu-item-active="$parent.$parent.search.filter === 'apps'"
+                          ng-class="$parent.$parent.$parent.apps.length <= 0 ? 'disabled' : ''">
+                          <a ow-radio="apps">Apps<span ng-show="($parent.$parent.$parent.apps.length - $parent.$parent.$parent.appsService.numOfHiddenItems) > 0">({{$parent.$parent.$parent.apps.length - $parent.$parent.$parent.appsService.numOfHiddenItems}})</span></a>
+                      </li>
+                      <li ow-menu-item ow-menu-item-active="$parent.$parent.search.filter === 'skins'"
+                          ng-class="$parent.$parent.$parent.skins.length <= 0 ? 'disabled' : ''">
+                          <a ow-radio="skins">Skins<span ng-show="$parent.$parent.$parent.skins.length > 0">({{$parent.$parent.$parent.skins.length}})</span></a>
+                      </li>
+                  </ul>
+              </section>
+          </section>
+
+          <!-- results - apps -->
+          <section class="appstore-shelf store-03-css" ng-class="search.filter == 'apps' ? '' : 'tiles-nowrap'" ng-show="(search.filter == 'all' || search.filter == 'apps') && apps.length > 0" ow-shelf ow-sort-items-selector=".search-tile-wrapper" >
+              <header class="appstore-shelf-header">
+                  <h1 class="appstore-shelf-header-title">Apps</h1>
+
+                  <a href="#" class="view-all-apps" ng-click="search.filter = 'apps'" ng-show="search.filter === 'all'">
+                      <span>View all</span>
+                      <i>
+                          <svg class="svg-icon-fill">
+                              <use xlink:href=".content/assets/svg/sprite.svg#right-arrow-indicator" />
+                          </svg>
+                      </i>
+                  </a>
+
+                  <div class="sort-dropdown-wrapper client-only" ng-show="search.filter === 'apps'">
+                      <h4>Sort By</h4>
+
+                      <div class="sort-dropdown ng-isolate-scope" ow-select="sortSel">
+                          <span class="sort-dropdown-selected-item">
+                              <span class="sort-trigger ng-binding ng-scope" ng-bind="owSelect.name">Name</span>
+                              <i>
+                                  <svg class="svg-icon-fill">
+                                      <use xlink:href=".content/assets/svg/sprite.svg#bottom-arrow-indicator" />
+                                  </svg>
+                              </i>
+                          </span>
+                          <ul class="ng-scope">
+                              <li ow-select-option="name">Name</li>
+                              <li ow-select-option="newest releases">Newest Releases</li>
+                              <li ow-select-option="most downloaded">Most Downloaded</li>
+                          </ul>
+                      </div>
+                  </div>
+              </header>
+
+              <div class="appstore-shelf-content" >
+                  <span class="search-tile-wrapper" ng-repeat="app in apps track by $index" bind-html-compile="app"></span>
+              </div>
+
+          </section>
+
+          <!-- results - skins -->
+          <section class="appstore-shelf store-03-css" ng-class="search.filter == 'skins' ? '' : 'tiles-nowrap'" ng-show="(search.filter == 'all' || search.filter == 'skins') && skins.length > 0" ow-shelf ow-sort-items-selector=".search-tile-wrapper">
+
+              <header class="appstore-shelf-header">
+                  <h1 class="appstore-shelf-header-title">Skins</h1>
+
+                  <a href="#" class="view-all-apps" ng-click="search.filter = 'skins'" ng-show="search.filter === 'all'">
+                      <span>View all</span>
+                      <i>
+                          <svg class="svg-icon-fill">
+                              <use xlink:href=".content/assets/svg/sprite.svg#right-arrow-indicator" />
+                          </svg>
+                      </i>
+                  </a>
+
+                  <div class="sort-dropdown-wrapper client-only" ng-show="search.filter === 'skins'">
+                      <h4>Sort By</h4>
+
+                      <div class="sort-dropdown ng-isolate-scope" ow-select="sortSel">
+                          <span class="sort-dropdown-selected-item">
+                              <span class="sort-trigger ng-binding ng-scope" ng-bind="owSelect.name">Name</span>
+                              <i>
+                                  <svg class="svg-icon-fill">
+                                      <use xlink:href=".content/assets/svg/sprite.svg#bottom-arrow-indicator" />
+                                  </svg>
+                              </i>
+                          </span>
+                          <ul class="ng-scope">
+                              <li ow-select-option="name">Name</li>
+                              <li ow-select-option="newest releases">Newest Releases</li>
+                              <li ow-select-option="most downloaded">Most Downloaded</li>
+                          </ul>
+                      </div>
+                  </div>
+              </header>
+
+              <div class="appstore-shelf-content">
+                  <span ng-repeat="skin in skins track by $index" bind-html-compile="skin"></span>
+              </div>
+
+          </section>
+
+          <!-- results - games -->
+          <section class="appstore-shelf store-03-css" ng-class="search.filter == 'games' ? '' : 'tiles-nowrap'" ng-show="(search.filter == 'all' || search.filter == 'games') && games.length > 0">
+
+              <header class="appstore-shelf-header">
+                  <h1 class="appstore-shelf-header-title">Games</h1>
+
+                  <a href="#" class="view-all-apps" ng-click="search.filter = 'games'" ng-show="search.filter === 'all'">
+                      <span>View all</span>
+                      <i>
+                          <svg class="svg-icon-fill">
+                              <use xlink:href=".content/assets/svg/sprite.svg#right-arrow-indicator" />
+                          </svg>
+                      </i>
+                  </a>
+
+              </header>
+                  <div class="appstore-shelf-content">
+                      <span ng-repeat="game in games track by $index" bind-html-compile="game"></span>
+                  </div>
+          </section>        
+
+          <section class="appstore-shelf store-03-css" ng-show="numOfResults == 0">
+              <div class="appstore-shelf-content">
+                  <article class="search-empty-state" ng-show="numOfResults == 0">
+                      <img src="images/global/no_results.png">
+                      <span>Sorry, no results</span>
+                  </article>
+
+                  <article class="search-empty-state" ng-show="hasError">
+                      <img src="images/global/no_results.png">
+                      <span>Sorry, an error has occurred. Please check your internet connection</span>
+                  </article>
+              </div>
+          </section>
+      </div>
+  </section>

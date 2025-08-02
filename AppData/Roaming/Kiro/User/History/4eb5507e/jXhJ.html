@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Realistic Lemon Tower Climber</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.2/p5.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Montserrat:wght@400;700&display=swap"
+    rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #1a2980, #26d0ce);
+      font-family: 'Montserrat', sans-serif;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .container {
+      position: relative;
+      z-index: 10;
+      text-align: center;
+      width: 100%;
+      max-width: 800px;
+      padding: 20px;
+    }
+
+    canvas {
+      border: 4px solid #2c3e50;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+      margin: 0 auto;
+      display: block;
+      cursor: pointer;
+    }
+
+    h1 {
+      font-family: 'Lilita One', cursive;
+      color: #f1c40f;
+      text-shadow: 3px 3px 0 #e67e22, 6px 6px 0 rgba(0, 0, 0, 0.2);
+      font-size: 3.5rem;
+      margin-bottom: 10px;
+      letter-spacing: 1.5px;
+    }
+
+    .game-info {
+      background: rgba(44, 62, 80, 0.85);
+      border-radius: 12px;
+      padding: 20px;
+      margin: 20px auto;
+      max-width: 500px;
+      color: white;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    .controls {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-top: 15px;
+    }
+
+    .control-item {
+      background: #3498db;
+      border-radius: 8px;
+      padding: 10px 15px;
+      min-width: 120px;
+      box-shadow: 0 4px 0 #2980b9;
+    }
+
+    .key {
+      display: inline-block;
+      background: #2c3e50;
+      color: #ecf0f1;
+      padding: 5px 10px;
+      border-radius: 5px;
+      font-weight: bold;
+      margin: 0 3px;
+    }
+
+    .stats {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      margin: 15px 0;
+    }
+
+    .stat-box {
+      background: rgba(236, 240, 241, 0.9);
+      border-radius: 10px;
+      padding: 12px 20px;
+      min-width: 150px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .stat-value {
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: #e74c3c;
+    }
+
+    .btn {
+      background: #e74c3c;
+      color: white;
+      border: none;
+      padding: 12px 25px;
+      font-size: 1.1rem;
+      border-radius: 50px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.3s;
+      box-shadow: 0 4px 0 #c0392b;
+      margin: 10px 5px;
+    }
+
+    .btn:hover {
+      background: #c0392b;
+      transform: translateY(2px);
+      box-shadow: 0 2px 0 #c0392b;
+    }
+
+    .btn:active {
+      transform: translateY(4px);
+      box-shadow: none;
+    }
+
+    .btn-restart {
+      background: #2ecc71;
+      box-shadow: 0 4px 0 #27ae60;
+    }
+
+    .btn-restart:hover {
+      background: #27ae60;
+      box-shadow: 0 2px 0 #27ae60;
+    }
+
+    .instructions {
+      margin-top: 20px;
+      line-height: 1.6;
+    }
+
+    .lemon-icon {
+      display: inline-block;
+      width: 24px;
+      height: 24px;
+      background: #f1c40f;
+      border-radius: 50%;
+      margin: 0 5px;
+      vertical-align: middle;
+      border: 2px solid #e67e22;
+    }
+
+    .background {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+    }
+
+    .cloud {
+      position: absolute;
+      background: rgba(255, 255, 255, 0.8);
+      border-radius: 50%;
+    }
+
+    .message {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(44, 62, 80, 0.95);
+      padding: 30px;
+      border-radius: 15px;
+      color: white;
+      text-align: center;
+      z-index: 100;
+      box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+      max-width: 90%;
+      width: 400px;
+    }
+
+    .message h2 {
+      color: #f1c40f;
+      margin-bottom: 20px;
+      font-size: 2.2rem;
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="background" id="background"></div>
+
+  <div class="container">
+    <h1>🍋 Lemon Tower Climber 🏆</h1>
+
+    <div class="game-info">
+      <div class="stats">
+        <div class="stat-box">
+          <div>SCORE</div>
+          <div class="stat-value" id="score-display">0</div>
+        </div>
+        <div class="stat-box">
+          <div>HIGH SCORE</div>
+          <div class="stat-value" id="high-score-display">0</div>
+        </div>
+      </div>
+
+      <div class="controls">
+        <div class="control-item">
+          <div>MOVE</div>
+          <div><span class="key">←</span> <span class="key">→</span></div>
+        </div>
+        <div class="control-item">
+          <div>JUMP</div>
+          <div><span class="key">SPACE</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="game-container"></div>
+
+    <div class="instructions">
+      <p>Help the lemon climb the tower by jumping on platforms! Reach the bell at the top to win!</p>
+      <p>Avoid falling off the screen! <span class="lemon-icon"></span> = 10 points</p>
+    </div>
+
+    <button class="btn btn-restart" id="restart-btn">RESTART GAME</button>
+  </div>
+
+  <div id="start-message" class="message">
+    <h2>Lemon Tower Climber</h2>
+    <p>Help the lemon reach the bell at the top of the tower!</p>
+    <p>Use <strong>LEFT/RIGHT</strong> arrows to move and <strong>SPACE</strong> to jump</p>
+    <p>Collect points by jumping on platforms</p>
+    <button class="btn" id="start-btn">START GAME</button>
+  </div>
+
+  <div id="win-message" class="message hidden">
+    <h2>You Won! 🎉</h2>
+    <p>You rang the bell!</p>
+    <p>Final Score: <span id="final-score">0</span></p>
+    <button class="btn btn-restart">PLAY AGAIN</button>
+  </div>
+
+  <div id="game-over-message" class="message hidden">
+    <h2>Game Over 😢</h2>
+    <p>The lemon fell off the tower!</p>
+    <p>Final Score: <span id="game-over-score">0</span></p>
+    <button class="btn btn-restart">TRY AGAIN</button>
+  </div>
+
+  <script>
+    // Game variables
+    let lemon;
+    let platforms = [];
+    let bell;
+    let particles = [];
+    let gravity = 0.5;
+    let jumpForce = -12;
+    let gameState = 'start'; // start, playing, won, gameOver
+    let score = 0;
+    let highScore = localStorage.getItem('lemonHighScore') || 0;
+    let backgroundClouds = [];
+    let bellRang = false;
+
+    // DOM Elements
+    const scoreDisplay = document.getElementById('score-display');
+    const highScoreDisplay = document.getElementById('high-score-display');
+    const finalScore = document.getElementById('final-score');
+    const gameOverScore = document.getElementById('game-over-score');
+    const startMessage = document.getElementById('start-message');
+    const winMessage = document.getElementById('win-message');
+    const gameOverMessage = document.getElementById('game-over-message');
+    const startBtn = document.getElementById('start-btn');
+    const restartBtn = document.getElementById('restart-btn');
+
+    // Set high score display
+    highScoreDisplay.textContent = highScore;
+
+    // Create background clouds
+    function createBackground() {
+      const background = document.querySelector('.background');
+      background.innerHTML = '';
+
+      // Create clouds
+      for (let i = 0; i < 12; i++) {
+        const cloud = document.createElement('div');
+        cloud.classList.add('cloud');
+
+        // Random cloud properties
+        const size = Math.random() * 120 + 60;
+        const posX = Math.random() * 100;
+        const posY = Math.random() * 100;
+        const opacity = Math.random() * 0.6 + 0.2;
+        const animationDuration = Math.random() * 40 + 40;
+
+        cloud.style.width = `${size}px`;
+        cloud.style.height = `${size / 1.5}px`;
+        cloud.style.left = `${posX}%`;
+        cloud.style.top = `${posY}%`;
+        cloud.style.opacity = opacity;
+        cloud.style.animation = `float ${animationDuration}s linear infinite`;
+
+        background.appendChild(cloud);
+      }
+
+      // Add CSS for animation
+      const style = document.createElement('style');
+      style.textContent = `
+        @keyframes float {
+          0% { transform: translateX(0) translateY(0); }
+          50% { transform: translateX(20px) translateY(10px); }
+          100% { transform: translateX(0) translateY(0); }
+        }
+      `;
+      document.head.appendChild(style);
+    }
+
+    function setup() {
+      const canvas = createCanvas(600, 700);
+      canvas.parent('game-container');
+
+      // Initialize game
+      resetGame();
+
+      // Set up event listeners
+      startBtn.addEventListener('click', () => {
+        gameState = 'playing';
+        startMessage.classList.add('hidden');
+      });
+
+      restartBtn.addEventListener('click', resetGame);
+
+      document.querySelectorAll('.btn-restart').forEach(btn => {
+        btn.addEventListener('click', () => {
+          winMessage.classList.add('hidden');
+          gameOverMessage.classList.add('hidden');
+          resetGame();
+          gameState = 'playing';
+        });
+      });
+    }
+
+    function resetGame() {
+      // Reset game state
+      score = 0;
+      scoreDisplay.textContent = score;
+      bellRang = false;
+
+      // Create lemon
+      lemon = new Lemon();
+
+      // Clear platforms and particles
+      platforms = [];
+      particles = [];
+
+      // Generate platforms
+      for (let i = 0; i < 10; i++) {
+        platforms.push(new Platform(random(70, width - 70), height - 150 - i * 80));
+      }
+
+      // Place bell at the top (always higher than the highest platform)
+      let highestPlatformY = Math.min(...platforms.map(p => p.y));
+      bell = new Bell(width / 2, highestPlatformY - 80);
+    }
+
+    function draw() {
+      // Gradient background
+      background(135, 206, 235);
+
+      // Draw tower backdrop
+      fill(169, 169, 169, 100);
+      noStroke();
+      rectMode(CENTER);
+      rect(width / 2, height / 2, 250, height, 30);
+
+      // Draw platforms
+      for (let platform of platforms) {
+        platform.show();
+      }
+
+      // Draw bell
+      bell.show();
+
+      // Draw lemon only if game is playing
+      if (gameState === 'playing' || gameState === 'won') {
+        lemon.show();
+        lemon.update();
+      }
+
+      // Update and display particles
+      for (let i = particles.length - 1; i >= 0; i--) {
+        particles[i].update();
+        particles[i].show();
+        if (particles[i].isDead()) {
+          particles.splice(i, 1);
+        }
+      }
+
+      // Handle movement only if game is playing
+      if (gameState === 'playing') {
+        if (keyIsDown(LEFT_ARROW)) {
+          lemon.moveLeft();
+        } else if (keyIsDown(RIGHT_ARROW)) {
+          lemon.moveRight();
+        } else {
+          lemon.stop();
+        }
+
+        // Check for collisions with platforms
+        let onPlatform = false;
+        for (let platform of platforms) {
+          if (lemon.hits(platform)) {
+            lemon.vy = jumpForce;
+            lemon.vx *= 0.7;
+            onPlatform = true;
+
+            // Add particles on jump
+            for (let i = 0; i < 8; i++) {
+              particles.push(new Particle(lemon.x, lemon.y + lemon.r, color(255, 200, 0)));
+            }
+          }
+        }
+
+        // Add landing particles if lemon was falling and just landed on ground
+        if (lemon.onGround() && lemon.vy > 0 && !onPlatform) {
+          for (let i = 0; i < 10; i++) {
+            particles.push(new Particle(lemon.x, height - 5, color(255, 255, 0)));
+          }
+        }
+
+        // Check for collision with bell
+        if (!bellRang && lemon.hitsBell(bell)) {
+          bellRang = true;
+          gameState = 'won';
+          winMessage.classList.remove('hidden');
+          finalScore.textContent = score;
+
+          // Add celebration particles
+          for (let i = 0; i < 100; i++) {
+            particles.push(new Particle(bell.x, bell.y, color(255, 215, 0), true));
+          }
+
+          // Play bell sound
+          playBellSound();
+        }
+
+        // Check if lemon fell off screen
+        if (lemon.y > height + 100) {
+          gameState = 'gameOver';
+          gameOverMessage.classList.remove('hidden');
+          gameOverScore.textContent = score;
+        }
+
+        // Update score
+        const newScore = max(score, floor((height - lemon.y) / 10));
+        if (newScore > score) {
+          score = newScore;
+          scoreDisplay.textContent = score;
+
+          // Update high score
+          if (score > highScore) {
+            highScore = score;
+            highScoreDisplay.textContent = highScore;
+            localStorage.setItem('lemonHighScore', highScore);
+          }
+        }
+      }
+
+      // Draw UI
+      drawUI();
+    }
+
+    function drawUI() {
+      // Draw score
+      fill(255);
+      stroke(44, 62, 80);
+      strokeWeight(3);
+      textSize(24);
+      textAlign(LEFT);
+      text(`Score: ${score}`, 20, 40);
+
+      // Draw high score
+      text(`High Score: ${highScore}`, 20, 80);
+
+      // Draw game state messages
+      if (gameState === 'start') {
+        fill(255, 255, 255, 200);
+        noStroke();
+        textSize(32);
+        textAlign(CENTER);
+        text('Press START to play!', width / 2, height / 2);
+      }
+    }
+
+    function keyPressed() {
+      if (keyCode === 32 && lemon.onGround() && gameState === 'playing') {
+        lemon.vy = jumpForce;
+
+        // Add particles on jump
+        for (let i = 0; i < 8; i++) {
+          particles.push(new Particle(lemon.x, lemon.y + lemon.r, color(255, 200, 0)));
+        }
+      }
+    }
+
+    function playBellSound() {
+      // Create bell sound using oscillator
+      let context = new (window.AudioContext || window.webkitAudioContext)();
+      let oscillator = context.createOscillator();
+      let gainNode = context.createGain();
+
+      oscillator.type = 'sine';
+      oscillator.frequency.setValueAtTime(523.25, context.currentTime); // C5
+      oscillator.frequency.setValueAtTime(659.25, context.currentTime + 0.1); // E5
+      oscillator.frequency.setValueAtTime(783.99, context.currentTime + 0.2); // G5
+
+      gainNode.gain.setValueAtTime(0.5, context.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, context.currentTime + 1);
+
+      oscillator.connect(gainNode);
+      gainNode.connect(context.destination);
+
+      oscillator.start();
+      oscillator.stop(context.currentTime + 1);
+    }
+
+    class Lemon {
+      constructor() {
+        this.x = width / 2;
+        this.y = height - 50;
+        this.vx = 0;
+        this.vy = 0;
+        this.r = 25;
+        this.maxSpeed = 6;
+        this.acceleration = 0.6;
+        this.friction = 0.4;
+        this.rotation = 0;
+        this.rotationSpeed = 0;
+      }
+
+      show() {
+        push();
+        translate(this.x, this.y);
+        rotate(this.rotation);
+
+        // Lemon body with realistic shape
+        noStroke();
+        fill(255, 220, 0); // Bright yellow
+
+        // Main body (slightly irregular)
+        beginShape();
+        for (let a = 0; a < TWO_PI; a += 0.1) {
+          let offset = map(sin(a * 5), -1, 1, 0.9, 1.1);
+          let r = this.r * offset;
+          vertex(r * cos(a), r * sin(a));
+        }
+        endShape(CLOSE);
+
+        // Lemon texture (pores)
+        stroke(200, 150, 0, 150);
+        strokeWeight(1);
+        for (let i = 0; i < 12; i++) {
+          let angle = TWO_PI / 12 * i;
+          let poreX = cos(angle) * this.r * 0.7;
+          let poreY = sin(angle) * this.r * 0.7;
+          point(poreX, poreY);
+        }
+
+        // Stem
+        fill(120, 80, 40); // Dark brown
+        noStroke();
+        ellipse(0, -this.r * 0.9, 8, 5);
+
+        // Realistic leaf
+        fill(50, 180, 70); // Leaf green
+        stroke(40, 120, 50);
+        strokeWeight(1.5);
+
+        // Leaf shape with curved edges
+        beginShape();
+        vertex(-12, -this.r);
+        bezierVertex(-10, -this.r - 25, 5, -this.r - 30, 12, -this.r);
+        bezierVertex(10, -this.r - 15, -5, -this.r - 15, -12, -this.r);
+        endShape(CLOSE);
+
+        // Leaf veins
+        stroke(40, 100, 50);
+        line(0, -this.r - 10, 0, -this.r - 25);
+        line(-5, -this.r - 12, -10, -this.r - 20);
+        line(5, -this.r - 12, 10, -this.r - 20);
+
+        // Highlight on the lemon
+        fill(255, 240, 150, 100);
+        noStroke();
+        arc(0, 0, this.r * 1.8, this.r * 1.8, -PI / 4, PI / 4);
+
+        // Shadow on the bottom
+        fill(220, 180, 0, 150);
+        arc(0, 0, this.r * 1.8, this.r * 1.8, PI / 4, 3 * PI / 4);
+
+        pop();
+      }
+
+      update() {
+        this.vy += gravity;
+        this.y += this.vy;
+        this.x += this.vx;
+        this.x = constrain(this.x, this.r, width - this.r);
+
+        // Rotate lemon based on movement
+        this.rotationSpeed = map(this.vx, -this.maxSpeed, this.maxSpeed, -0.2, 0.2);
+        this.rotation += this.rotationSpeed;
+
+        // Constrain rotation to reasonable limits
+        this.rotation = constrain(this.rotation, -PI / 4, PI / 4);
+
+        // Ground collision
+        if (this.y > height - this.r) {
+          this.y = height - this.r;
+          this.vy = 0;
+          this.vx *= 0.7;
+        }
+      }
+
+      moveLeft() {
+        this.vx -= this.acceleration;
+        this.vx = max(this.vx, -this.maxSpeed);
+      }
+
+      moveRight() {
+        this.vx += this.acceleration;
+        this.vx = min(this.vx, this.maxSpeed);
+      }
+
+      stop() {
+        if (this.vx > 0) {
+          this.vx -= this.friction;
+          if (this.vx < 0) this.vx = 0;
+        } else if (this.vx < 0) {
+          this.vx += this.friction;
+          if (this.vx > 0) this.vx = 0;
+        }
+      }
+
+      onGround() {
+        return this.y >= height - this.r;
+      }
+
+      hits(platform) {
+        return (
+          this.y + this.r > platform.y &&
+          this.y + this.r < platform.y + platform.h &&
+          this.x > platform.x - platform.w / 2 &&
+          this.x < platform.x + platform.w / 2 &&
+          this.vy > 0
+        );
+      }
+
+      hitsBell(bell) {
+        let d = dist(this.x, this.y, bell.x, bell.y);
+        return d < this.r + bell.r;
+      }
+    }
+
+    class Platform {
+      constructor(x, y) {
+        this.x = x;
+        this.y = y;
+        this.w = 100;
+        this.h = 15;
+        this.oscillation = random(TWO_PI);
+      }
+
+      show() {
+        // Wooden platform with texture
+        fill(160, 120, 80);
+        stroke(120, 80, 40);
+        strokeWeight(2);
+        rectMode(CENTER);
+
+        // Slight oscillation for visual effect
+        let offset = sin(frameCount * 0.05 + this.oscillation) * 2;
+        rect(this.x, this.y + offset, this.w, this.h, 8);
+
+        // Wood grain details
+        stroke(100, 60, 20);
+        strokeWeight(1);
+        for (let i = -this.w / 2 + 10; i < this.w / 2; i += 15) {
+          let grainOffset = random(-1, 1);
+          line(
+            this.x + i + grainOffset,
+            this.y - this.h / 2 + offset,
+            this.x + i + grainOffset,
+            this.y + this.h / 2 + offset
+          );
+        }
+
+        // Platform shadow
+        fill(0, 0, 0, 30);
+        noStroke();
+        rect(this.x, this.y + this.h / 2 + 5 + offset, this.w - 10, 5, 2);
+      }
+    }
+
+    class Bell {
+      constructor(x, y) {
+        this.x = x;
+        this.y = y;
+        this.r = 25;
+        this.angle = 0;
+        this.ringing = false;
+        this.ringCounter = 0;
+      }
+
+      show() {
+        // Bell clapper
+        let clapperX = this.x + sin(this.angle) * 5;
+        let clapperY = this.y + this.r * 0.7;
+
+        // Draw clapper string
+        stroke(100);
+        strokeWeight(2);
+        line(this.x, this.y, clapperX, clapperY);
+
+        // Draw clapper
+        fill(100);
+        ellipse(clapperX, clapperY + 15, 8, 15);
+
+        // Bell body with gradient
+        for (let r = this.r; r > 0; r -= 2) {
+          let c = lerpColor(color(255, 215, 0), color(230, 180, 0), 1 - r / this.r);
+          fill(c);
+          stroke(180, 140, 0);
+          strokeWeight(1.5);
+          ellipse(this.x, this.y, r * 2);
+        }
+
+        // Bell highlight
+        fill(255, 240, 180, 150);
+        noStroke();
+        arc(this.x, this.y, this.r * 1.8, this.r * 1.8, -PI / 4, PI / 4);
+
+        // Bell top
+        fill(180, 140, 0);
+        rect(this.x, this.y - this.r, 15, 10, 5);
+
+        // Update bell angle if ringing
+        if (this.ringing) {
+          this.angle = sin(frameCount * 0.5) * 0.5;
+          this.ringCounter++;
+
+          if (this.ringCounter > 60) {
+            this.ringing = false;
+            this.ringCounter = 0;
+          }
+        } else {
+          this.angle = lerp(this.angle, 0, 0.1);
+        }
+      }
+
+      ring() {
+        this.ringing = true;
+        this.ringCounter = 0;
+      }
+    }
+
+    class Particle {
+      constructor(x, y, col, isSpecial = false) {
+        this.x = x;
+        this.y = y;
+        this.vx = random(-3, 3);
+        this.vy = random(-4, -1);
+        this.alpha = 255;
+        this.size = isSpecial ? random(4, 12) : random(3, 8);
+        this.color = col;
+        this.gravity = isSpecial ? 0.1 : 0.2;
+      }
+
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        this.vy += this.gravity;
+        this.alpha -= 3;
+        this.size *= 0.97;
+      }
+
+      show() {
+        noStroke();
+        fill(red(this.color), green(this.color), blue(this.color), this.alpha);
+        ellipse(this.x, this.y, this.size);
+      }
+
+      isDead() {
+        return this.alpha <= 0 || this.size <= 0.5;
+      }
+    }
+
+    // Initialize background on load
+    window.addEventListener('load', createBackground);
+  </script>
+</body>
+
+</html>

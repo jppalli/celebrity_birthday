@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Word Morph Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        
+        .container {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            padding: 20px;
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+        }
+        
+        h1 {
+            color: #333;
+        }
+        
+        .game-area {
+            margin: 20px 0;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+        }
+        
+        .word-display {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .word-box {
+            background-color: #4a90e2;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .arrow {
+            font-size: 24px;
+        }
+        
+        button {
+            background-color: #4a90e2;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px;
+        }
+        
+        button:hover {
+            background-color: #357abD;
+        }
+        
+        .status {
+            margin: 20px 0;
+            padding: 10px;
+            background-color: #e6f7ff;
+            border-left: 4px solid #1890ff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Word Morph Game</h1>
+        
+        <div class="status" id="status">Initializing game...</div>
+        
+        <div class="game-area">
+            <h2>Today's Challenge</h2>
+            <div class="word-display">
+                <div class="word-box" id="start-word">ROCK</div>
+                <div class="arrow">→</div>
+                <div class="word-box" id="target-word">SAND</div>
+            </div>
+            <p>Optimal solution: <span id="steps">3</span> steps</p>
+            
+            <button id="play-btn">PLAY GAME</button>
+        </div>
+        
+        <div id="sdk-status"></div>
+    </div>
+
+    <script src="https://developers.arkadium.com/cdn/sdk/v2/sdk.js"></script>
+    <script>
+        // Minimal implementation focusing on Arkadium lifecycle events
+        (async function() {
+            const statusEl = document.getElementById('status');
+            const sdkStatusEl = document.getElementById('sdk-status');
+            
+            function updateStatus(message) {
+                statusEl.textContent = message;
+                console.log(message);
+            }
+            
+            function updateSDKStatus(message) {
+                sdkStatusEl.textContent = message;
+                console.log('SDK: ' + message);
+            }
+            
+            updateStatus('Game starting...');
+            
+            // Initialize game elements
+            document.getElementById('play-btn').addEventListener('click', function() {
+                alert('Game would start here!');
+            });
+            
+            // Initialize Arkadium SDK with proper lifecycle events
+            try {
+                updateStatus('Checking for Arkadium SDK...');
+                
+                // Wait for SDK to be available
+                let attempts = 0;
+                while (!window.ArkadiumGameSDK && attempts < 10) {
+                    updateStatus(`Waiting for SDK (${attempts + 1}/10)...`);
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                    attempts++;
+                }
+                
+                if (!window.ArkadiumGameSDK) {
+                    throw new Error('Arkadium SDK not available');
+                }
+                
+                updateStatus('SDK found, initializing...');
+                const sdk = await window.ArkadiumGameSDK.getInstance();
+                updateSDKStatus(`SDK initialized (env: ${sdk.env || 'unknown'})`);
+                
+                // Enable debug mode
+                if (sdk.debugMode) {
+                    sdk.debugMode(true);
+                    updateSDKStatus('Debug mode enabled');
+                }
+                
+                // CRITICAL: Follow the exact lifecycle sequence
+                
+                // 1. First, signal that the game is loading
+                updateSDKStatus('Sending onLoading signal...');
+                if (sdk.lifecycle && sdk.lifecycle.onLoading) {
+                    sdk.lifecycle.onLoading();
+                }
+                
+                // 2. Wait a moment to simulate game loading
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                // 3. Signal that the game is ready for testing
+                updateSDKStatus('Sending onTestReady signal...');
+                if (sdk.lifecycle && sdk.lifecycle.onTestReady) {
+                    sdk.lifecycle.onTestReady();
+                }
+                
+                // 4. Signal that the game is ready for production
+                updateSDKStatus('Sending onReady signal...');
+                if (sdk.lifecycle && sdk.lifecycle.onReady) {
+                    sdk.lifecycle.onReady();
+                }
+                
+                // Store SDK reference
+                window.gameSDK = sdk;
+                
+                updateStatus('Game ready to play!');
+                
+            } catch (e) {
+                updateStatus(`Error: ${e.message}`);
+                console.error('SDK initialization error:', e);
+            }
+        })();
+    </script>
+</body>
+</html>

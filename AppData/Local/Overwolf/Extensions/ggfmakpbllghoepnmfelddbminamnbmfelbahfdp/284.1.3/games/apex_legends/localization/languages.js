@@ -1,0 +1,45 @@
+define([
+  '/games/apex_legends/localization/english.js',
+  '/games/apex_legends/localization/french.js',
+  '/games/apex_legends/localization/german.js',
+  '/games/apex_legends/localization/italian.js',
+  '/games/apex_legends/localization/japanese.js',
+  '/games/apex_legends/localization/korean.js',
+  '/games/apex_legends/localization/polish.js',
+  '/games/apex_legends/localization/portuguese.js',
+  '/games/apex_legends/localization/russian.js',
+  '/games/apex_legends/localization/schinese.js',
+  '/games/apex_legends/localization/spanish.js',
+  '/games/apex_legends/localization/mspanish.js',
+  '/games/apex_legends/localization/tchinese.js',
+], function(
+  english,
+  french,
+  german,
+  italian,
+  japanese,
+  korean,
+  polish,
+  portuguese,
+  russian,
+  schinese,
+  spanish,
+  mspanish,
+  tchinese
+) {
+  return {
+    english,
+    french,
+    german,
+    italian,
+    japanese,
+    korean,
+    polish,
+    portuguese,
+    russian,
+    schinese,
+    spanish,
+    mspanish,
+    tchinese
+  }
+})

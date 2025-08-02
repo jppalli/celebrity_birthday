@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>Overwolf Settings</title>
+  <!--  LEGACY-IMPLEMENTATION-->
+  <link href="https://fonts.googleapis.com/css?family=Lato:400,700" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <script src="js/common/services/locales-service.js"></script>
+  <script src="libs/angular.min.js"></script>
+  <script src="libs/angular-animate.min.js"></script>
+  <script src="js/privacy-angular.js"></script>
+  <script src="js/common/filters/translate.js"></script>
+  <script src="js/privacy-tab/services/accountService.js"></script>
+  <script src="js/privacy-tab/services/privacyService.js"></script>
+  <script src="js/privacy-tab/controllers/accountController.js"></script>
+  <script src="js/privacy-tab/controllers/howWeUseYourDataController.js"></script>
+  <script src="js/privacy-tab/controllers/exerciseYourRightsController.js"></script>
+  <script src="js/privacy-tab/controllers/modalController.js"></script>
+  <script src="js/privacy-tab/controllers/headerController.js"></script>
+  <script src="js/privacy-tab/directives/dragDirective.js"></script>
+  <script src="js/privacy-tab/directives/modalDirective.js"></script>
+  <script src="js/privacy-tab/directives/headerDirective.js"></script>
+  <script src="js/privacy-tab/directives/overviewDirective.js"></script>
+  <script src="js/privacy-tab/directives/accountDirective.js"></script>
+  <script src="js/privacy-tab/directives/dataManagementDirective.js"></script>
+  <script src="js/privacy-tab/directives/howWeUseYourDataDirective.js"></script>
+  <script src="js/privacy-tab/directives/exerciseYourRightsDirective.js"></script>
+  <script src="js/privacy-tab/utils/privacy-utils.js"></script>
+  <!--  LEGACY-IMPLEMENTATION-->
+
+</head>
+
+<body>
+  <div id="window-curtain">
+    <div class="progress-bar"></div>
+  </div>
+  <div id="main"></div>
+
+  <!--  LEGACY-IMPLEMENTATION-->
+  <div id="legacy" class="window__content">
+    <main class="tab-content-container">
+
+      <!--
+        Keep the languages tab first so that when switching languages,
+        it will be the first to update and thus has a better UX.
+      -->
+      <section style="display: none;" legacy-tab="#/language" class="tab-content tab-content--language"
+        id="tab-content--language">
+        <div class="tab-content--language__restart-notification">
+          <p class="info-box active">
+            <span data-locale-key="language.message.restartToApply"></span>
+            <a href="javascript:;">
+              <span data-locale-key="language.message.restartOverwolf"></span>
+            </a>
+          </p>
+        </div>
+        <div class="tab-content--language__main">
+          <h1 data-locale-key="nav.languageTitle"></h1>
+          <h2 data-locale-key="language.selectLanguage"></h2>
+          <ul class="language-selector">
+            <li class="radio-button">
+              <input type="radio" name="language" id="language--english" value="en" checked hidden>
+              <label for="language--english">
+                <b></b>
+                <p>English</p>
+                <p data-locale-key="language.englishUS"></p>
+                <img src="assets/svg/language-flags/english.svg" />
+              </label>
+            </li>
+            <li class="radio-button">
+              <input type="radio" name="language" id="language--russian" value="ru" hidden>
+              <label for="language--russian">
+                <b></b>
+                <p>Pусский</p>
+                <p data-locale-key="language.russian"></p>
+                <img src="assets/svg/language-flags/russian.svg" />
+              </label>
+            </li>
+            <li class="radio-button">
+              <input type="radio" name="language" id="language--german" value="de" hidden>
+              <label for="language--german">
+                <b></b>
+                <p>Deutsch</p>
+                <p data-locale-key="language.german"></p>
+                <img src="assets/svg/language-flags/german.svg" />
+              </label>
+            </li>
+            <li class="radio-button">
+              <input type="radio" name="language" id="language--portuguese" value="pt" hidden>
+              <label for="language--portuguese">
+                <b></b>
+                <p>Português</p>
+                <p data-locale-key="language.portuguese"></p>
+                <img src="assets/svg/language-flags/portuguese.svg" />
+              </label>
+            </li>
+            <li class="radio-button">
+              <input type="radio" name="language" id="language--spanish" value="es" hidden>
+              <label for="language--spanish">
+                <b></b>
+                <p>Español</p>
+                <p data-locale-key="language.spanish"></p>
+                <img src="assets/svg/language-flags/spanish.svg" />
+              </label>
+            </li>
+            <li class="radio-button">
+              <input type="radio" name="language" id="language--french" value="fr" hidden>
+              <label for="language--french">
+                <b></b>
+                <p>Français</p>
+                <p data-locale-key="language.french"></p>
+                <img src="assets/svg/language-flags/french.svg" />
+              </label>
+            </li>
+            <li class="radio-button">
+              <input type="radio" name="language" id="language--italian" value="it" hidden>
+              <label for="language--italian">
+                <b></b>
+                <p>Italiano</p>
+                <p data-locale-key="language.italian"></p>
+                <img src="assets/svg/language-flags/italian.svg" />
+              </label>
+            </li>
+            <li class="radio-button">
+              <input type="radio" name="language" id="language--turkish" value="tr" hidden>
+              <label for="language--turkish">
+                <b></b>
+                <p>Türkçe</p>
+                <p data-locale-key="language.turkish"></p>
+                <img src="assets/svg/language-flags/turkish.svg" />
+              </label>
+            </li>
+            <li class="radio-button">
+              <input type="radio" name="language" id="language--korean" value="ko" hidden>
+              <label for="language--korean">
+                <b></b>
+                <p>한국어</p>
+                <p data-locale-key="language.korean"></p>
+                <img src="assets/svg/language-flags/korean.svg" />
+              </label>
+            </li>
+            <li class="radio-button">
+              <input type="radio" name="language" id="language--polish" value="pl" hidden>
+              <label for="language--polish">
+                <b></b>
+                <p>Polski</p>
+                <p data-locale-key="language.polish"></p>
+                <img src="assets/svg/language-flags/polish.svg" />
+              </label>
+            </li>
+            <li class="radio-button">
+              <input type="radio" name="language" id="language--vietnamese" value="vi" hidden>
+              <label for="language--vietnamese">
+                <b></b>
+                <p>Việt Nam</p>
+                <p data-locale-key="language.vietnamese"></p>
+                <img src="assets/svg/language-flags/vietnamese.svg" />
+              </label>
+            </li>
+            <li class="radio-button">
+              <input type="radio" name="language" id="language--chinese" value="zh" hidden>
+              <label for="language--chinese">
+                <b></b>
+                <p>汉语</p>
+                <p data-locale-key="language.chinese"></p>
+                <img src="assets/svg/language-flags/chinese.svg" />
+              </label>
+            </li>
+            <li class="radio-button">
+              <input type="radio" name="language" id="language--japanese" value="ja" hidden>
+              <label for="language--japanese">
+                <b></b>
+                <p>日本語</p>
+                <p data-locale-key="language.japanese"></p>
+                <img src="assets/svg/language-flags/japanese.svg" />
+              </label>
+            </li>
+            <li class="radio-button">
+              <input type="radio" name="language" id="language--chinese-taiwan" value="zh-tw" hidden>
+              <label for="language--chinese-taiwan">
+                <b></b>
+                <p>繁體中文</p>
+                <p data-locale-key="language.chinese-taiwan"></p>
+                <img src="assets\icons\default_flag.png" />
+              </label>
+            </li>
+          </ul>
+        </div>
+      </section>
+
+
+      <section style="display: none;" legacy-tab="#/capture" class="tab-content tab-content--capture"
+        id="tab-content--capture">
+        <section class="tab-content--capture__main-state">
+          <div class="tab-content--capture__recording-in-progress-notification">
+            <p class="info-box active">
+              <span data-locale-key="capture.recordingInProgress"></span>
+            </p>
+          </div>
+          <div class="tab-content--capture__main-state__scrollable">
+            <h1><span data-locale-key="nav.captureTitle"></span></h1>
+            <div class="relevant-apps-box">
+              <span data-locale-key="capture.relevantAppsBox"></span>
+              <ul>
+                <!-- relevant apps -->
+              </ul>
+            </div>
+            <div class="subsection-selector" id="capture-subsection-selector">
+              <button id="captureVideoSelectionButton" class="active"><span
+                  data-locale-key="capture.captureVideoSelectionButton"></span></button>
+              <button id="captureAudioSelectionButton"><span
+                  data-locale-key="capture.captureAudioSelectionButton"></span></button>
+            </div>
+            <section class="subsection capture-subsection--video active" id="capture-subsection--video">
+              <section class="capture-section quality-options">
+                <section>
+                  <h2><span data-locale-key="capture.resolution"></span></h2>
+                  <ul>
+                    <li class="radio-button">
+                      <input type="radio" name="resolution" id="resolution--source" checked hidden>
+                      <label for="resolution--source">
+                        <b></b>
+                        <p><span data-locale-key="capture.resolution.source"></span></p>
+                      </label>
+                    </li>
+                    <li class="radio-button">
+                      <input type="radio" name="resolution" id="resolution--1080" hidden>
+                      <label for="resolution--1080">
+                        <b></b>
+                        <p>1080p</p>
+                      </label>
+                    </li>
+                    <li class="radio-button">
+                      <input type="radio" name="resolution" id="resolution--720" hidden>
+                      <label for="resolution--720">
+                        <b></b>
+                        <p>720p</p>
+                      </label>
+                    </li>
+                    <li class="radio-button">
+                      <input type="radio" name="resolution" id="resolution--480" hidden>
+                      <label for="resolution--480">
+                        <b></b>
+                        <p>480p</p>
+                      </label>
+                    </li>
+                  </ul>
+                </section>
+                <section>
+                  <h2><span data-locale-key="capture.frameRate"></span></h2>
+                  <ul>
+                    <li class="radio-button">
+                      <input type="radio" name="frame-rate" id="frame-rate--120" hidden>
+                      <label for="frame-rate--120">
+                        <b></b>
+                        <p>120</p>
+                      </label>
+                    </li>
+                    <li class="radio-button">
+                      <input type="radio" name="frame-rate" id="frame-rate--60" checked hidden>
+                      <label for="frame-rate--60">
+                        <b></b>
+                        <p>60</p>
+                      </label>
+                    </li>
+                    <li class="radio-button">
+                      <input type="radio" name="frame-rate" id="frame-rate--30" hidden>
+                      <label for="frame-rate--30">
+                        <b></b>
+                        <p>30</p>
+                      </label>
+                    </li>
+                    <li class="radio-button">
+                      <input type="radio" name="frame-rate" id="frame-rate--20" hidden>
+                      <label for="frame-rate--20">
+                        <b></b>
+                        <p>20</p>
+                      </label>
+                    </li>
+                    <li class="radio-button">
+                      <input type="radio" name="frame-rate" id="frame-rate--10" hidden>
+                      <label for="frame-rate--10">
+                        <b></b>
+                        <p>10</p>
+                      </label>
+                    </li>
+                  </ul>
+                </section>
+              </section>
+              <section class="capture-section capture-folder-selectors">
+                <section>
+                  <h2><span data-locale-key="capture.videoFolder"></span></h2>
+                  <div class="folder-selector">
+                    <p>
+                      <span id="videosFolderPathPrefix"></span>
+                      <span id="videosFolderPathSuffix"></span>
+                    </p>
+                    <button class="button--text" id="videosFolderOpenButton"><span
+                        data-locale-key="capture.videoFolder.open"></span></button>
+                    <button class="button--text" id="videosFolderChangeButton"><span
+                        data-locale-key="capture.videoFolder.change"></span></button>
+                  </div>
+                </section>
+                <section>
+                  <h2><span data-locale-key="capture.screenshotFolder"></span></h2>
+                  <div class="folder-selector">
+                    <p>
+                      <span id="screenshotsFolderPathPrefix"></span>
+                      <span id="screenshotsFolderPathSuffix"></span>
+                    </p>
+                    <button class="button--text" id="screenshotsFolderOpenButton"><span
+                        data-locale-key="capture.screenshotFolder.open"></span></button>
+                    <button class="button--text" id="screenshotsFolderChangeButton"><span
+                        data-locale-key="capture.screenshotFolder.change"></span></button>
+                  </div>
+                </section>
+              </section>
+              <section class="capture-section advanced-toggle">
+                <button id="videoCaptureAdvancedButton" class="button--text button--text--flippable"
+                  data-id-to-activate="capture-video-advanced">
+                  <span data-locale-key="capture.AdvancedButton"></span>
+                  <svg>
+                    <use xlink:href="/assets/svg/sprite.svg#dropdown-icon"></use>
+                  </svg>
+                </button>
+              </section>
+              <div class="advanced" id="capture-video-advanced">
+                <section class="capture-section recording-mode">
+                  <h2><span data-locale-key="capture.RecordingMode"></span></h2>
+                  <ul>
+                    <li>
+                      <div class="radio-button">
+                        <input type="radio" name="recording-mode" id="recording-mode--monitor" checked hidden>
+                        <label for="recording-mode--monitor">
+                          <b></b>
+                          <p><span data-locale-key="capture.RecordingMode.recordMonitor"></span></p>
+                          <span class="more-info">
+                            <div class="tooltip">
+                              <p><span data-locale-key="capture.RecordingMode.recordMonitor.tooltip"></span></p>
+                            </div>
+                          </span>
+                        </label>
+                      </div>
+                      <div class="dropdown" id="record-monitor-dropdown">
+                        <p class="dropdown-selected-item">
+                          <span id="selectedCaptureMonitor"></span>
+                          <i>
+                            <svg>
+                              <use xlink:href="/assets/svg/sprite.svg#dropdown-icon"></use>
+                            </svg>
+                          </i>
+                        </p>
+                        <div class="dropdown-list-wrapper">
+                          <ul class="dropdown-list" id="captureMonitorList">
+                          </ul>
+                        </div>
+                      </div>
+                    </li>
+                    <li>
+                      <div class="radio-button">
+                        <input type="radio" name="recording-mode" id="recording-mode--game" hidden>
+                        <label for="recording-mode--game">
+                          <b></b>
+                          <p><span data-locale-key="capture.RecordingMode.recordActiveGame"></span></p>
+                          <span class="more-info">
+                            <div class="tooltip">
+                              <p><span data-locale-key="capture.RecordingMode.recordActiveGame.tooltip"></span></p>
+                            </div>
+                          </span>
+                        </label>
+                      </div>
+                    </li>
+                  </ul>
+                </section>
+                <section class="capture-section capture-options">
+                  <h2><span data-locale-key="capture.captureOptions"></span></h2>
+                  <section>
+                    <header><span data-locale-key="capture.captureOptions.mouseCursor"></span></header>
+                    <div class="dropdown">
+                      <p class="dropdown-selected-item">
+                        <span id="selectedCaptureCursor"></span>
+                        <i><svg>
+                            <use xlink:href="/assets/svg/sprite.svg#dropdown-icon"></use>
+                          </svg></i>
+                      </p>
+                      <div class="dropdown-list-wrapper">
+                        <ul class="dropdown-list" id="captureCursorList">
+                          <li data-setting-id="0"><span
+                              data-locale-key="capture.captureOptions.mouseCursor.desktopAndGame"></span></li>
+                          <li data-setting-id="1"><span
+                              data-locale-key="capture.captureOptions.mouseCursor.gameOnly"></span></li>
+                          <li data-setting-id="2"><span
+                              data-locale-key="capture.captureOptions.mouseCursor.desktopOnly"></span></li>
+                        </ul>
+                      </div>
+                    </div>
+                  </section>
+                  <section>
+                    <header><span data-locale-key="capture.captureOptions.overwolfWindows"></span>
+                      <!--
+											--><span class="more-info">
+                        <div class="tooltip">
+                          <p><span data-locale-key="capture.captureOptions.overwolfWindows.tooltip"></span>
+                            <a href="https://support.overwolf.com/support/solutions/articles/9000178065-overwolf-window-capture-settings"
+                              target="_blank">
+                              <span data-locale-key="capture.captureOptions.overwolfWindows.tooltip.learnMore"></span>
+                            </a>
+                          </p>
+                        </div>
+                      </span>
+                    </header>
+                    <div class="dropdown" id="capture-overwolf-windows">
+                      <p class="dropdown-selected-item">
+                        <span id="selectedCaptureWindows"></span>
+                        <i><svg>
+                            <use xlink:href="/assets/svg/sprite.svg#dropdown-icon"></use>
+                          </svg></i>
+                      </p>
+                      <div class="dropdown-list-wrapper">
+                        <ul class="dropdown-list" id="captureWindowsList">
+                          <li data-setting-id="1"><span
+                              data-locale-key="capture.captureOptions.overwolfWindows.allWindows"></span></li>
+                          <li data-setting-id="2"><span
+                              data-locale-key="capture.captureOptions.overwolfWindows.allButRecorder"></span></li>
+                          <li data-setting-id="0"><span
+                              data-locale-key="capture.captureOptions.overwolfWindows.noWindows"></span></li>
+                        </ul>
+                      </div>
+                    </div>
+                    <p class="caption active" id="opengl-note"><span
+                        data-locale-key="capture.captureOptions.overwolfWindows.allButRecorder.notSupportedIn"></span><a
+                        target="_blank"
+                        href="https://support.overwolf.com/support/solutions/articles/9000178065-overwolf-window-capture-settings#ogl_issues">
+                        <span
+                          data-locale-key="capture.captureOptions.overwolfWindows.allButRecorder.notSupportedIn.openGLGames"></span></a>
+                    </p>
+                  </section>
+                </section>
+                <section class="capture-section recording-indication">
+                  <h2><span data-locale-key="capture.recordingIndication"></span></h2>
+                  <header><span data-locale-key="capture.recordingIndication.displayIndicatorOptions"></span>
+                    <!--
+											--><span class="more-info">
+                      <div class="tooltip">
+                        <p><span data-locale-key="capture.recordingIndication.displayIndicatorOptions.tooltip"></span>
+                        </p>
+                      </div>
+                    </span>
+                  </header>
+                  <div class="dropdown" id="recording-indicator-dropdown">
+                    <p class="dropdown-selected-item">
+                      <span id="selectedRecordingIndicator"></span>
+                      <i><svg>
+                          <use xlink:href="/assets/svg/sprite.svg#dropdown-icon"></use>
+                        </svg></i>
+                    </p>
+                    <div class="dropdown-list-wrapper">
+                      <ul class="dropdown-list" id="recordingIndicatorList">
+                        <li class="active" data-setting-id="2"><span
+                            data-locale-key="capture.recordingIndication.displayIndicatorOptions.redDotAndTime"></span>
+                        </li>
+                        <li data-setting-id="1"><span
+                            data-locale-key="capture.recordingIndication.displayIndicatorOptions.redDot"></span></li>
+                        <li data-setting-id="0"><span
+                            data-locale-key="capture.recordingIndication.displayIndicatorOptions.noIndication"></span>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                  <div class="corner-selector-wrapper">
+                    <div class="corner-selector selected--bottom-left" id="recording-indicator-corner-selector"
+                      data-setting-id="2">
+                      <img src="assets/svg/screen.svg" />
+                      <button class="corner-selector__button corner-selector__button__top-left" data-corner="top-left"
+                        data-setting-id="0"></button>
+                      <button class="corner-selector__button corner-selector__button__top-right" data-corner="top-right"
+                        data-setting-id="1"></button>
+                      <button class="corner-selector__button corner-selector__button__bottom-left"
+                        data-corner="bottom-left" data-setting-id="2"></button>
+                      <button class="corner-selector__button corner-selector__button__bottom-right"
+                        data-corner="bottom-right" data-setting-id="3"></button>
+                    </div>
+                  </div>
+                </section>
+                <section class="capture-section encoding-options">
+                  <h2><span data-locale-key="capture.encoding"></span></h2>
+                  <section>
+                    <header><span data-locale-key="capture.encoding.codec"></span>
+                      <!--
+											--><span class="more-info">
+                        <div class="tooltip">
+                          <p><span data-locale-key="capture.encoding.codec.tooltip"></span><a
+                              href="https://support.overwolf.com/support/solutions/articles/9000177861-video-codec-selection-and-availability"
+                              target="_blank"><span
+                                data-locale-key="capture.encoding.codec.tooltip.learnMore"></span></a></p>
+                        </div>
+                      </span></header>
+                    <div class="dropdown dropdown--reversed">
+                      <p class="dropdown-selected-item">
+                        <span id="selectedRecordingEncoder"></span>
+                        <i><svg>
+                            <use xlink:href="/assets/svg/sprite.svg#dropdown-icon"></use>
+                          </svg></i>
+                      </p>
+                      <div class="dropdown-list-wrapper">
+                        <ul class="dropdown-list" id="recordingEncoderList">
+                        </ul>
+                      </div>
+                    </div>
+                  </section>
+                  <section>
+                    <header><span data-locale-key="capture.encoding.preset"></span>
+                      <!--
+											--><span class="more-info">
+                        <div class="tooltip">
+                          <p><span data-locale-key="capture.encoding.preset.tooltip"></span></p>
+                        </div>
+                      </span></header>
+                    <div class="dropdown dropdown--reversed">
+                      <p class="dropdown-selected-item">
+                        <span id="selectedRecordingPreset"></span>
+                        <i><svg>
+                            <use xlink:href="/assets/svg/sprite.svg#dropdown-icon"></use>
+                          </svg></i>
+                      </p>
+                      <div class="dropdown-list-wrapper">
+                        <ul class="dropdown-list" id="recordingPresetList">
+                        </ul>
+                      </div>
+                    </div>
+                  </section>
+                  <section>
+                    <header><span data-locale-key="capture.encoding.rateControl"></span>
+                      <span class="more-info">
+                        <div class="tooltip">
+                          <p><span data-locale-key="capture.encoding.rateControl.tooltip"></span></p>
+                        </div>
+                      </span>
+                    </header>
+                    <div class="dropdown dropdown--reversed">
+                      <p class="dropdown-selected-item">
+                        <span id="selectedRecordingRateControl"></span>
+                        <i><svg>
+                            <use xlink:href="/assets/svg/sprite.svg#dropdown-icon"></use>
+                          </svg>
+                        </i>
+                      </p>
+                      <div class="dropdown-list-wrapper">
+                        <ul class="dropdown-list" id="recordingRateControlList">
+                        </ul>
+                      </div>
+                    </div>
+                  </section>
+                  <section>
+                    <header><span data-locale-key="capture.encoding.maxKbps"></span>
+                      <!-- <span class="more-info">
+                        <div class="tooltip">
+                          <p><span data-locale-key="capture.encoding.maxKbps.tooltip"></span></p>
+                        </div>
+                      </span> -->
+                    </header>
+                    <div id="maxKbpsSlider" class="input-range-slider-container">
+                      <div class="range-value-floater">
+                        <div class="range-output">
+                          <span class="val"></span>
+                          <span class="size-meta">Kbps</span>
+                        </div>
+                      </div>
+                      <input id="selectedMaxKbps" type="range" min="2000" max="50000" step="100">
+                      <span class="progress-line"></span>
+                    </div>
+                  </section>
+                </section>
+                <section class="capture-section" id="compatibility-section">
+                  <h2><span data-locale-key="capture.compatibilityMode"></span>
+                    <!--
+										--><span class="more-info">
+                      <div class="tooltip">
+                        <p><span data-locale-key="capture.compatibilityMode.tooltip"></span></p>
+                      </div>
+                    </span></h2>
+                  <div class="toggle">
+                    <input id="compatibility-mode" type="checkbox" hidden />
+                    <label for="compatibility-mode">
+                      <span data-locale-key="capture.compatibilityMode.enableWhenCapturing"></span>
+                      <b></b>
+                    </label>
+                  </div>
+                </section>
+              </div>
+            </section>
+            <section class="subsection capture-subsection--audio" id="capture-subsection--audio" style="display:none;">
+              <section class="capture-section">
+                <h2 data-locale-key="capture.audio.systemSoundHeader"></h2>
+                <section>
+                  <div class="toggle">
+                    <input id="capture-system-sound" type="checkbox" checked hidden />
+                    <label for="capture-system-sound">
+                      <span data-locale-key="capture.audio.captureSystemSound"></span>
+                      <b></b>
+                    </label>
+                  </div>
+                </section>
+                <section id="system-sound__device">
+                  <header data-locale-key="capture.audio.device"></header>
+                  <div class="dropdown">
+                    <p class="dropdown-selected-item">
+                      <span id="selectedSystemSoundDevice"></span>
+                      <i><svg>
+                          <use xlink:href="/assets/svg/sprite.svg#dropdown-icon"></use>
+                        </svg></i>
+                    </p>
+                    <div class="dropdown-list-wrapper">
+                      <ul class="dropdown-list" id="systemSoundDeviceList">
+                      </ul>
+                    </div>
+                  </div>
+                </section>
+                <section id="system-sound__volume">
+                  <header data-locale-key="capture.audio.volume"></header>
+                  <input type="range" />
+                </section>
+              </section>
+              <section class="capture-section">
+                <h2 data-locale-key="capture.audio.microphone"></h2>
+                <section>
+                  <div class="toggle">
+                    <input id="capture-microphone-sound" type="checkbox" checked hidden />
+                    <label for="capture-microphone-sound">
+                      <span data-locale-key="capture.audio.captureMicrophone"></span>
+                      <b></b>
+                    </label>
+                  </div>
+                </section>
+                <section id="microphone-sound__device">
+                  <header data-locale-key="capture.audio.device"></header>
+                  <div class="dropdown dropdown--reversed">
+                    <p class="dropdown-selected-item">
+                      <span id="selectedMicSoundDevice"></span>
+                      <i><svg>
+                          <use xlink:href="/assets/svg/sprite.svg#dropdown-icon"></use>
+                        </svg></i>
+                    </p>
+                    <div class="dropdown-list-wrapper">
+                      <ul class="dropdown-list" id="micSoundDeviceList">
+                      </ul>
+                    </div>
+                  </div>
+                </section>
+                <section id="microphone-sound__volume">
+                  <header data-locale-key="capture.audio.volume"></header>
+                  <input type="range" />
+                </section>
+              </section>
+            </section>
+          </div>
+        </section>
+        <section class="tab-content--capture__no-apps-state" style="display: none;">
+          <h1 data-locale-key="nav.captureTitle"></h1>
+          <div class="tab-content--capture__no-apps-state__content">
+            <img src="assets/svg/no-capture-apps.webp" />
+            <p data-locale-key="capture.emptyState.message"></p>
+            <button class="button--text button--text--cta" data-locale-key="capture.emptyState.discoverCaptureAppsBtn">
+            </button>
+          </div>
+        </section>
+      </section>
+
+      <section style="display: none;" legacy-tab="#/sounds" class="tab-content tab-content--sounds"
+        id="tab-content--sounds">
+        <h1 data-locale-key="sounds.title"></h1>
+        <section>
+          <header data-locale-key="sounds.playbackDevice"></header>
+          <div class="dropdown">
+            <p class="dropdown-selected-item">
+              <span id="selectedDevice"></span>
+              <i>
+                <svg>
+                  <use xlink:href="/assets/svg/sprite.svg#dropdown-icon"></use>
+                </svg>
+              </i>
+            </p>
+            <div class="dropdown-list-wrapper">
+              <ul class="dropdown-list" id="audioDeviceList">
+              </ul>
+            </div>
+          </div>
+        </section>
+        <section>
+          <header data-locale-key="sounds.volume"></header>
+          <div class="tab-content--sounds__volume">
+            <input type="range" />
+            <button class="button--icon button--icon--small button--play">
+              <svg class="svg-icon-fill">
+                <use xlink:href="/assets/svg/sprite.svg#button--play"></use>
+              </svg>
+            </button>
+          </div>
+        </section>
+        <section>
+          <div class="toggle">
+            <input id="play-skin-sfx" type="checkbox" checked hidden />
+            <label for="play-skin-sfx">
+              <span data-locale-key="sounds.playSkinSfxSounds"></span>
+              <b></b>
+            </label>
+          </div>
+          <div class="toggle">
+            <input id="play-skin-speech" type="checkbox" checked hidden />
+            <label for="play-skin-speech">
+              <span>
+                <span data-locale-key="sounds.playSkinSpeechSounds"></span>
+                <!--
+								--><span class="more-info">
+                  <div class="tooltip">
+                    <p data-locale-key="sounds.playSkinSpeechSounds.tooltip"></p>
+                  </div>
+                </span>
+              </span>
+              <b></b>
+            </label>
+          </div>
+        </section>
+      </section>
+
+
+      <section style="display: none;" legacy-tab="#/privacy" class="tab-content tab-content--privacy"
+        id="tab-content--privacy">
+        <h1 data-locale-key="nav.privacyTitle"></h1>
+        <section class="tab-content--privacy__main">
+          <section id="overview" ow-overview></section>
+          <section id="data-management" ng-hide="!showCmp" ow-data-management>
+          </section>
+
+          <section
+            id="exercise-your-rights"
+            ng-controller="ExerciseYourRightsController"
+            ow-exercise-your-rights>
+          </section>
+
+          <section id="how-we-use-your-data"
+            ng-controller="HowWeUseYourDataController"
+            ow-how-we-use-your-data>
+          </section>
+
+          <section id="account" ng-controller="AccountController" ow-account></section>
+        </section>
+
+        <section ng-controller="ModalController" ow-modal></section>
+      </section>
+
+    </main>
+
+  </div>
+
+  <script src="js/common/views/view-component.js"></script>
+  <script src="js/common/views/view.js"></script>
+  <script src="js/common/views/modal.js"></script>
+  <script src="js/common/views/drop-down/drop-down-component.js"></script>
+  <script src="js/common/views/drop-down/drop-down-audio-device-adapter.js"></script>
+  <script src="js/common/models/audio-device-model.js"></script>
+  <script src="js/common/services/tooltip-utils.js"></script>
+  <script src="js/common/services/path-utils-service.js"></script>
+  <script src="js/common/services/settings-service.js"></script>
+  <script src="js/common/services/audio-device-service.js"></script>
+  <script src="js/common/services/translation-service.js"></script>
+  <script src="js/common/services/analytics-service.js"></script>
+  <script src="js/common/services/extensions-service.js"></script>
+  <script src="js/common/controllers/base-controller.js"></script>
+  <script src="js/app/views/app-view.js"></script>
+
+  <script src="js/app/controllers/app-controller.js"></script>
+
+  <script src="js/capture-tab/views/capture-tab-video-view.js"></script>
+  <script src="js/capture-tab/views/capture-tab-video-recording-mode-view.js"></script>
+  <script src="js/capture-tab/views/capture-tab-video-capture-options-view.js"></script>
+  <script src="js/capture-tab/views/capture-tab-video-recording-indicator-view.js"></script>
+  <script src="js/capture-tab/views/capture-tab-video-encoding-view.js"></script>
+  <script src="js/capture-tab/views/capture-tab-audio-view.js"></script>
+  <script src="js/capture-tab/views/capture-tab-view.js"></script>
+  <script src="js/capture-tab/controllers/capture-tab-video-controller.js"></script>
+  <script src="js/capture-tab/controllers/capture-tab-video-recording-mode-controller.js"></script>
+  <script src="js/capture-tab/controllers/capture-tab-video-capture-options-controller.js"></script>
+  <script src="js/capture-tab/controllers/capture-tab-video-recording-indicator-controller.js"></script>
+  <script src="js/capture-tab/controllers/capture-tab-video-encoding-controller.js"></script>
+  <script src="js/capture-tab/controllers/capture-tab-controller.js"></script>
+  <script src="js/capture-tab/controllers/capture-tab-audio-controller.js"></script>
+  <script src="js/sounds-tab/services/sound-check-service.js"></script>
+  <script src="js/sounds-tab/views/sounds-tab-view.js"></script>
+  <script src="js/sounds-tab/controllers/sounds-tab-controller.js"></script>
+
+  <script src="js/language-tab/controllers/language-tab-controller.js"></script>
+  <script src="js/language-tab/views/language-tab-view.js"></script>
+
+  <script src="js/bootstrap.js"></script>
+  <!--  LEGACY-IMPLEMENTATION-->
+<script type="text/javascript" src="../main/index.js"></script></body>
+
+</html>

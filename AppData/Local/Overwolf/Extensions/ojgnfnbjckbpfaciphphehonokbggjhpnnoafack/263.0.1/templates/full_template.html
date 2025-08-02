@@ -1,0 +1,481 @@
+<div id="dvTemplate">
+<!-- BLOCK: NAV MENU -->
+<nav id="main-menu" ow-menu ow-menu-border-size="14" ng-hide="hideMenuNav">
+    <div class="inner">
+        <ul>
+            <li ow-menu-item class="search">
+                <a href="/search2/">Search <i class="icon-ui_search"></i></a>
+            </li>
+            <li ow-menu-item active="true" ow-menu-item-border-size="44">
+                <a href="#">Overwolf Apps</a>
+                <ul>
+                    <!--<li ow-menu-item class="highlighted"><a href="#">Popular</a></li>-->
+                    <!--<li ow-menu-item class="highlighted"><a href="cow/">New stuff</a></li>-->
+                    <li ow-menu-item><a href="/categories/social/">Social</a></li>
+
+                    <li ow-menu-item><a href="/categories/entertainment/">Entertaiment</a></li>
+                    <li ow-menu-item><a href="/cow/">Utilities</a></li>
+                    <li ow-menu-item><a href="categories/social/">TouchFox</a></li>
+                    <li ow-menu-item><a href="#">For Games</a></li>
+                    <li ow-menu-item><a href="#">Capture &amp; Streaming</a></li>
+                    <li ow-menu-item><a href="#">Chat &amp; Voice</a></li>
+                </ul>
+            </li>
+            <li ow-menu-item ow-menu-item-border-size="44">
+                <a href="#">Games</a>
+                <ul>
+                    <!--<li ow-menu-item class="highlighted"><a href="#">Friends Games</a></li>-->
+                    <!--<li ow-menu-item class="highlighted"><a href="#">Deals</a></li>-->
+                    <!--<li ow-menu-item class="highlighted"><a href="#">Free to Play</a></li>-->
+                    <li ow-menu-item><a href="#">Shooters</a></li>
+                    <li ow-menu-item><a href="#">MMORPG</a></li>
+                    <li ow-menu-item><a href="#">Sports</a></li>
+                    <li ow-menu-item><a href="#">RPG</a></li>
+                    <li ow-menu-item><a href="#">Strategy</a></li>
+                    <li ow-menu-item><a href="#">Action</a></li>
+                    <li ow-menu-item><a href="#">Arcade</a></li>
+                </ul>
+            </li>
+
+            <li class="redeem"><a href="#" class="btn-standard btn-redeem"
+                                  ow-modal-trigger="templates/redeem-modal.html" ow-modal-trigger-container="redeem">Redeem</a>
+            </li>
+        </ul>
+    </div>
+
+    <span class="sliding-border" ng-style="owMenu.activeBorder"></span>
+    <!--
+    <span class="sliding-border non-transition" ng-style="owMenu.hoverBorder"></span>
+    -->
+</nav>
+<!-- /BLOCK: NAV MENU -->
+<div id="dvScrollWrapper" style="position: relative; overflow: hidden; height: 100%;" ow-scrollbar
+     scroll-top-y-offset="74">
+<div id="dvView" ng-view>
+<!-- BLOCK: MAIN CONTENT -->
+<section id="main-content" class="starting-background">
+<div class="bg-slide" ow-slide ow-slide-data="{img: 'images/temp/bg-2.png'}" ow-slide-active="true"></div>
+<div class="bg-slide-dimming" ow-dimming></div>
+
+
+<div class="main-content-inner">
+<div id="dvInfiniscroll" infinite-scroll='loadNextPage()' infinite-scroll-distance='0.1'>
+
+
+<section class="tiles">
+<header>
+    <h1>Featured
+        <a href="#" class="js-view-all-tiles">View all<i>&#xe60a;</i></a>
+    </h1>
+</header>
+
+<div class="tiles-inner">
+
+<div class="tiles-row cf">
+<!-- BLOCK APPLICATION TILE -->
+<article ow-modal-trigger="templates/app-modal.html" ow-modal-trigger-container="app" ng-controller="AppsController"
+         data-ow-id="333">
+    <small class="installed" ng-show="isInstalled" ng-cloak>
+        <i class="icon-ui_installed"></i> Installed
+    </small>
+    <span class="tile-pic"><img src="images/temp/img-1.png" alt=""></span>
+    <h5 ng-cloak>
+        <small class="price">{{price}}</small>
+        Very Long application name
+    </h5>
+    <aside>
+                                        <span class="downloads">
+                                            <i class="icon-ui_downloads-arrow"></i> 10,256 Downloads
+                                        </span>
+                                        <span class="rating rating-3-5">
+                                            <i></i>
+                                            <i></i>
+                                            <i></i>
+                                            <i></i>
+                                            <i></i>
+                                        </span>
+    </aside>
+
+    <div class="overlay-wrap">
+        <div class="overlay">
+            <h6>
+                <span class="tile-thumb"><img src="images/temp/img-thumb-1.jpg" alt=""></span>
+                Very Long application name
+
+                                                <span class="rating rating-3-5">
+                                                    <i></i>
+                                                    <i></i>
+                                                    <i></i>
+                                                    <i></i>
+                                                    <i></i>
+                                                </span>
+            </h6>
+
+            <p ow-trim-text>
+                Defend your kingdom against hordes of orcs, trolls, evil wizards and other nasty fiends in this medieval
+                fantasy fun action packed tower defense game with RTS elements by Ironhide Game Studio.
+            </p>
+
+                                            <span class="tile-controls" ow-modal-trigger-ignore ng-cloak>
+                                                <a href="#" class="btn-standard" ng-show="isInstalled">Launch</a>
+                                                <a href="#" class="btn-standard" ng-hide="isInstalled">{{price}}</a>
+                                                <!--<a href="#" class="btn-share" ow-share-tooltip="https://google.com/"><i class="icon-ui_share"></i></a>-->
+                                            </span>
+        </div>
+    </div>
+</article>
+<!-- /BLOCK APPLICATION TILE -->
+<article ow-modal-trigger="templates/app-modal.html" ow-modal-trigger-container="app">
+    <span class="tile-pic"><img src="images/temp/img-2.png" alt=""></span>
+    <h5>
+        <small class="price">free</small>
+        Very Long application name
+    </h5>
+    <aside>
+                                        <span class="metacritic green">
+                                            <em>99</em>
+                                        </span>
+                                        <span class="rating rating-3-5">
+                                            <i></i>
+                                            <i></i>
+                                            <i></i>
+                                            <i></i>
+                                            <i></i>
+                                        </span>
+    </aside>
+    <div class="overlay-wrap">
+        <div class="overlay">
+            <h6>
+                <span class="tile-thumb"><img src="images/temp/img-thumb-1.jpg" alt=""></span>
+                Very Long application name
+
+                                                <span class="metacritic green">
+                                                    <em>99</em>
+                                                </span>
+            </h6>
+
+            <p ow-trim-text>
+                Defend your kingdom against hordes of orcs, trolls, evil wizards and other nasty fiends in this medieval
+                fantasy fun action packed tower defense game with RTS elements by Ironhide Game Studio.
+                Defend your kingdom against hordes of orcs, trolls, evil wizards and other nasty fiends in this medieval
+                fantasy fun action packed tower defense game with RTS elements by Ironhide Game Studio.
+            </p>
+
+                                            <span class="tile-controls" ow-modal-trigger-ignore>
+                                                <a href="#" class="btn-standard">Free <i class="icon-ui_link-arrow"></i></a>
+                                                <a href="#" class="btn-share" ow-share-tooltip="https://google.com/"><i
+                                                        class="icon-ui_share"></i></a>
+                                            </span>
+        </div>
+    </div>
+</article>
+
+<article ow-modal-trigger="templates/app-modal.html" ow-modal-trigger-container="app">
+    <span class="tile-pic"><img src="images/temp/img-1.png" alt=""></span>
+    <h5>
+        <small class="price">$22.99</small>
+        Very Long application name with some dots for you to see
+    </h5>
+    <aside>
+                                        <span class="metacritic yellow">
+                                            <em>50</em>
+                                        </span>
+                                        <span class="rating rating-1-5">
+                                            <i></i>
+                                            <i></i>
+                                            <i></i>
+                                            <i></i>
+                                            <i></i>
+                                        </span>
+    </aside>
+    <div class="overlay-wrap">
+        <div class="overlay">
+            <h6>
+                <span class="tile-thumb"><img src="images/temp/img-thumb-1.jpg" alt=""></span>
+                Very Long application name
+
+                                                <span class="metacritic yellow">
+                                                    <em>50</em>
+                                                </span>
+            </h6>
+
+            <p ow-trim-text>
+                Defend your kingdom against hordes of orcs, trolls, evil wizards and other nasty fiends in this medieval
+                fantasy fun action packed tower defense game with RTS elements by Ironhide Game Studio.
+            </p>
+
+                                            <span class="tile-controls" ow-modal-trigger-ignore>
+                                                <a href="#" class="btn-standard">$22.99</a>
+                                                <a href="#" class="btn-share" ow-share-tooltip="https://google.com/"><i
+                                                        class="icon-ui_share"></i></a>
+                                            </span>
+        </div>
+    </div>
+</article>
+
+<article ow-modal-trigger="templates/app-modal.html" ow-modal-trigger-container="app">
+    <span class="tile-pic"><img src="images/temp/img-4.png" alt=""></span>
+    <h5>
+        <small class="price">$0.99</small>
+        Very Long application name to check it's length here
+    </h5>
+    <aside>
+                                        <span class="metacritic red">
+                                            <em>25</em>
+                                        </span>
+                                        <span class="rating rating-5">
+                                            <i></i>
+                                            <i></i>
+                                            <i></i>
+                                            <i></i>
+                                            <i></i>
+                                        </span>
+    </aside>
+
+    <div class="overlay-wrap">
+        <div class="overlay">
+            <h6>
+                <span class="tile-thumb"><img src="images/temp/img-thumb-1.jpg" alt=""></span>
+                Very Long application name to check it's length here
+
+                                                <span class="metacritic red">
+                                                    <em>25</em>
+                                                </span>
+            </h6>
+
+            <p ow-trim-text>
+                Defend your kingdom against hordes of orcs, trolls, evil wizards and other nasty fiends in this medieval
+                fantasy fun action packed tower defense game with RTS elements by Ironhide Game Studio.
+            </p>
+
+                                            <span class="tile-controls" ow-modal-trigger-ignore>
+                                                <a href="#" class="btn-standard">$0.99</a>
+                                                <a href="#" class="btn-share" ow-share-tooltip="https://google.com/"><i
+                                                        class="icon-ui_share"></i></a>
+                                            </span>
+        </div>
+    </div>
+</article>
+
+<article ow-modal-trigger="templates/app-modal.html" ow-modal-trigger-container="app">
+    <span class="tile-pic"><img src="images/temp/img-5.png" alt=""></span>
+    <h5>
+        <small class="price price-discount">$18.75</small>
+        Very Long application name
+    </h5>
+    <aside class="discount">
+        <div class="inner">
+            <small class="price">$12.99</small>
+            <em>40% Off</em>
+            on Amazon
+        </div>
+    </aside>
+    <div class="overlay-wrap">
+        <div class="overlay">
+            <h6>
+                <span class="tile-thumb"><img src="images/temp/img-thumb-1.jpg" alt=""></span>
+                Very Long application name
+
+                                                <span class="metacritic yellow">
+                                                    <em>62</em>
+                                                </span>
+            </h6>
+
+            <p ow-trim-text>
+                Defend your kingdom against hordes of orcs, trolls, evil wizards and other nasty fiends in this medieval
+                fantasy fun action packed tower defense game with RTS elements by Ironhide Game Studio.
+            </p>
+
+            <aside class="discount-large">
+                <div class="inner">
+                    <small class="price">$79.99</small>
+                    <em>20% Off</em>
+                    on Amazon
+                </div>
+            </aside>
+
+                                            <span class="tile-controls" ow-modal-trigger-ignore>
+                                                <a href="#" class="btn-standard">Get the deal <i
+                                                        class="icon-ui_link-arrow"></i></a>
+                                                <a href="#" class="btn-share" ow-share-tooltip="https://google.com/"><i
+                                                        class="icon-ui_share"></i></a>
+                                            </span>
+        </div>
+    </div>
+</article>
+</div>
+</div>
+
+<div class="tiles-inner">
+    <div class="tiles-row tiles-row-banner cf">
+        <article>
+            <span><img src="images/temp/img-9.png" alt=""></span>
+        </article>
+
+        <article>
+            <span><img src="images/temp/img-7.png" alt=""></span>
+        </article>
+
+        <article>
+            <span><img src="images/temp/img-8.png" alt=""></span>
+        </article>
+    </div>
+</div>
+</section>
+
+<section class="tiles">
+    <header>
+        <h1>New Stuff
+            <a href="#" class="js-view-all-tiles">View all<i>&#xe60a;</i></a>
+        </h1>
+    </header>
+
+    <div class="tiles-inner">
+        <div class="tiles-row cf">
+            <article ow-modal-trigger="templates/app-modal.html" ow-modal-trigger-container="app">
+                <span class="tile-pic"><img src="images/temp/img-5.png" alt=""></span>
+                <h5>
+                    <small class="price price-discount">$18.75</small>
+                    Very Long application name
+                </h5>
+                <aside class="discount">
+                    <div class="inner">
+                        <small class="price">$12.99</small>
+                        <em>40% Off</em>
+                        on Amazon
+                    </div>
+                </aside>
+                <div class="overlay-wrap">
+                    <div class="overlay">
+                        <h6>
+                            <span class="tile-thumb"><img src="images/temp/img-thumb-1.jpg" alt=""></span>
+                            Very Long application name
+
+                                                <span class="metacritic yellow">
+                                                    <em>62</em>
+                                                </span>
+                        </h6>
+
+                        <div class="discount">
+                            <div class="inner">
+                                <small class="price">
+                                    $79.99
+                                    <a href="#"><i class="icon-ui_link-arrow"></i></a>
+                                </small>
+                                <em>20% Off</em>
+                                on Amazon
+                            </div>
+                        </div>
+
+                        <div class="discount">
+                            <div class="inner">
+                                <small class="price">
+                                    $79.99
+                                    <a href="#"><i class="icon-ui_link-arrow"></i></a>
+                                </small>
+                                <em>20% Off</em>
+                                on GamersGate
+                            </div>
+                        </div>
+
+                        <div class="discount">
+                            <div class="inner">
+                                <small class="price">
+                                    $79.99
+                                    <a href="#"><i class="icon-ui_link-arrow"></i></a>
+                                </small>
+                                <em>20% Off</em>
+                                on Amazon
+                            </div>
+                        </div>
+
+                        <div class="discount-large">
+                            <div class="inner">
+                                <small class="price">$79.99</small>
+                                <em>20% Off</em>
+                                on Amazon
+                            </div>
+                        </div>
+
+                                            <span class="tile-controls" ow-modal-trigger-ignore>
+                                                <a href="#" class="btn-standard btn-wide">Get the deal <i
+                                                        class="icon-ui_link-arrow"></i></a>
+                                                <a href="#" class="btn-share" ow-share-tooltip="https://google.com/"><i
+                                                        class="icon-ui_share"></i></a>
+                                            </span>
+                    </div>
+                </div>
+            </article>
+
+            <article ow-modal-trigger="templates/app-modal.html" ow-modal-trigger-container="app">
+                <span class="tile-pic"><img src="images/temp/img-2.png" alt=""></span>
+                <h5>
+                    <small class="price">Free</small>
+                    Very Long application name
+                </h5>
+                <aside>
+                                        <span class="metacritic red">
+                                            <em>25</em>
+                                        </span>
+                </aside>
+                <div class="overlay-wrap">
+                    <div class="overlay">
+                        <h6>
+                            <span class="tile-thumb"><img src="images/temp/img-thumb-1.jpg" alt=""></span>
+                            Very Long application name
+
+                                            <span class="metacritic red">
+                                                <em>25</em>
+                                            </span>
+                        </h6>
+
+                        <p ow-trim-text>
+                            Defend your kingdom against hordes of orcs, trolls, evil wizards and other nasty fiends in
+                            this medieval fantasy fun action packed tower defense game with RTS elements by Ironhide
+                            Game Studio.
+                        </p>
+                        <a href="#" class="link-red">Official website <i class="icon-ui_link-arrow"></i></a>
+                    </div>
+                </div>
+            </article>
+
+            <article>
+                <span class="tile-pic"><img src="images/temp/img-3.png" alt=""></span>
+            </article>
+
+            <article>
+                <span class="tile-pic"><img src="images/temp/img-4.png" alt=""></span>
+            </article>
+
+            <article>
+                <span class="tile-pic"><img src="images/temp/img-5.png" alt=""></span>
+            </article>
+        </div>
+    </div>
+
+    <div class="tiles-inner">
+        <div class="tiles-row tiles-row-banner cf">
+            <article>
+                <span><img src="images/temp/img-9.png" alt=""></span>
+            </article>
+
+            <article>
+                <span><img src="images/temp/img-7.png" alt=""></span>
+            </article>
+
+            <article>
+                <span><img src="images/temp/img-8.png" alt=""></span>
+            </article>
+        </div>
+    </div>
+</section>
+
+</div>
+
+</div>
+
+
+</section>
+<!-- /BLOCK: MAIN CONTENT -->
+</div>
+</div>

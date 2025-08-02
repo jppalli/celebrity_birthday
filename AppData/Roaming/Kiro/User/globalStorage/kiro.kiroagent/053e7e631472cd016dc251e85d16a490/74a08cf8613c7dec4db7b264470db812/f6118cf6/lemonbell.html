@@ -1,0 +1,1151 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Realistic Lemon Tower Climber</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.2/p5.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Montserrat:wght@400;700&display=swap"
+    rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      display: flex;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #1a2980, #26d0ce);
+      font-family: 'Montserrat', sans-serif;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .container {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      width: 100%;
+      height: 100vh;
+      padding: 20px;
+      gap: 20px;
+    }
+
+    .game-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding-top: 20px;
+    }
+
+    .ui-panel {
+      width: 320px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      padding: 20px;
+      background: rgba(44, 62, 80, 0.2);
+      border-radius: 15px;
+      backdrop-filter: blur(10px);
+      height: fit-content;
+      align-self: flex-start;
+      margin-top: 20px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .panel-section {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      padding: 15px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .panel-section h2 {
+      color: #f1c40f;
+      font-size: 1.4rem;
+      margin-bottom: 10px;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+    }
+
+    canvas {
+      border: 4px solid #2c3e50;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+      margin: 0 auto;
+      display: block;
+      cursor: pointer;
+    }
+
+    h1 {
+      font-family: 'Lilita One', cursive;
+      color: #f1c40f;
+      text-shadow: 3px 3px 0 #e67e22, 6px 6px 0 rgba(0, 0, 0, 0.2);
+      font-size: 3.5rem;
+      margin-bottom: 10px;
+      letter-spacing: 1.5px;
+    }
+
+    .game-info {
+      color: white;
+      width: 100%;
+    }
+
+    .controls {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-top: 15px;
+    }
+
+    .control-item {
+      background: #3498db;
+      border-radius: 8px;
+      padding: 10px 15px;
+      min-width: 120px;
+      box-shadow: 0 4px 0 #2980b9;
+    }
+
+    .key {
+      display: inline-block;
+      background: #2c3e50;
+      color: #ecf0f1;
+      padding: 5px 10px;
+      border-radius: 5px;
+      font-weight: bold;
+      margin: 0 3px;
+    }
+
+    .stats {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin: 10px 0;
+    }
+
+    .stat-box {
+      background: rgba(236, 240, 241, 0.9);
+      border-radius: 10px;
+      padding: 12px;
+      flex: 1;
+      text-align: center;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .stat-value {
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: #e74c3c;
+    }
+
+    .btn {
+      background: #e74c3c;
+      color: white;
+      border: none;
+      padding: 12px 25px;
+      font-size: 1.1rem;
+      border-radius: 50px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.3s;
+      box-shadow: 0 4px 0 #c0392b;
+      margin: 10px 5px;
+    }
+
+    .btn:hover {
+      background: #c0392b;
+      transform: translateY(2px);
+      box-shadow: 0 2px 0 #c0392b;
+    }
+
+    .btn:active {
+      transform: translateY(4px);
+      box-shadow: none;
+    }
+
+    .btn-restart {
+      background: #2ecc71;
+      box-shadow: 0 4px 0 #27ae60;
+    }
+
+    .btn-restart:hover {
+      background: #27ae60;
+      box-shadow: 0 2px 0 #27ae60;
+    }
+
+    .instructions {
+      margin-top: 20px;
+      line-height: 1.6;
+    }
+
+    .lemon-icon {
+      display: inline-block;
+      width: 24px;
+      height: 24px;
+      background: #f1c40f;
+      border-radius: 50%;
+      margin: 0 5px;
+      vertical-align: middle;
+      border: 2px solid #e67e22;
+    }
+
+    .background {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+    }
+
+    .cloud {
+      position: absolute;
+      background: rgba(255, 255, 255, 0.8);
+      border-radius: 50%;
+    }
+
+    .message {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(44, 62, 80, 0.95);
+      padding: 30px;
+      border-radius: 15px;
+      color: white;
+      text-align: center;
+      z-index: 100;
+      box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+      max-width: 90%;
+      width: 400px;
+    }
+
+    .message h2 {
+      color: #f1c40f;
+      margin-bottom: 20px;
+      font-size: 2.2rem;
+    }
+
+    .hidden {
+      display: none;
+    }
+    
+    #level-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin: 20px 0;
+    }
+    
+    .level-item {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      padding: 15px;
+      cursor: pointer;
+      transition: all 0.3s;
+      border: 2px solid transparent;
+      position: relative;
+    }
+    
+    .level-item:hover:not(.locked) {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
+    }
+    
+    .level-item.locked {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    
+    .level-item.locked::after {
+      content: "🔒";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 24px;
+    }
+    
+    .level-item.completed::before {
+      content: "✓";
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      color: #2ecc71;
+      font-weight: bold;
+      font-size: 18px;
+    }
+    
+    .level-number {
+      display: inline-block;
+      background: rgba(0, 0, 0, 0.3);
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      line-height: 30px;
+      margin-right: 10px;
+    }
+    
+    .level-name {
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="background" id="background"></div>
+
+  <div class="container">
+    <div class="game-area">
+      <h1>🍋 Lemon Tower Climber 🏆</h1>
+      <div id="game-container"></div>
+    </div>
+
+    <div class="ui-panel">
+      <div class="panel-section">
+        <h2>Game Stats</h2>
+        <div class="stats">
+          <div class="stat-box">
+            <div>SCORE</div>
+            <div class="stat-value" id="score-display">0</div>
+          </div>
+          <div class="stat-box">
+            <div>HIGH SCORE</div>
+            <div class="stat-value" id="high-score-display">0</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-section">
+        <h2>Controls</h2>
+        <div class="controls">
+          <div class="control-item">
+            <div>MOVE</div>
+            <div><span class="key">←</span> <span class="key">→</span></div>
+          </div>
+          <div class="control-item">
+            <div>JUMP</div>
+            <div><span class="key">SPACE</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-section">
+        <h2>How to Play</h2>
+        <div class="instructions">
+          <p>Help the lemon climb the tower by jumping on platforms!</p>
+          <p>Reach the bell at the top to win!</p>
+          <p>Avoid falling off the screen!</p>
+          <p><span class="lemon-icon"></span> = 10 points</p>
+        </div>
+      </div>
+
+      <button class="btn btn-restart" id="restart-btn">RESTART GAME</button>
+    </div>
+  </div>
+
+  <div id="main-menu" class="message">
+    <h2>Lemon Tower Climber</h2>
+    <p>Help the lemon reach the bell at the top of the tower!</p>
+    <p>Complete all 10 levels to become a Lemon Legend!</p>
+    <button class="btn" id="play-btn">PLAY GAME</button>
+    <button class="btn" id="levels-btn">SELECT LEVEL</button>
+  </div>
+  
+  <div id="level-select" class="message hidden">
+    <h2>Select Level</h2>
+    <div id="level-grid"></div>
+    <button class="btn" id="back-to-menu-btn">BACK TO MENU</button>
+  </div>
+
+  <div id="start-message" class="message hidden">
+    <h2 id="level-title">Lemon Tower Climber</h2>
+    <p>Level <span id="level-number">1</span>: <span id="level-name">Beginner's Climb</span></p>
+    <p>Use <strong>LEFT/RIGHT</strong> arrows to move and <strong>SPACE</strong> to jump</p>
+    <p>Collect points by jumping on platforms</p>
+    <button class="btn" id="start-btn">START LEVEL</button>
+    <button class="btn" id="back-btn">BACK TO LEVELS</button>
+  </div>
+
+  <div id="win-message" class="message hidden">
+    <h2>You Won! 🎉</h2>
+    <p>You rang the bell!</p>
+    <p>Level <span id="win-level-number">1</span> Complete!</p>
+    <p>Final Score: <span id="final-score">0</span></p>
+    <button class="btn" id="next-level-btn">NEXT LEVEL</button>
+    <button class="btn" id="level-select-btn">LEVEL SELECT</button>
+  </div>
+
+  <div id="game-over-message" class="message hidden">
+    <h2>Game Over 😢</h2>
+    <p>The lemon fell off the tower!</p>
+    <p>Final Score: <span id="game-over-score">0</span></p>
+    <button class="btn btn-restart">TRY AGAIN</button>
+    <button class="btn" id="level-select-btn-fail">LEVEL SELECT</button>
+  </div>
+
+  <script>
+    // Game variables
+    let lemon;
+    let platforms = [];
+    let bell;
+    let particles = [];
+    let gravity = 0.5;
+    let jumpForce = -12;
+    let gameState = 'menu'; // menu, levelSelect, playing, won, gameOver
+    let score = 0;
+    let highScore = localStorage.getItem('lemonHighScore') || 0;
+    let backgroundClouds = [];
+    let bellRang = false;
+    let currentLevel = 0;
+    
+    // Level data
+    const levels = [
+      { name: "Beginner's Climb", platformCount: 8, difficulty: 1, color: "#3498db" },
+      { name: "Lemon Heights", platformCount: 10, difficulty: 1.2, color: "#2ecc71" },
+      { name: "Citrus Tower", platformCount: 12, difficulty: 1.5, color: "#e67e22" },
+      { name: "Sour Summit", platformCount: 10, difficulty: 1.8, color: "#9b59b6" },
+      { name: "Zesty Zenith", platformCount: 14, difficulty: 2, color: "#e74c3c" },
+      { name: "Lemon Lookout", platformCount: 12, difficulty: 2.2, color: "#f1c40f" },
+      { name: "Tangy Tops", platformCount: 15, difficulty: 2.5, color: "#1abc9c" },
+      { name: "Citrus Clouds", platformCount: 16, difficulty: 2.8, color: "#34495e" },
+      { name: "Lemon Legend", platformCount: 18, difficulty: 3, color: "#8e44ad" },
+      { name: "Ultimate Ascent", platformCount: 20, difficulty: 3.5, color: "#c0392b" }
+    ];
+    
+    // Level completion tracking
+    let levelProgress = JSON.parse(localStorage.getItem('lemonLevelProgress')) || Array(levels.length).fill(false);
+    levelProgress[0] = true; // First level always unlocked
+
+    // DOM Elements
+    const scoreDisplay = document.getElementById('score-display');
+    const highScoreDisplay = document.getElementById('high-score-display');
+    const finalScore = document.getElementById('final-score');
+    const gameOverScore = document.getElementById('game-over-score');
+    const mainMenu = document.getElementById('main-menu');
+    const levelSelect = document.getElementById('level-select');
+    const levelGrid = document.getElementById('level-grid');
+    const startMessage = document.getElementById('start-message');
+    const winMessage = document.getElementById('win-message');
+    const gameOverMessage = document.getElementById('game-over-message');
+    const startBtn = document.getElementById('start-btn');
+    const restartBtn = document.getElementById('restart-btn');
+    const playBtn = document.getElementById('play-btn');
+    const levelsBtn = document.getElementById('levels-btn');
+    const backToMenuBtn = document.getElementById('back-to-menu-btn');
+    const backBtn = document.getElementById('back-btn');
+    const nextLevelBtn = document.getElementById('next-level-btn');
+    const levelSelectBtn = document.getElementById('level-select-btn');
+    const levelSelectBtnFail = document.getElementById('level-select-btn-fail');
+    const levelNumber = document.getElementById('level-number');
+    const levelName = document.getElementById('level-name');
+    const winLevelNumber = document.getElementById('win-level-number');
+
+    // Set high score display
+    highScoreDisplay.textContent = highScore;
+    
+    // Create level selection grid
+    function createLevelGrid() {
+      levelGrid.innerHTML = '';
+      
+      levels.forEach((level, index) => {
+        const levelItem = document.createElement('div');
+        levelItem.classList.add('level-item');
+        
+        // Add locked/completed classes
+        if (!levelProgress[index]) {
+          levelItem.classList.add('locked');
+        }
+        if (levelProgress[index] && index < levels.length - 1 && levelProgress[index + 1]) {
+          levelItem.classList.add('completed');
+        }
+        
+        // Level content
+        levelItem.innerHTML = `
+          <div class="level-number">${index + 1}</div>
+          <div class="level-name">${level.name}</div>
+          <div style="color: ${level.color}">Difficulty: ${'★'.repeat(Math.ceil(level.difficulty))}</div>
+        `;
+        
+        // Add click event for unlocked levels
+        if (levelProgress[index]) {
+          levelItem.addEventListener('click', () => {
+            selectLevel(index);
+          });
+        }
+        
+        levelGrid.appendChild(levelItem);
+      });
+    }
+    
+    // Select a level
+    function selectLevel(index) {
+      currentLevel = index;
+      levelNumber.textContent = index + 1;
+      levelName.textContent = levels[index].name;
+      winLevelNumber.textContent = index + 1;
+      
+      // Hide level select and show start message
+      levelSelect.classList.add('hidden');
+      startMessage.classList.remove('hidden');
+    }
+    
+    // Show main menu
+    function showMainMenu() {
+      mainMenu.classList.remove('hidden');
+      levelSelect.classList.add('hidden');
+      startMessage.classList.add('hidden');
+      winMessage.classList.add('hidden');
+      gameOverMessage.classList.add('hidden');
+      gameState = 'menu';
+    }
+    
+    // Show level select
+    function showLevelSelect() {
+      mainMenu.classList.add('hidden');
+      levelSelect.classList.remove('hidden');
+      startMessage.classList.add('hidden');
+      winMessage.classList.add('hidden');
+      gameOverMessage.classList.add('hidden');
+      gameState = 'levelSelect';
+      createLevelGrid();
+    }
+
+    // Create background clouds
+    function createBackground() {
+      const background = document.querySelector('.background');
+      background.innerHTML = '';
+
+      // Create clouds
+      for (let i = 0; i < 12; i++) {
+        const cloud = document.createElement('div');
+        cloud.classList.add('cloud');
+
+        // Random cloud properties
+        const size = Math.random() * 120 + 60;
+        const posX = Math.random() * 100;
+        const posY = Math.random() * 100;
+        const opacity = Math.random() * 0.6 + 0.2;
+        const animationDuration = Math.random() * 40 + 40;
+
+        cloud.style.width = `${size}px`;
+        cloud.style.height = `${size / 1.5}px`;
+        cloud.style.left = `${posX}%`;
+        cloud.style.top = `${posY}%`;
+        cloud.style.opacity = opacity;
+        cloud.style.animation = `float ${animationDuration}s linear infinite`;
+
+        background.appendChild(cloud);
+      }
+
+      // Add CSS for animation
+      const style = document.createElement('style');
+      style.textContent = `
+        @keyframes float {
+          0% { transform: translateX(0) translateY(0); }
+          50% { transform: translateX(20px) translateY(10px); }
+          100% { transform: translateX(0) translateY(0); }
+        }
+      `;
+      document.head.appendChild(style);
+    }
+
+    function setup() {
+      const canvas = createCanvas(500, 900);
+      canvas.parent('game-container');
+
+      // Initialize game
+      resetGame();
+
+      // Set up event listeners for main menu
+      playBtn.addEventListener('click', () => {
+        selectLevel(0); // Start with first level
+        mainMenu.classList.add('hidden');
+        startMessage.classList.remove('hidden');
+      });
+      
+      levelsBtn.addEventListener('click', showLevelSelect);
+      backToMenuBtn.addEventListener('click', showMainMenu);
+      
+      // Level start/back buttons
+      startBtn.addEventListener('click', () => {
+        gameState = 'playing';
+        startMessage.classList.add('hidden');
+      });
+      
+      backBtn.addEventListener('click', showLevelSelect);
+      
+      // Win screen buttons
+      nextLevelBtn.addEventListener('click', () => {
+        // Unlock next level if available
+        if (currentLevel < levels.length - 1) {
+          levelProgress[currentLevel + 1] = true;
+          localStorage.setItem('lemonLevelProgress', JSON.stringify(levelProgress));
+          selectLevel(currentLevel + 1);
+          winMessage.classList.add('hidden');
+          startMessage.classList.remove('hidden');
+        } else {
+          // Last level completed
+          showLevelSelect();
+        }
+      });
+      
+      levelSelectBtn.addEventListener('click', showLevelSelect);
+      levelSelectBtnFail.addEventListener('click', showLevelSelect);
+
+      restartBtn.addEventListener('click', () => {
+        resetGame();
+        gameState = 'playing';
+      });
+
+      document.querySelectorAll('.btn-restart').forEach(btn => {
+        btn.addEventListener('click', () => {
+          winMessage.classList.add('hidden');
+          gameOverMessage.classList.add('hidden');
+          resetGame();
+          gameState = 'playing';
+        });
+      });
+    }
+
+    function resetGame() {
+      // Reset game state
+      score = 0;
+      scoreDisplay.textContent = score;
+      bellRang = false;
+
+      // Create lemon
+      lemon = new Lemon();
+
+      // Clear platforms and particles
+      platforms = [];
+      particles = [];
+      
+      // Get current level data
+      const levelData = levels[currentLevel];
+      const platformCount = levelData.platformCount;
+      const difficulty = levelData.difficulty;
+      
+      // Set level-specific properties
+      const levelColor = color(levelData.color);
+      
+      // Calculate spacing based on level difficulty
+      const verticalSpacing = 65 - (difficulty * 5); // Harder levels have tighter spacing
+      const horizontalRange = 120 + (difficulty * 10); // Harder levels have wider platform distribution
+      
+      // Generate platforms with level-specific spacing
+      for (let i = 0; i < platformCount; i++) {
+        // Calculate vertical position with level-specific spacing
+        let y = height - 150 - i * verticalSpacing;
+        
+        // Ensure platforms are not too far horizontally from each other
+        let x;
+        if (i === 0) {
+          // First platform near center
+          x = random(width * 0.3, width * 0.7);
+        } else {
+          // Subsequent platforms with level-specific horizontal range
+          let prevPlatform = platforms[i - 1];
+          let minX = Math.max(70, prevPlatform.x - horizontalRange);
+          let maxX = Math.min(width - 70, prevPlatform.x + horizontalRange);
+          x = random(minX, maxX);
+        }
+        
+        // Create platform with level-specific properties
+        let platform = new Platform(x, y);
+        
+        // Customize platform based on level
+        platform.color = levelColor;
+        platform.w = 100 - (difficulty * 5); // Platforms get smaller in harder levels
+        
+        // Add moving platforms in higher levels
+        if (difficulty > 1.5 && random() < 0.3) {
+          platform.moving = true;
+          platform.moveSpeed = random(0.5, 1.5) * difficulty;
+          platform.moveRange = random(30, 80);
+          platform.moveOffset = random(TWO_PI);
+        }
+        
+        platforms.push(platform);
+      }
+
+      // Place bell at the top (always higher than the highest platform)
+      let highestPlatformY = Math.min(...platforms.map(p => p.y));
+      bell = new Bell(width / 2, highestPlatformY - 80);
+    }
+
+    function draw() {
+      // Gradient background
+      background(135, 206, 235);
+      
+      // Only draw game elements if not in menu or level select
+      if (gameState !== 'menu' && gameState !== 'levelSelect') {
+        // Draw tower backdrop with level-specific color tint
+        let levelColor = color(levels[currentLevel].color);
+        levelColor.setAlpha(30);
+        fill(levelColor);
+        noStroke();
+        rectMode(CENTER);
+        rect(width / 2, height / 2, 250, height, 30);
+        
+        // Draw tower structure
+        fill(169, 169, 169, 100);
+        rect(width / 2, height / 2, 250, height, 30);
+
+        // Draw level number at the top of the tower
+        fill(255);
+        stroke(0);
+        strokeWeight(2);
+        textSize(24);
+        textAlign(CENTER);
+        text(`Level ${currentLevel + 1}`, width / 2, 50);
+
+        // Draw platforms
+        for (let platform of platforms) {
+          platform.show();
+        }
+
+        // Draw bell
+        bell.show();
+
+        // Draw lemon only if game is playing
+        if (gameState === 'playing' || gameState === 'won') {
+          lemon.show();
+          lemon.update();
+        }
+      }
+
+      // Update and display particles
+      for (let i = particles.length - 1; i >= 0; i--) {
+        particles[i].update();
+        particles[i].show();
+        if (particles[i].isDead()) {
+          particles.splice(i, 1);
+        }
+      }
+
+      // Handle movement only if game is playing
+      if (gameState === 'playing') {
+        if (keyIsDown(LEFT_ARROW)) {
+          lemon.moveLeft();
+        } else if (keyIsDown(RIGHT_ARROW)) {
+          lemon.moveRight();
+        } else {
+          lemon.stop();
+        }
+
+        // Check for collisions with platforms
+        let onPlatform = false;
+        for (let platform of platforms) {
+          if (lemon.hits(platform)) {
+            lemon.vy = jumpForce;
+            lemon.vx *= 0.7;
+            onPlatform = true;
+
+            // Add particles on jump
+            for (let i = 0; i < 8; i++) {
+              particles.push(new Particle(lemon.x, lemon.y + lemon.r, color(255, 200, 0)));
+            }
+          }
+        }
+
+        // Add landing particles if lemon was falling and just landed on ground
+        if (lemon.onGround() && lemon.vy > 0 && !onPlatform) {
+          for (let i = 0; i < 10; i++) {
+            particles.push(new Particle(lemon.x, height - 5, color(255, 255, 0)));
+          }
+        }
+
+        // Check for collision with bell
+        if (!bellRang && lemon.hitsBell(bell)) {
+          bellRang = true;
+          gameState = 'won';
+          winMessage.classList.remove('hidden');
+          finalScore.textContent = score;
+
+          // Add celebration particles
+          for (let i = 0; i < 100; i++) {
+            particles.push(new Particle(bell.x, bell.y, color(255, 215, 0), true));
+          }
+
+          // Play bell sound
+          playBellSound();
+        }
+
+        // Check if lemon fell off screen
+        if (lemon.y > height + 100) {
+          gameState = 'gameOver';
+          gameOverMessage.classList.remove('hidden');
+          gameOverScore.textContent = score;
+        }
+
+        // Update score
+        const newScore = max(score, floor((height - lemon.y) / 10));
+        if (newScore > score) {
+          score = newScore;
+          scoreDisplay.textContent = score;
+
+          // Update high score
+          if (score > highScore) {
+            highScore = score;
+            highScoreDisplay.textContent = highScore;
+            localStorage.setItem('lemonHighScore', highScore);
+          }
+        }
+      }
+
+      // Draw UI
+      drawUI();
+    }
+
+    function drawUI() {
+      // We don't need to draw score on canvas since it's in the UI panel now
+
+      // Draw game state messages
+      if (gameState === 'start') {
+        fill(255, 255, 255, 200);
+        noStroke();
+        textSize(32);
+        textAlign(CENTER);
+        text('Press START to play!', width / 2, height / 2);
+      }
+    }
+
+    function keyPressed() {
+      if (keyCode === 32 && lemon.onGround() && gameState === 'playing') {
+        lemon.vy = jumpForce;
+
+        // Add particles on jump
+        for (let i = 0; i < 8; i++) {
+          particles.push(new Particle(lemon.x, lemon.y + lemon.r, color(255, 200, 0)));
+        }
+      }
+    }
+
+    function playBellSound() {
+      // Create bell sound using oscillator
+      let context = new (window.AudioContext || window.webkitAudioContext)();
+      let oscillator = context.createOscillator();
+      let gainNode = context.createGain();
+
+      oscillator.type = 'sine';
+      oscillator.frequency.setValueAtTime(523.25, context.currentTime); // C5
+      oscillator.frequency.setValueAtTime(659.25, context.currentTime + 0.1); // E5
+      oscillator.frequency.setValueAtTime(783.99, context.currentTime + 0.2); // G5
+
+      gainNode.gain.setValueAtTime(0.5, context.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, context.currentTime + 1);
+
+      oscillator.connect(gainNode);
+      gainNode.connect(context.destination);
+
+      oscillator.start();
+      oscillator.stop(context.currentTime + 1);
+    }
+
+    class Lemon {
+      constructor() {
+        this.x = width / 2;
+        this.y = height - 50;
+        this.vx = 0;
+        this.vy = 0;
+        this.r = 25;
+        this.maxSpeed = 6;
+        this.acceleration = 0.6;
+        this.friction = 0.4;
+        this.rotation = 0;
+        this.rotationSpeed = 0;
+      }
+
+      show() {
+        push();
+        translate(this.x, this.y);
+        rotate(this.rotation);
+
+        // Lemon body with realistic shape
+        noStroke();
+        fill(255, 220, 0); // Bright yellow
+
+        // Main body (slightly irregular)
+        beginShape();
+        for (let a = 0; a < TWO_PI; a += 0.1) {
+          let offset = map(sin(a * 5), -1, 1, 0.9, 1.1);
+          let r = this.r * offset;
+          vertex(r * cos(a), r * sin(a));
+        }
+        endShape(CLOSE);
+
+        // Lemon texture (pores)
+        stroke(200, 150, 0, 150);
+        strokeWeight(1);
+        for (let i = 0; i < 12; i++) {
+          let angle = TWO_PI / 12 * i;
+          let poreX = cos(angle) * this.r * 0.7;
+          let poreY = sin(angle) * this.r * 0.7;
+          point(poreX, poreY);
+        }
+
+        // Stem
+        fill(120, 80, 40); // Dark brown
+        noStroke();
+        ellipse(0, -this.r * 0.9, 8, 5);
+
+        // Realistic leaf
+        fill(50, 180, 70); // Leaf green
+        stroke(40, 120, 50);
+        strokeWeight(1.5);
+
+        // Leaf shape with curved edges
+        beginShape();
+        vertex(-12, -this.r);
+        bezierVertex(-10, -this.r - 25, 5, -this.r - 30, 12, -this.r);
+        bezierVertex(10, -this.r - 15, -5, -this.r - 15, -12, -this.r);
+        endShape(CLOSE);
+
+        // Leaf veins
+        stroke(40, 100, 50);
+        line(0, -this.r - 10, 0, -this.r - 25);
+        line(-5, -this.r - 12, -10, -this.r - 20);
+        line(5, -this.r - 12, 10, -this.r - 20);
+
+        // Highlight on the lemon
+        fill(255, 240, 150, 100);
+        noStroke();
+        arc(0, 0, this.r * 1.8, this.r * 1.8, -PI / 4, PI / 4);
+
+        // Shadow on the bottom
+        fill(220, 180, 0, 150);
+        arc(0, 0, this.r * 1.8, this.r * 1.8, PI / 4, 3 * PI / 4);
+
+        pop();
+      }
+
+      update() {
+        this.vy += gravity;
+        this.y += this.vy;
+        this.x += this.vx;
+        this.x = constrain(this.x, this.r, width - this.r);
+
+        // Rotate lemon based on movement
+        this.rotationSpeed = map(this.vx, -this.maxSpeed, this.maxSpeed, -0.2, 0.2);
+        this.rotation += this.rotationSpeed;
+
+        // Constrain rotation to reasonable limits
+        this.rotation = constrain(this.rotation, -PI / 4, PI / 4);
+
+        // Ground collision
+        if (this.y > height - this.r) {
+          this.y = height - this.r;
+          this.vy = 0;
+          this.vx *= 0.7;
+        }
+      }
+
+      moveLeft() {
+        this.vx -= this.acceleration;
+        this.vx = max(this.vx, -this.maxSpeed);
+      }
+
+      moveRight() {
+        this.vx += this.acceleration;
+        this.vx = min(this.vx, this.maxSpeed);
+      }
+
+      stop() {
+        if (this.vx > 0) {
+          this.vx -= this.friction;
+          if (this.vx < 0) this.vx = 0;
+        } else if (this.vx < 0) {
+          this.vx += this.friction;
+          if (this.vx > 0) this.vx = 0;
+        }
+      }
+
+      onGround() {
+        return this.y >= height - this.r;
+      }
+
+      hits(platform) {
+        return (
+          this.y + this.r > platform.y &&
+          this.y + this.r < platform.y + platform.h &&
+          this.x > platform.x - platform.w / 2 &&
+          this.x < platform.x + platform.w / 2 &&
+          this.vy > 0
+        );
+      }
+
+      hitsBell(bell) {
+        let d = dist(this.x, this.y, bell.x, bell.y);
+        return d < this.r + bell.r;
+      }
+    }
+
+    class Platform {
+      constructor(x, y) {
+        this.x = x;
+        this.y = y;
+        this.w = 100;
+        this.h = 15;
+        this.oscillation = random(TWO_PI);
+        this.color = color(160, 120, 80);
+        this.moving = false;
+        this.moveSpeed = 1;
+        this.moveRange = 50;
+        this.moveOffset = 0;
+        this.startX = x;
+      }
+
+      update() {
+        if (this.moving) {
+          this.x = this.startX + sin(frameCount * 0.02 * this.moveSpeed + this.moveOffset) * this.moveRange;
+        }
+      }
+
+      show() {
+        // Update position if moving
+        this.update();
+        
+        // Wooden platform with texture
+        fill(this.color);
+        stroke(120, 80, 40);
+        strokeWeight(2);
+        rectMode(CENTER);
+
+        // Slight oscillation for visual effect
+        let offset = sin(frameCount * 0.05 + this.oscillation) * 2;
+        rect(this.x, this.y + offset, this.w, this.h, 8);
+
+        // Wood grain details
+        stroke(100, 60, 20);
+        strokeWeight(1);
+        for (let i = -this.w / 2 + 10; i < this.w / 2; i += 15) {
+          let grainOffset = random(-1, 1);
+          line(
+            this.x + i + grainOffset,
+            this.y - this.h / 2 + offset,
+            this.x + i + grainOffset,
+            this.y + this.h / 2 + offset
+          );
+        }
+
+        // Platform shadow
+        fill(0, 0, 0, 30);
+        noStroke();
+        rect(this.x, this.y + this.h / 2 + 5 + offset, this.w - 10, 5, 2);
+        
+        // Moving platform indicator
+        if (this.moving) {
+          stroke(255);
+          strokeWeight(2);
+          noFill();
+          arc(this.x, this.y - 5, 20, 10, PI, TWO_PI);
+        }
+      }
+    }
+
+    class Bell {
+      constructor(x, y) {
+        this.x = x;
+        this.y = y;
+        this.r = 25;
+        this.angle = 0;
+        this.ringing = false;
+        this.ringCounter = 0;
+      }
+
+      show() {
+        // Bell clapper
+        let clapperX = this.x + sin(this.angle) * 5;
+        let clapperY = this.y + this.r * 0.7;
+
+        // Draw clapper string
+        stroke(100);
+        strokeWeight(2);
+        line(this.x, this.y, clapperX, clapperY);
+
+        // Draw clapper
+        fill(100);
+        ellipse(clapperX, clapperY + 15, 8, 15);
+
+        // Bell body with gradient
+        for (let r = this.r; r > 0; r -= 2) {
+          let c = lerpColor(color(255, 215, 0), color(230, 180, 0), 1 - r / this.r);
+          fill(c);
+          stroke(180, 140, 0);
+          strokeWeight(1.5);
+          ellipse(this.x, this.y, r * 2);
+        }
+
+        // Bell highlight
+        fill(255, 240, 180, 150);
+        noStroke();
+        arc(this.x, this.y, this.r * 1.8, this.r * 1.8, -PI / 4, PI / 4);
+
+        // Bell top
+        fill(180, 140, 0);
+        rect(this.x, this.y - this.r, 15, 10, 5);
+
+        // Update bell angle if ringing
+        if (this.ringing) {
+          this.angle = sin(frameCount * 0.5) * 0.5;
+          this.ringCounter++;
+
+          if (this.ringCounter > 60) {
+            this.ringing = false;
+            this.ringCounter = 0;
+          }
+        } else {
+          this.angle = lerp(this.angle, 0, 0.1);
+        }
+      }
+
+      ring() {
+        this.ringing = true;
+        this.ringCounter = 0;
+      }
+    }
+
+    class Particle {
+      constructor(x, y, col, isSpecial = false) {
+        this.x = x;
+        this.y = y;
+        this.vx = random(-3, 3);
+        this.vy = random(-4, -1);
+        this.alpha = 255;
+        this.size = isSpecial ? random(4, 12) : random(3, 8);
+        this.color = col;
+        this.gravity = isSpecial ? 0.1 : 0.2;
+      }
+
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        this.vy += this.gravity;
+        this.alpha -= 3;
+        this.size *= 0.97;
+      }
+
+      show() {
+        noStroke();
+        fill(red(this.color), green(this.color), blue(this.color), this.alpha);
+        ellipse(this.x, this.y, this.size);
+      }
+
+      isDead() {
+        return this.alpha <= 0 || this.size <= 0.5;
+      }
+    }
+
+    // Initialize background on load
+    window.addEventListener('load', createBackground);
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,1389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Quote Puzzle - Modern</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Special+Elite&display=swap" rel="stylesheet">
+    <!-- Temporarily disabled PixiJS to fix black overlay issue -->
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/7.3.2/pixi.min.js"></script> -->
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Special Elite', 'Courier New', monospace;
+        }
+
+        body {
+            background: #f0f0f0;
+            color: #222;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            background-image: linear-gradient(#f9f9f9 1px, transparent 1px),
+                linear-gradient(90deg, #f9f9f9 1px, transparent 1px);
+            background-size: 20px 20px;
+            background-color: #fafafa;
+        }
+
+        .newspaper-container {
+            width: 100%;
+            height: 100vh;
+            background: white;
+            border-top: 4px solid #333;
+            position: relative;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .header {
+            position: relative;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #222;
+            margin-bottom: 20px;
+            flex-shrink: 0;
+        }
+
+        .header-content {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .title-date-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .newspaper-title {
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: #222;
+            line-height: 1;
+        }
+
+        .header-icons {
+            position: absolute;
+            top: 50%;
+            right: 0;
+            transform: translateY(-50%);
+            display: flex;
+            gap: 8px;
+        }
+
+
+
+        .header-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s;
+            background: #222;
+            color: white;
+        }
+
+        .header-icon:hover {
+            transform: scale(1.1);
+        }
+
+        .quote-container {
+            padding: 20px 0;
+            margin-bottom: 20px;
+            position: relative;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .quote-container:before,
+        .quote-container:after {
+            content: """;
+            position: absolute;
+            font-size: 80px;
+            color: #ddd;
+            font-family: Georgia, serif;
+        }
+
+        .quote-container:before {
+            top: 0;
+            left: -25px;
+        }
+
+        .quote-container:after {
+            bottom: -10px;
+            right: -25px;
+            transform: rotate(180deg);
+        }
+
+        .quote-text {
+            font-size: 22px;
+            line-height: 1.8;
+            text-align: center;
+            margin-bottom: 25px;
+            padding: 0 20px;
+            font-weight: 400;
+            letter-spacing: 0.3px;
+            font-style: italic;
+        }
+
+        .quote-word {
+            margin: 0 2px;
+            padding: 3px 8px;
+            display: inline-block;
+            transition: all 0.2s;
+            border-radius: 2px;
+        }
+
+        .quote-word.scrambled {
+            background: #f0f0f0;
+            border: 1px solid #ddd;
+            text-decoration: underline;
+            text-decoration-style: wavy;
+            text-decoration-color: #999;
+            text-underline-offset: 3px;
+            cursor: pointer;
+        }
+
+        .quote-word.scrambled.active {
+            background: #e0e0e0;
+            border: 1px solid #222;
+        }
+
+        .quote-word.scrambled:hover {
+            background: #e5e5e5;
+        }
+
+        .author {
+            text-align: center;
+            font-size: 20px;
+            font-weight: 500;
+            font-style: italic;
+            padding-top: 15px;
+        }
+
+        .author.scrambled {
+            background: #f0f0f0;
+            border: 1px solid #ddd;
+            padding: 5px 15px;
+            display: inline-block;
+            text-decoration: underline;
+            text-decoration-style: wavy;
+            text-decoration-color: #999;
+            text-underline-offset: 3px;
+            cursor: pointer;
+        }
+
+        .author.scrambled.active {
+            background: #e0e0e0;
+            border: 1px solid #222;
+        }
+
+        .author.scrambled:hover {
+            background: #e5e5e5;
+        }
+
+        .congrats {
+            margin-bottom: 25px;
+            padding: 30px;
+            background: linear-gradient(135deg, #f9f9f9 0%, #e8e8e8 100%);
+            border: 2px solid #222;
+            text-align: center;
+            display: none;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        .congrats.show {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+
+        .congrats h2 {
+            font-size: 28px;
+            margin-bottom: 20px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            color: #222;
+        }
+
+        .congrats-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 20px;
+            margin: 25px 0;
+        }
+
+        .stat-item {
+            background: white;
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #222;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .congrats-cta {
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+        }
+
+        .cta-text {
+            font-size: 16px;
+            color: #444;
+            margin-bottom: 15px;
+        }
+
+        .cta-button {
+            background: #222;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .cta-button:hover {
+            background: #444;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .input-area {
+            padding: 20px;
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            margin-bottom: 20px;
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            min-height: 180px;
+            visibility: hidden;
+            opacity: 0;
+            transition: opacity 0.3s ease-out;
+            flex-shrink: 0;
+        }
+
+        .input-area.show {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .input-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            text-align: center;
+            letter-spacing: 1px;
+        }
+
+        .letter-cells {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .letter-cell {
+            width: 50px;
+            height: 50px;
+            border: 2px solid #222;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: 600;
+            position: relative;
+        }
+
+        .letter-cell:after {
+            content: "";
+            position: absolute;
+            bottom: 5px;
+            width: 80%;
+            height: 2px;
+            background: #222;
+        }
+
+        .available-letters {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .letter-btn {
+            width: 50px;
+            height: 50px;
+            border: 1px solid #222;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .letter-btn:not(.used):hover {
+            background: #e0e0e0;
+        }
+
+        .letter-btn.used {
+            background: #ddd;
+            color: #888;
+            cursor: default;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            background: #fff;
+            border: 1px solid #222;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn:hover {
+            background: #222;
+            color: white;
+        }
+
+        .btn:disabled {
+            background: #f5f5f5;
+            color: #999;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .btn:disabled:hover {
+            background: #f5f5f5;
+            color: #999;
+        }
+
+        /* Cooldown Timer Styles */
+        .cooldown-timer {
+            display: none;
+            margin-left: 8px;
+            font-size: 12px;
+            font-weight: bold;
+            color: #666;
+            background: #f0f0f0;
+            padding: 2px 6px;
+            border-radius: 3px;
+            border: 1px solid #ddd;
+        }
+
+        .cooldown-timer.show {
+            display: inline-block;
+        }
+
+        .btn:disabled .cooldown-timer {
+            color: #999;
+            background: #e0e0e0;
+        }
+
+        /* Hamburger Menu Styles */
+        .hamburger-menu {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            z-index: 1001;
+        }
+
+        .hamburger-icon {
+            width: 30px;
+            height: 24px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: all 0.3s ease;
+        }
+
+        .hamburger-icon span {
+            width: 100%;
+            height: 3px;
+            background: #222;
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+
+        .hamburger-icon:hover span {
+            background: #444;
+        }
+
+        .hamburger-icon.active span:nth-child(1) {
+            transform: rotate(45deg) translate(8px, 8px);
+        }
+
+        .hamburger-icon.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger-icon.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(8px, -8px);
+        }
+
+        /* Menu Overlay */
+        .menu-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1002;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .menu-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Slide Menu */
+        .slide-menu {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 280px;
+            height: 100%;
+            background: white;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+            z-index: 1003;
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+            overflow-y: auto;
+        }
+
+        .slide-menu.active {
+            transform: translateX(0);
+        }
+
+        .menu-header {
+            padding: 20px;
+            border-bottom: 2px solid #222;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f9f9f9;
+        }
+
+        .menu-header h3 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 700;
+            color: #222;
+        }
+
+        .close-menu {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: #666;
+            transition: color 0.3s;
+            padding: 5px;
+        }
+
+        .close-menu:hover {
+            color: #222;
+        }
+
+        .menu-content {
+            padding: 0;
+        }
+
+        .menu-section {
+            border-bottom: 1px solid #eee;
+            padding: 20px 0;
+        }
+
+        .menu-section:last-child {
+            border-bottom: none;
+        }
+
+        .menu-section h4 {
+            margin: 0 0 15px 0;
+            padding: 0 20px;
+            font-size: 16px;
+            font-weight: 600;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .menu-item {
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.2s;
+        }
+
+        .menu-item:hover {
+            background: #f5f5f5;
+        }
+
+        .menu-link {
+            cursor: pointer;
+        }
+
+        .menu-link:hover {
+            background: #f0f0f0;
+        }
+
+        .menu-item-label {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 16px;
+            color: #333;
+        }
+
+        .menu-item-label i {
+            width: 20px;
+            text-align: center;
+            color: #666;
+        }
+
+        .menu-item-control {
+            display: flex;
+            align-items: center;
+        }
+
+        .menu-link .fas.fa-chevron-right {
+            color: #999;
+            font-size: 14px;
+        }
+
+        /* Update header layout */
+        .header-content {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .title-date-container {
+            display: flex;
+            align-items: center;
+        }
+
+        /* Modal Styles */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            display: none;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+            padding: 30px;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.3);
+            position: relative;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .modal-header h2 {
+            font-size: 24px;
+            font-weight: 600;
+            color: #222;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+            transition: color 0.3s;
+        }
+
+        .close-modal:hover {
+            color: #222;
+        }
+
+        /* Calendar Specific Styles */
+        .calendar-navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 0 10px;
+        }
+
+        .calendar-nav-btn {
+            background: #222;
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            transition: all 0.2s;
+        }
+
+        .calendar-nav-btn:hover {
+            background: #444;
+            transform: scale(1.1);
+        }
+
+        .calendar-nav-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        #calendarMonthYear {
+            font-size: 20px;
+            font-weight: 600;
+            color: #222;
+            margin: 0;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+            margin-bottom: 20px;
+        }
+
+        .calendar-day {
+            text-align: center;
+            padding: 5px 0;
+            font-weight: bold;
+            color: #444;
+        }
+
+        .calendar-dates {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+        }
+
+        .calendar-date {
+            text-align: center;
+            padding: 10px 5px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .calendar-date:hover {
+            background: #f0f0f0;
+        }
+
+        .calendar-date.active {
+            background: #222;
+            color: white;
+        }
+
+        .calendar-date.past {
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        .calendar-date.today {
+            background: #e0e0e0;
+            font-weight: bold;
+        }
+
+        .calendar-date.future {
+            background: #f9f9f9;
+            color: #999;
+            cursor: not-allowed;
+            position: relative;
+        }
+        
+        .calendar-date.future:before {
+            content: "\f023";
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            font-size: 12px;
+            color: #bbb;
+        }
+
+        .calendar-date.solved:after {
+            content: "★";
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            font-size: 14px;
+            color: #222;
+            font-weight: normal;
+            text-shadow: 0 0 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .calendar-date.solved {
+            background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
+            border: 1px solid #ccc;
+            font-weight: 600;
+        }
+
+        .calendar-status {
+            text-align: center;
+            font-size: 14px;
+            color: #666;
+            margin-top: 15px;
+        }
+
+        /* Help Modal Specific Styles */
+        .help-content {
+            font-size: 16px;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .help-content h3 {
+            font-size: 20px;
+            margin-bottom: 15px;
+            color: #222;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .help-content ul {
+            list-style-type: none;
+            padding-left: 20px;
+            margin-bottom: 20px;
+        }
+
+        .help-content li {
+            margin-bottom: 12px;
+            position: relative;
+            padding-left: 25px;
+        }
+
+        .help-content li:before {
+            content: "•";
+            position: absolute;
+            left: 10px;
+            font-size: 20px;
+            color: #222;
+        }
+
+        .help-content p {
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+
+        .help-content .highlight {
+            background: #f0f0f0;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+
+        /* Stats Modal Styles */
+        .stats-content {
+            text-align: center;
+            padding: 15px 0;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin: 25px 0;
+        }
+
+        .stat-card {
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 36px;
+            font-weight: 700;
+            color: #222;
+            margin: 10px 0;
+        }
+
+        .stat-label {
+            font-size: 16px;
+            color: #666;
+        }
+
+        /* Settings Modal Styles */
+        .settings-content {
+            padding: 20px 0;
+        }
+
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .setting-item:last-of-type {
+            border-bottom: none;
+        }
+
+        .setting-label {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .setting-label i {
+            width: 20px;
+            text-align: center;
+            color: #666;
+        }
+
+        .setting-toggle {
+            display: flex;
+            align-items: center;
+        }
+
+        /* Toggle Switch Styles */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: 0.3s;
+            border-radius: 24px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: 0.3s;
+            border-radius: 50%;
+        }
+
+        input:checked + .toggle-slider {
+            background-color: #222;
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(26px);
+        }
+
+        .toggle-slider:hover {
+            background-color: #bbb;
+        }
+
+        input:checked + .toggle-slider:hover {
+            background-color: #444;
+        }
+
+        .settings-info {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        .settings-info p {
+            margin: 0;
+            font-size: 14px;
+            color: #666;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .settings-info i {
+            color: #888;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes wordComplete {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); background: #e8e8e8; }
+            100% { transform: scale(1); background: #f5f5f5; }
+        }
+
+        @keyframes authorComplete {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); background: #e8e8e8; }
+            100% { transform: scale(1); background: #f5f5f5; }
+        }
+
+        @keyframes puzzleComplete {
+            0% { transform: scale(1); opacity: 1; }
+            25% { transform: scale(1.02); opacity: 0.9; }
+            50% { transform: scale(1.04); opacity: 0.8; }
+            75% { transform: scale(1.02); opacity: 0.9; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes smallCelebration {
+            0% { transform: scale(1) rotate(0deg); opacity: 1; }
+            25% { transform: scale(1.2) rotate(-2deg); opacity: 0.8; }
+            50% { transform: scale(1.3) rotate(2deg); opacity: 0.6; }
+            75% { transform: scale(1.1) rotate(-1deg); opacity: 0.8; }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+
+        @keyframes wordReveal {
+            0% { opacity: 0; transform: translateY(-5px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        .word-completed { animation: wordComplete 0.6s ease-out; }
+        .author-completed { animation: authorComplete 0.6s ease-out; }
+        .puzzle-completed { animation: puzzleComplete 1s ease-out; }
+        .quote-complete { font-weight: bold; }
+        .quote-complete .quote-text { font-weight: 700; }
+        .quote-complete .author { font-weight: 600; }
+        .small-celebration { animation: smallCelebration 0.8s ease-out; }
+        .word-reveal { animation: wordReveal 0.4s ease-out; }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .slide-menu {
+                width: 70%;
+                max-width: 300px;
+            }
+            
+            .hamburger-menu {
+                left: 15px;
+            }
+            
+            .newspaper-title {
+                font-size: 22px;
+            }
+        }
+
+        @media (max-width: 650px) {
+            .newspaper-container { padding: 20px; }
+            .newspaper-title { font-size: 20px; }
+            .quote-text { font-size: 20px; padding: 0 10px; }
+            .letter-btn, .letter-cell { width: 40px; height: 40px; font-size: 20px; }
+            .modal-content { width: 95%; padding: 20px; }
+            .help-content li { padding-left: 20px; }
+            .stats-grid { grid-template-columns: 1fr; }
+            
+            .slide-menu {
+                width: 80%;
+            }
+            
+            .menu-item {
+                padding: 15px 20px;
+            }
+            
+            .menu-item-label {
+                font-size: 18px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .newspaper-title { font-size: 18px; }
+            
+            .slide-menu {
+                width: 85%;
+            }
+            
+            .hamburger-menu {
+                left: 10px;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .slide-menu {
+                width: 90%;
+            }
+            
+            .newspaper-title {
+                font-size: 16px;
+                text-align: center;
+            }
+            
+            .hamburger-menu {
+                left: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Debug element to test for black overlay -->
+    <div id="debug-overlay" style="position: fixed; top: 0; left: 0; width: 100px; height: 100px; background: red; z-index: 9999; display: none;">DEBUG</div>
+    
+    <!-- Hamburger Menu Overlay -->
+    <div class="menu-overlay" id="menuOverlay"></div>
+    
+    <!-- Slide-out Menu -->
+    <div class="slide-menu" id="slideMenu">
+        <div class="menu-header">
+            <h3>Menu</h3>
+            <button class="close-menu" id="closeMenu">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <div class="menu-content">
+            <div class="menu-section">
+                <h4><i class="fas fa-volume-up"></i> Audio Settings</h4>
+                <div class="menu-item">
+                    <div class="menu-item-label">
+                        <i class="fas fa-music"></i>
+                        <span>Sound Effects</span>
+                    </div>
+                    <div class="menu-item-control">
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="menuSoundEffectsToggle" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+                <div class="menu-item">
+                    <div class="menu-item-label">
+                        <i class="fas fa-music"></i>
+                        <span>Background Music</span>
+                    </div>
+                    <div class="menu-item-control">
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="menuBackgroundMusicToggle" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="menu-section">
+                <h4><i class="fas fa-gamepad"></i> Game</h4>
+                <div class="menu-item menu-link" id="menuStatsLink">
+                    <div class="menu-item-label">
+                        <i class="fas fa-chart-bar"></i>
+                        <span>Statistics</span>
+                    </div>
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+                <div class="menu-item menu-link" id="menuCalendarLink">
+                    <div class="menu-item-label">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span>Past Challenges</span>
+                    </div>
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+                <div class="menu-item menu-link" id="menuHelpLink">
+                    <div class="menu-item-label">
+                        <i class="fas fa-question-circle"></i>
+                        <span>How to Play</span>
+                    </div>
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="newspaper-container">
+        <div class="header">
+            <div class="header-content">
+                <div class="hamburger-menu" id="hamburgerMenu">
+                    <div class="hamburger-icon">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </div>
+                <div class="title-date-container">
+                    <div class="newspaper-title">Daily Quote Puzzle</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="quote-container">
+            <div class="quote-text" id="quoteText"></div>
+            <div class="author" id="quoteAuthor"></div>
+        </div>
+
+        <div class="congrats" id="congrats">
+            <div class="congrats-stats">
+                <div class="stat-item">
+                    <div class="stat-value" id="congratsTotalSolved">0</div>
+                    <div class="stat-label">Puzzles Solved</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="congratsCurrentStreak">0</div>
+                    <div class="stat-label">Current Streak</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="congratsSuccessRate">0%</div>
+                    <div class="stat-label">Success Rate</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="congratsAvgTime">0s</div>
+                    <div class="stat-label">Avg Time</div>
+                </div>
+            </div>
+            
+            <div class="congrats-cta">
+                <div class="cta-text">Ready for more?</div>
+                <a href="#" class="cta-button" id="pastChallengesBtn">
+                    <i class="fas fa-calendar-alt"></i> Past Challenges
+                </a>
+            </div>
+        </div>
+
+        <div class="input-area" id="inputArea">
+            <div class="input-title" id="inputTitle">Unscramble Word</div>
+            <div class="letter-cells" id="letterCells"></div>
+            <div class="available-letters" id="availableLetters"></div>
+            <div class="controls">
+                <button class="btn" id="resetBtn">
+                    <i class="fas fa-redo"></i> Reset
+                </button>
+                <button class="btn" id="backspaceBtn">
+                    <i class="fas fa-backspace"></i> Backspace
+                </button>
+                <button class="btn" id="unscrambleBtn">
+                    <i class="fas fa-lightbulb"></i> Unscramble
+                    <span class="cooldown-timer" id="unscrambleTimer"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Calendar Modal -->
+    <div class="modal" id="calendarModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Past Challenges</h2>
+                <button class="close-modal" id="closeCalendar">&times;</button>
+            </div>
+            <div class="calendar-navigation">
+                <button class="calendar-nav-btn" id="prevMonth">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <h3 id="calendarMonthYear">July 2025</h3>
+                <button class="calendar-nav-btn" id="nextMonth">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+            <div class="calendar-grid">
+                <div class="calendar-day">Sun</div>
+                <div class="calendar-day">Mon</div>
+                <div class="calendar-day">Tue</div>
+                <div class="calendar-day">Wed</div>
+                <div class="calendar-day">Thu</div>
+                <div class="calendar-day">Fri</div>
+                <div class="calendar-day">Sat</div>
+            </div>
+            <div class="calendar-dates" id="calendarDates"></div>
+            <div class="calendar-status" id="calendarStatus">
+                Select a date to play that day's challenge
+            </div>
+        </div>
+    </div>
+
+    <!-- Help Modal -->
+    <div class="modal" id="helpModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>How to Play</h2>
+                <button class="close-modal" id="closeHelp">&times;</button>
+            </div>
+            <div class="help-content">
+                <p>Unscramble the words in the daily quote to reveal the inspirational message!</p>
+                <ul>
+                    <li><span class="highlight">Click on scrambled words</span> to start unscrambling them</li>
+                    <li><span class="highlight">Click letters</span> or <span class="highlight">type on keyboard</span> to spell the word</li>
+                    <li>Use <span class="highlight">Backspace</span> to remove letters and <span class="highlight">Reset</span> to clear</li>
+                    <li>Don't forget to <span class="highlight">unscramble the author's name</span> at the bottom</li>
+                </ul>
+                <p>Come back daily for a new challenging quote to unscramble!</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Modal -->
+    <div class="modal" id="statsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Your Puzzle Stats</h2>
+                <button class="close-modal" id="closeStats">&times;</button>
+            </div>
+            <div class="stats-content">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalSolved">0</div>
+                        <div class="stat-label">Puzzles Solved</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="currentStreak">0</div>
+                        <div class="stat-label">Current Streak</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="successRate">0%</div>
+                        <div class="stat-label">Success Rate</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="avgTime">0s</div>
+                        <div class="stat-label">Average Time</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal" id="settingsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Settings</h2>
+                <button class="close-modal" id="closeSettings">&times;</button>
+            </div>
+            <div class="settings-content">
+                <div class="setting-item">
+                    <div class="setting-label">
+                        <i class="fas fa-volume-up"></i>
+                        <span>Sound Effects</span>
+                    </div>
+                    <div class="setting-toggle">
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="soundEffectsToggle" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+                <div class="setting-item">
+                    <div class="setting-label">
+                        <i class="fas fa-music"></i>
+                        <span>Background Music</span>
+                    </div>
+                    <div class="setting-toggle">
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="backgroundMusicToggle" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+                <div class="settings-info">
+                    <p><i class="fas fa-info-circle"></i> Changes are saved automatically</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Load quotes from external file -->
+    <script src="quotes_calendar.js"></script>
+    <script src="game-modern.js"></script>
+</body>
+</html> 

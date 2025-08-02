@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <link href="https://fonts.googleapis.com/css?family=Lato:400,700" rel="stylesheet">
+    <link rel="stylesheet" href="notification-style.css">
+</head>
+<body>
+    <div class="notifications-container">
+        <div class="notification notification--type1 active">
+            <div class="window-controls">
+                <button
+                  class="button--icon button--icon--old window-control window-control--close"
+                  onclick="window.close()">
+                    <svg class="svg-icon-fill">
+                        <use href="../assets/sprite.svg#window-control--close--old"></use>
+                    </svg>
+                </button>
+            </div>
+            <!-- <img src="images/optimized/gs/world_of_war_ships.jpg" /> -->
+            <h2>
+                <svg>
+                    <use href="../assets/sprite.svg#overwolf-logo"></use>
+                </svg>
+                <span>Attention</span>
+            </h2>
+            <p>
+                We've noticed that Overwolf's updater is not working properly, and as a result you may be missing important updates for your apps. Please download and install the Overwolf latest version to ensure your apps are running smoothly.
+            </p>
+             <div class="notification__buttons">
+                <button class="button--text button--text--cta">
+                  Download
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <script type="text/javascript" src="notification.js"></script>
+</body>
+
+</html>

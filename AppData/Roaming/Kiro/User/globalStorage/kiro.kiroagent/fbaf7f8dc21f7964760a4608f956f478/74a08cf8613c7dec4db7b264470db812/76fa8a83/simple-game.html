@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Object Hunter - Simple Version</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #6366f1;
+            --primary-dark: #4f46e5;
+            --primary-light: #a5b4fc;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --gray-color: #6b7280;
+            --light-gray: #f3f4f6;
+            --dark-gray: #374151;
+            --white: #ffffff;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --border-radius: 12px;
+            --transition: all 0.3s ease;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: var(--dark-gray);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+        
+        .game-header {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: var(--border-radius);
+            margin-bottom: 25px;
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .game-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(to right, #6366f1, #8b5cf6, #d946ef);
+        }
+        
+        h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            background: linear-gradient(45deg, #6366f1, #8b5cf6, #d946ef);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+            letter-spacing: -1px;
+        }
+        
+        h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--dark-gray);
+        }
+        
+        .game-stats {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .stat-pill {
+            background-color: var(--light-gray);
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .input-area {
+            display: flex;
+            margin-bottom: 25px;
+            box-shadow: var(--shadow-md);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+        }
+        
+        input {
+            flex: 1;
+            padding: 16px 20px;
+            font-size: 1.1rem;
+            border: none;
+            outline: none;
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--white);
+        }
+        
+        input::placeholder {
+            color: #9ca3af;
+        }
+        
+        button {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 16px 28px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        button:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        button:disabled {
+            background: var(--gray-color);
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .btn-primary {
+            background: var(--primary-color);
+        }
+        
+        .btn-success {
+            background: var(--success-color);
+        }
+        
+        .btn-rounded {
+            border-radius: 50px;
+            padding: 10px 20px;
+        }
+        
+        .guesses {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: var(--border-radius);
+            padding: 25px;
+            box-shadow: var(--shadow-lg);
+            margin-bottom: 25px;
+        }
+        
+        .guesses-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--light-gray);
+        }
+        
+        .guesses-list {
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+        
+        .guesses-list::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .guesses-list::-webkit-scrollbar-track {
+            background: var(--light-gray);
+            border-radius: 10px;
+        }
+        
+        .guesses-list::-webkit-scrollbar-thumb {
+            background: var(--primary-light);
+            border-radius: 10px;
+        }
+        
+        .guess-item {
+            padding: 18px;
+            margin-bottom: 15px;
+            border-radius: var(--border-radius);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .guess-item:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .guess-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .guess-word {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .guess-attributes {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        
+        .guess-similarity {
+            text-align: right;
+        }
+        
+        .similarity-text {
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+        
+        .similarity-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        
+        .perfect { 
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white; 
+        }
+        
+        .very-close { 
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: white; 
+        }
+        
+        .warm { 
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white; 
+        }
+        
+        .similar { 
+            background: linear-gradient(135deg, #f97316, #ea580c);
+            color: white; 
+        }
+        
+        .distant { 
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white; 
+        }
+        
+        .different { 
+            background: linear-gradient(135deg, #6b7280, #4b5563);
+            color: white; 
+        }
+        
+        .win-message {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            text-align: center;
+            padding: 30px;
+            border-radius: var(--border-radius);
+            margin-bottom: 25px;
+            box-shadow: var(--shadow-lg);
+            animation: bounce 1s;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .win-message h2 {
+            color: white;
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        
+        .win-message p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-20px); }
+            60% { transform: translateY(-10px); }
+        }
+        
+        .instructions {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: var(--border-radius);
+            padding: 25px;
+            margin-top: 25px;
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .instructions p {
+            margin-bottom: 15px;
+        }
+        
+        .similarity-levels {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+            margin-top: 20px;
+        }
+        
+        .similarity-level {
+            padding: 12px;
+            text-align: center;
+            border-radius: var(--border-radius);
+            color: white;
+            font-weight: 500;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+        
+        .similarity-level:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        /* Confetti animation */
+        @keyframes confetti-slow {
+            0% { transform: translate3d(0, 0, 0) rotateX(0) rotateY(0); }
+            100% { transform: translate3d(25px, 105vh, 0) rotateX(360deg) rotateY(180deg); }
+        }
+        
+        @keyframes confetti-medium {
+            0% { transform: translate3d(0, 0, 0) rotateX(0) rotateY(0); }
+            100% { transform: translate3d(100px, 105vh, 0) rotateX(100deg) rotateY(360deg); }
+        }
+        
+        @keyframes confetti-fast {
+            0% { transform: translate3d(0, 0, 0) rotateX(0) rotateY(0); }
+            100% { transform: translate3d(-50px, 105vh, 0) rotateX(10deg) rotateY(250deg); }
+        }
+        
+        .confetti-container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+        }
+        
+        .confetti {
+            position: absolute;
+            z-index: 1;
+            top: -10px;
+            border-radius: 0%;
+        }
+        
+        .confetti--animation-slow {
+            animation: confetti-slow 2.5s linear 1 forwards;
+        }
+        
+        .confetti--animation-medium {
+            animation: confetti-medium 2s linear 1 forwards;
+        }
+        
+        .confetti--animation-fast {
+            animation: confetti-fast 1.5s linear 1 forwards;
+        }
+        
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px 15px;
+            }
+            
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            .game-header {
+                padding: 20px;
+            }
+            
+            .guess-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .guess-similarity {
+                text-align: left;
+                margin-top: 10px;
+                width: 100%;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+            
+            .similarity-levels {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="game-header">
+            <h1>🎯 Object Hunter</h1>
+            <p>Find the hidden physical object by guessing similar things</p>
+            <div class="game-stats">
+                <div class="stat-pill">
+                    <span id="guess-count">Guesses: 0</span>
+                </div>
+                <button id="new-game-btn" class="btn-rounded">🎲 New Game</button>
+            </div>
+        </div>
+        
+        <div id="win-message" style="display: none;" class="win-message">
+            <h2>🎉 Found it!</h2>
+            <p id="win-text"></p>
+        </div>
+        
+        <div class="input-area">
+            <input type="text" id="guess-input" placeholder="Guess a physical object...">
+            <button id="submit-btn">🔍 Hunt</button>
+        </div>
+        
+        <div class="guesses">
+            <div class="guesses-header">
+                <h2>🎯 Your Objects</h2>
+                <div id="hint-container"></div>
+            </div>
+            <div id="guesses-list" class="guesses-list"></div>
+        </div>
+        
+        <div id="instructions" class="instructions">
+            <p>🎮 Guess physical objects that exist in the real world!</p>
+            <p>Examples: apple, chair, bicycle, book, hammer, flower...</p>
+            <div class="similarity-levels">
+                <div class="similarity-level perfect">🎯 Perfect</div>
+                <div class="similarity-level very-close">🔥 Very Close</div>
+                <div class="similarity-level warm">♨️ Getting Warm</div>
+                <div class="similarity-level similar">🌡️ Somewhat Similar</div>
+                <div class="similarity-level distant">❄️ Distantly Related</div>
+                <div class="similarity-level different">🧊 Very Different</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Game data
+        const WORD_BANK = [
+            'apple', 'chair', 'bicycle', 'lamp', 'book', 'guitar', 'hammer', 'pillow',
+            'telephone', 'camera', 'scissors', 'umbrella', 'clock', 'mirror', 'candle',
+            'keyboard', 'backpack', 'toothbrush', 'wallet', 'headphones', 'pencil',
+            'bottle', 'shoe', 'flower', 'tree', 'rock', 'shell', 'coin', 'knife', 'cup'
+        ];
+
+        const PHYSICAL_ATTRIBUTES = {
+            apple: { size: 15, hardness: 30, weight: 20, temperature: 40, material: 'Organic', category: 'Food', function: 'Eating' },
+            chair: { size: 70, hardness: 85, weight: 60, temperature: 35, material: 'Wood', category: 'Furniture', function: 'Sitting' },
+            bicycle: { size: 85, hardness: 90, weight: 75, temperature: 35, material: 'Metal', category: 'Vehicle', function: 'Transportation' },
+            lamp: { size: 45, hardness: 75, weight: 40, temperature: 60, material: 'Mixed', category: 'Electronics', function: 'Lighting' },
+            book: { size: 25, hardness: 40, weight: 30, temperature: 35, material: 'Paper', category: 'Media', function: 'Reading' },
+            guitar: { size: 80, hardness: 70, weight: 50, temperature: 35, material: 'Wood', category: 'Instrument', function: 'Music' },
+            hammer: { size: 35, hardness: 95, weight: 70, temperature: 35, material: 'Metal', category: 'Tool', function: 'Building' },
+            pillow: { size: 50, hardness: 10, weight: 15, temperature: 40, material: 'Fabric', category: 'Bedding', function: 'Comfort' },
+            telephone: { size: 30, hardness: 80, weight: 40, temperature: 35, material: 'Plastic', category: 'Electronics', function: 'Communication' },
+            camera: { size: 40, hardness: 85, weight: 55, temperature: 35, material: 'Plastic', category: 'Electronics', function: 'Photography' },
+            scissors: { size: 20, hardness: 90, weight: 25, temperature: 35, material: 'Metal', category: 'Tool', function: 'Cutting' },
+            umbrella: { size: 60, hardness: 50, weight: 35, temperature: 35, material: 'Fabric', category: 'Accessory', function: 'Protection' },
+            clock: { size: 35, hardness: 80, weight: 45, temperature: 35, material: 'Plastic', category: 'Electronics', function: 'Time' },
+            mirror: { size: 55, hardness: 95, weight: 60, temperature: 35, material: 'Glass', category: 'Furniture', function: 'Reflection' },
+            candle: { size: 15, hardness: 40, weight: 20, temperature: 70, material: 'Wax', category: 'Decoration', function: 'Lighting' },
+            keyboard: { size: 45, hardness: 75, weight: 50, temperature: 35, material: 'Plastic', category: 'Electronics', function: 'Typing' },
+            backpack: { size: 65, hardness: 25, weight: 40, temperature: 35, material: 'Fabric', category: 'Accessory', function: 'Carrying' },
+            toothbrush: { size: 18, hardness: 60, weight: 10, temperature: 35, material: 'Plastic', category: 'Hygiene', function: 'Cleaning' },
+            wallet: { size: 20, hardness: 50, weight: 15, temperature: 35, material: 'Leather', category: 'Accessory', function: 'Storage' },
+            headphones: { size: 35, hardness: 70, weight: 30, temperature: 35, material: 'Plastic', category: 'Electronics', function: 'Audio' },
+            pencil: { size: 12, hardness: 60, weight: 5, temperature: 35, material: 'Wood', category: 'Tool', function: 'Writing' },
+            bottle: { size: 35, hardness: 90, weight: 45, temperature: 40, material: 'Glass', category: 'Container', function: 'Storage' },
+            shoe: { size: 30, hardness: 65, weight: 40, temperature: 35, material: 'Leather', category: 'Clothing', function: 'Protection' },
+            flower: { size: 10, hardness: 15, weight: 5, temperature: 40, material: 'Organic', category: 'Plant', function: 'Beauty' },
+            tree: { size: 95, hardness: 85, weight: 90, temperature: 35, material: 'Wood', category: 'Plant', function: 'Oxygen' },
+            rock: { size: 25, hardness: 100, weight: 80, temperature: 30, material: 'Stone', category: 'Natural', function: 'Building' },
+            shell: { size: 8, hardness: 85, weight: 10, temperature: 35, material: 'Calcium', category: 'Natural', function: 'Protection' },
+            coin: { size: 3, hardness: 90, weight: 8, temperature: 35, material: 'Metal', category: 'Currency', function: 'Payment' },
+            knife: { size: 25, hardness: 95, weight: 30, temperature: 35, material: 'Metal', category: 'Tool', function: 'Cutting' },
+            cup: { size: 20, hardness: 85, weight: 25, temperature: 45, material: 'Ceramic', category: 'Container', function: 'Drinking' }
+        };
+
+        const SIMILARITY_LEVELS = [
+            { min: 100, max: 100, text: '🎯 Perfect!', class: 'perfect' },
+            { min: 80, max: 99, text: '🔥 Very Close', class: 'very-close' },
+            { min: 60, max: 79, text: '♨️ Getting Warm', class: 'warm' },
+            { min: 40, max: 59, text: '🌡️ Somewhat Similar', class: 'similar' },
+            { min: 20, max: 39, text: '❄️ Distantly Related', class: 'distant' },
+            { min: 0, max: 19, text: '🧊 Very Different', class: 'different' }
+        ];
+
+        // Game state
+        let targetWord = '';
+        let guesses = [];
+        let guessCount = 0;
+        let gameWon = false;
+
+        // DOM elements
+        const guessInput = document.getElementById('guess-input');
+        const submitBtn = document.getElementById('submit-btn');
+        const newGameBtn = document.getElementById('new-game-btn');
+        const guessesList = document.getElementById('guesses-list');
+        const guessCountEl = document.getElementById('guess-count');
+        const winMessage = document.getElementById('win-message');
+        const winText = document.getElementById('win-text');
+        const instructions = document.getElementById('instructions');
+
+        // Start a new game
+        function startNewGame() {
+            targetWord = WORD_BANK[Math.floor(Math.random() * WORD_BANK.length)];
+            guesses = [];
+            guessCount = 0;
+            gameWon = false;
+            
+            guessCountEl.textContent = `Guesses: ${guessCount}`;
+            guessesList.innerHTML = '';
+            winMessage.style.display = 'none';
+            guessInput.disabled = false;
+            submitBtn.disabled = false;
+            guessInput.value = '';
+            guessInput.focus();
+            
+            console.log('New game started. Target word:', targetWord);
+        }
+
+        // Calculate similarity between guess and target
+        function calculateSimilarity(guessWord) {
+            if (guessWord === targetWord) return 100;
+
+            const targetData = PHYSICAL_ATTRIBUTES[targetWord];
+            const guessData = PHYSICAL_ATTRIBUTES[guessWord];
+
+            if (!targetData || !guessData) return Math.floor(Math.random() * 20) + 5;
+
+            const sizeDiff = Math.abs(targetData.size - guessData.size);
+            const hardnessDiff = Math.abs(targetData.hardness - guessData.hardness);
+            const weightDiff = Math.abs(targetData.weight - guessData.weight);
+            const temperatureDiff = Math.abs(targetData.temperature - guessData.temperature);
+
+            const physicalSimilarity = 100 - ((sizeDiff + hardnessDiff + weightDiff + temperatureDiff) / 4);
+
+            const categoryBonus = targetData.category === guessData.category ? 25 : 0;
+            const materialBonus = targetData.material === guessData.material ? 15 : 0;
+            const functionBonus = targetData.function === guessData.function ? 15 : 0;
+
+            const totalSimilarity = physicalSimilarity + categoryBonus + materialBonus + functionBonus;
+
+            return Math.min(95, Math.max(5, Math.round(totalSimilarity)));
+        }
+
+        // Get similarity level info
+        function getSimilarityLevel(similarity) {
+            for (const level of SIMILARITY_LEVELS) {
+                if (similarity >= level.min && similarity <= level.max) {
+                    return level;
+                }
+            }
+            return SIMILARITY_LEVELS[5]; // Default to "different"
+        }
+
+        // Process a guess
+        function processGuess() {
+            const guessWord = guessInput.value.toLowerCase().trim();
+            
+            if (!guessWord || gameWon) return;
+            
+            // Check if already guessed
+            if (guesses.some(g => g.word === guessWord)) {
+                alert('You already guessed that!');
+                return;
+            }
+            
+            const similarity = calculateSimilarity(guessWord);
+            const newGuess = {
+                word: guessWord,
+                similarity,
+                attributes: PHYSICAL_ATTRIBUTES[guessWord] || null
+            };
+            
+            guesses.push(newGuess);
+            guessCount++;
+            guessCountEl.textContent = `Guesses: ${guessCount}`;
+            
+            // Sort guesses by similarity
+            guesses.sort((a, b) => b.similarity - a.similarity);
+            
+            // Update UI
+            renderGuesses();
+            
+            // Check if won
+            if (similarity === 100) {
+                gameWon = true;
+                winMessage.style.display = 'block';
+                winText.textContent = `The object was "${targetWord}" - discovered in ${guessCount} guesses!`;
+                guessInput.disabled = true;
+                submitBtn.disabled = true;
+                
+                // Create confetti effect
+                createConfetti();
+            }
+            
+            guessInput.value = '';
+            guessInput.focus();
+            
+            // Hide instructions after first guess
+            instructions.style.display = 'none';
+        }
+
+        // Render guesses list
+        function renderGuesses() {
+            guessesList.innerHTML = '';
+            
+            guesses.forEach((guess, index) => {
+                const level = getSimilarityLevel(guess.similarity);
+                
+                const guessEl = document.createElement('div');
+                guessEl.className = `guess-item ${level.class}`;
+                
+                // Add animation class for new items
+                if (index === 0) {
+                    guessEl.style.animation = 'slideIn 0.3s ease-out';
+                }
+                
+                let attributesText = '';
+                if (guess.attributes) {
+                    attributesText = `<div class="guess-attributes">${guess.attributes.material} • ${guess.attributes.category} • Used for ${guess.attributes.function}</div>`;
+                }
+                
+                guessEl.innerHTML = `
+                    <div>
+                        <div class="guess-word"><strong>#${index + 1}</strong> ${guess.word}</div>
+                        ${attributesText}
+                    </div>
+                    <div class="guess-similarity">
+                        <div class="similarity-text">${level.text}</div>
+                        <div class="similarity-value">${guess.similarity}%</div>
+                    </div>
+                `;
+                
+                guessesList.appendChild(guessEl);
+            });
+        }
+
+        // Event listeners
+        submitBtn.addEventListener('click', processGuess);
+        
+        guessInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                processGuess();
+            }
+        });
+        
+        newGameBtn.addEventListener('click', startNewGame);
+
+        // Initialize game
+        startNewGame();
+    </script>
+</body>
+</html>

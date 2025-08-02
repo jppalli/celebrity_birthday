@@ -1,0 +1,404 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html>
+<head>
+  <title>Snowy Racket Whacker</title>
+  <style>
+    canvas {
+      image-rendering: pixelated;
+      width: 640px;
+      height: 576px;
+      background: #9BBC0F;
+    }
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background: #0F380F;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="gameCanvas" width="320" height="288"></canvas>
+  <script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+
+    // Gameboy-style palette
+    const colors = {
+      bg: '#9BBC0F',
+      dark: '#306230',
+      medium: '#8BAC0F',
+      light: '#0F380F'
+    };
+
+    // Player
+    let player = {
+      x: 160,
+      y: 240,
+      width: 32,
+      height: 32,
+      speed: 0,
+      maxSpeed: 2,
+      friction: 0.99, // Doubled sliding effect
+      swinging: false,
+      swingTimer: 0
+    };
+
+    // Snowballs
+    let snowballs = [];
+    let snowballSpawnRate = 600;
+    let frameCount = 0;
+    let gameSpeed = 0.5;
+    let score = 0;
+    let floorHits = 0;
+    let gameOver = false;
+    let gameStarted = false;
+
+    // Particles for hit animation
+    let particles = [];
+
+    // Snowflakes for background
+    let snowflakes = [];
+    for (let i = 0; i < 50; i++) {
+      snowflakes.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        size: Math.random() * 4 + 2,
+        speed: Math.random() * 0.05 + 0.05
+      });
+    }
+
+    // Start with 1 snowball
+    function initializeSnowballs() {
+      const size = Math.random() * 8 + 8;
+      snowballs.push({
+        x: Math.random() * (canvas.width - size),
+        y: -size - Math.random() * 100,
+        size: size,
+        speed: 0.3 * gameSpeed
+      });
+    }
+
+    // Input
+    let keys = { left: false, right: false, swing: false, start: false, retry: false };
+
+    // Draw player sprite (32x32 pixel art)
+    function drawPlayer() {
+      const x = player.x;
+      const y = player.y;
+      ctx.fillStyle = colors.dark;
+      // Head
+      ctx.fillRect(x + 12, y, 8, 8);
+      // Body
+      ctx.fillRect(x + 10, y + 8, 12, 12);
+      // Legs
+      ctx.fillRect(x + 10, y + 20, 4, 8);
+      ctx.fillRect(x + 18, y + 20, 4, 8);
+      // Arms
+      ctx.fillStyle = colors.medium;
+      if (player.swinging) {
+        // Racket swinging (angled)
+        ctx.fillRect(x + 22, y + 4, 8, 4);
+        ctx.fillRect(x + 26, y + 2, 4, 8);
+      } else {
+        // Racket at rest
+        ctx.fillRect(x + 22, y + 8, 4, 12);
+        ctx.fillRect(x + 24, y + 8, 8, 4);
+      }
+    }
+
+    function drawSnowball(x, y, size) {
+      // Low-res Gameboy-style snowball with rounded pixel clusters
+      ctx.fillStyle = colors.light;
+      // Main body (blocky rounded shape)
+      ctx.fillRect(x + size / 4, y + size / 4, size / 2, size / 2);
+      ctx.fillRect(x + size / 3 - 1, y + size / 6, size / 3, size / 3);
+      ctx.fillRect(x + size / 6, y + size / 3 - 1, size / 3, size / 3);
+      // Whiter highlights for snowy effect
+      ctx.fillStyle = colors.bg;
+      ctx.fillRect(x + size / 2.5, y + size / 4, size / 5, size / 5);
+      ctx.fillRect(x + size / 3, y + size / 2 - 1, size / 5, size / 5);
+      // Additional pixelated edge for roundness
+      ctx.fillRect(x + size / 2, y + size / 6, size / 6, size / 6);
+    }
+
+    function drawSnowflakes() {
+      ctx.globalAlpha = 0.3;
+      snowflakes.forEach(sf => {
+        ctx.fillStyle = colors.light;
+        const x = sf.x;
+        const y = sf.y;
+        const s = sf.size;
+        // Star-like crystalline shape
+        ctx.beginPath();
+        ctx.moveTo(x, y - s);
+        ctx.lineTo(x + s * 0.2, y - s * 0.2);
+        ctx.lineTo(x + s, y);
+        ctx.lineTo(x + s * 0.2, y + s * 0.2);
+        ctx.lineTo(x, y + s);
+        ctx.lineTo(x - s * 0.2, y + s * 0.2);
+        ctx.lineTo(x - s, y);
+        ctx.lineTo(x - s * 0.2, y - s * 0.2);
+        ctx.closePath();
+        ctx.fill();
+        sf.y += sf.speed;
+        if (sf.y > canvas.height) {
+          sf.y = -s;
+          sf.x = Math.random() * canvas.width;
+        }
+      });
+      ctx.globalAlpha = 1.0;
+    }
+
+    function drawFloor() {
+      ctx.fillStyle = colors.light;
+      ctx.fillRect(0, canvas.height - 32, canvas.width, 32);
+      ctx.fillStyle = colors.bg;
+      for (let x = 0; x < canvas.width; x += 16) {
+        ctx.fillRect(x, canvas.height - 32, 8, 8);
+      }
+      ctx.fillStyle = colors.medium;
+      for (let x = 8; x < canvas.width; x += 16) {
+        ctx.fillRect(x, canvas.height - 24, 4, 4);
+      }
+    }
+
+    function spawnSnowball() {
+      if (!gameOver && gameStarted) {
+        const size = Math.random() * 8 + 8;
+        snowballs.push({
+          x: Math.random() * (canvas.width - size),
+          y: -size,
+          size: size,
+          speed: 0.3 * gameSpeed
+        });
+      }
+    }
+
+    function spawnParticles(x, y) {
+      for (let i = 0; i < 8; i++) {
+        particles.push({
+          x: x,
+          y: y,
+          vx: (Math.random() - 0.5) * 4,
+          vy: (Math.random() - 0.5) * 4,
+          size: Math.random() * 4 + 2,
+          life: 20
+        });
+      }
+    }
+
+    function updateParticles() {
+      for (let i = particles.length - 1; i >= 0; i--) {
+        let p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.life--;
+        if (p.life <= 0) {
+          particles.splice(i, 1);
+        }
+      }
+    }
+
+    function drawParticles() {
+      particles.forEach(p => {
+        ctx.fillStyle = colors.light;
+        ctx.globalAlpha = p.life / 20;
+        ctx.fillRect(p.x, p.y, p.size, p.size);
+        ctx.globalAlpha = 1.0;
+      });
+    }
+
+    function updatePlayer() {
+      if (gameOver || !gameStarted) return;
+      if (keys.left) player.speed -= 0.1;
+      if (keys.right) player.speed += 0.1;
+      player.speed = Math.max(-player.maxSpeed, Math.min(player.maxSpeed, player.speed));
+      player.x += player.speed;
+      player.speed *= player.friction;
+
+      player.x = Math.max(0, Math.min(canvas.width - player.width, player.x));
+
+      if (player.swinging) {
+        player.swingTimer--;
+        if (player.swingTimer <= 0) player.swinging = false;
+      }
+      if (keys.swing && !player.swinging) {
+        player.swinging = true;
+        player.swingTimer = 10;
+      }
+    }
+
+    function updateSnowballs() {
+      if (gameOver || !gameStarted) return;
+      for (let i = snowballs.length - 1; i >= 0; i--) {
+        let sb = snowballs[i];
+        sb.y += sb.speed;
+
+        // Check collision with player swing
+        if (player.swinging &&
+            sb.x < player.x + player.width + 16 &&
+            sb.x + sb.size > player.x &&
+            sb.y < player.y &&
+            sb.y + sb.size > player.y - 8) {
+          spawnParticles(sb.x + sb.size / 2, sb.y + sb.size / 2);
+          snowballs.splice(i, 1);
+          score += 10;
+          continue;
+        }
+
+        // Snowballs hitting floor
+        if (sb.y + sb.size > canvas.height - 32) {
+          snowballs.splice(i, 1);
+          floorHits++;
+          if (floorHits >= 3) {
+            gameOver = true;
+          }
+        }
+      }
+    }
+
+    function resetGame() {
+      player.x = 160;
+      player.speed = 0;
+      snowballs = [];
+      particles = [];
+      score = 0;
+      floorHits = 0;
+      gameSpeed = 0.5;
+      snowballSpawnRate = 600;
+      gameOver = false;
+      gameStarted = true;
+      initializeSnowballs();
+    }
+
+    function drawStartMenu() {
+      ctx.fillStyle = colors.bg;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      drawSnowflakes();
+      ctx.fillStyle = colors.dark;
+      ctx.font = '24px monospace';
+      ctx.fillText('Snowy Racket', 60, 80);
+      ctx.fillText('Whacker', 90, 110);
+      ctx.font = '16px monospace';
+      ctx.fillText('Press SPACE to Start', 50, 160);
+    }
+
+    function draw() {
+      ctx.fillStyle = colors.bg;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      if (!gameStarted) {
+        drawStartMenu();
+        return;
+      }
+
+      drawSnowflakes();
+      drawFloor();
+      drawParticles();
+      if (!gameOver) {
+        drawPlayer();
+      }
+      snowballs.forEach(sb => drawSnowball(sb.x, sb.y, sb.size));
+
+      ctx.fillStyle = colors.dark;
+      ctx.font = '16px monospace';
+      ctx.fillText('Score: ' + score, 8, 24);
+      if (!gameOver) {
+        ctx.fillText('Misses: ' + floorHits + '/3', 8, 40);
+      }
+
+      if (gameOver) {
+        ctx.fillStyle = colors.dark;
+        ctx.fillText('Game Over', 120, 140);
+        ctx.fillText('Press R to Retry', 90, 160);
+      }
+    }
+
+    function gameLoop() {
+      frameCount++;
+      if (frameCount % snowballSpawnRate === 0) {
+        spawnSnowball();
+      }
+      if (frameCount % 600 === 0 && !gameOver && gameStarted) {
+        gameSpeed += 0.02;
+        snowballSpawnRate = Math.max(300, snowballSpawnRate - 5);
+      }
+
+      updatePlayer();
+      updateSnowballs();
+      updateParticles();
+      draw();
+      requestAnimationFrame(gameLoop);
+    }
+
+    // Input handling
+    document.addEventListener('keydown', e => {
+      if (e.key === 'ArrowLeft') keys.left = true;
+      if (e.key === 'ArrowRight') keys.right = true;
+      if (e.key === ' ') keys.swing = true;
+      if (e.key === ' ' && !gameStarted) {
+        keys.start = true;
+        gameStarted = true;
+        resetGame();
+      }
+      if (e.key === 'r' && gameOver) {
+        keys.retry = true;
+        resetGame();
+      }
+    });
+
+    document.addEventListener('keyup', e => {
+      if (e.key === 'ArrowLeft') keys.left = false;
+      if (e.key === 'ArrowRight') keys.right = false;
+      if (e.key === ' ') keys.swing = false;
+      if (e.key === ' ') keys.start = false;
+      if (e.key === 'r') keys.retry = false;
+    });
+
+    // Start game
+    gameLoop();
+  </script>
+</body>
+</html>

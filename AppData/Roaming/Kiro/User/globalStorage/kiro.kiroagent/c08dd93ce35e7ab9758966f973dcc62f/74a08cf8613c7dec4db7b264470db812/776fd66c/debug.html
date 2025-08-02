@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Game Loading</title>
+</head>
+<body>
+    <h1>Game Loading Debug</h1>
+    <div id="status">Checking...</div>
+    <div id="details"></div>
+    
+    <script>
+        const status = document.getElementById('status');
+        const details = document.getElementById('details');
+        
+        function log(message) {
+            console.log(message);
+            details.innerHTML += '<p>' + message + '</p>';
+        }
+        
+        // Check if we're running from localhost
+        log('Current URL: ' + window.location.href);
+        log('Protocol: ' + window.location.protocol);
+        
+        // Check if files exist
+        const filesToCheck = [
+            'dmloader.js',
+            'Waffle.wasm',
+            'Waffle_wasm.js',
+            'archive/archive_files.json',
+            'utils/arkadiumDefoldBridge.js'
+        ];
+        
+        async function checkFiles() {
+            for (const file of filesToCheck) {
+                try {
+                    const response = await fetch(file);
+                    if (response.ok) {
+                        log('✓ ' + file + ' - OK (' + response.status + ')');
+                    } else {
+                        log('✗ ' + file + ' - ERROR (' + response.status + ')');
+                    }
+                } catch (error) {
+                    log('✗ ' + file + ' - FAILED: ' + error.message);
+                }
+            }
+            
+            // Try to load the main game
+            log('Attempting to load main game...');
+            try {
+                const script = document.createElement('script');
+                script.src = 'dmloader.js';
+                script.onload = () => log('✓ dmloader.js loaded successfully');
+                script.onerror = () => log('✗ dmloader.js failed to load');
+                document.head.appendChild(script);
+            } catch (error) {
+                log('✗ Error loading dmloader.js: ' + error.message);
+            }
+        }
+        
+        checkFiles();
+    </script>
+</body>
+</html>

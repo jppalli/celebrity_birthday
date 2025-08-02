@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Quote Puzzle - Simple</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Special+Elite&display=swap" rel="stylesheet">
+    <!-- Arkadium Game SDK -->
+    <script src="https://developers.arkadium.com/cdn/sdk/v2/sdk.js"></script>
+    <style>
+        html, body {
+            width: 100vw;
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            font-family: 'Special Elite', 'Courier New', monospace;
+        }
+        
+        body {
+            background: #f0f0f0;
+            color: #222;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .game-container {
+            width: 90vw;
+            height: 90vh;
+            max-width: 800px;
+            background: white;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            border: 2px solid #333;
+            padding: 20px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .title {
+            font-size: 32px;
+            font-weight: bold;
+            margin: 0;
+        }
+        
+        .date {
+            font-size: 14px;
+            color: #666;
+            margin: 5px 0;
+        }
+        
+        .quote-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .quote-text {
+            font-size: 18px;
+            line-height: 1.6;
+            text-align: center;
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .word {
+            display: inline-block;
+            margin: 0 5px;
+            padding: 5px 10px;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+            min-width: 60px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .word.solved {
+            border-color: #28a745;
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .word:hover {
+            border-color: #007cba;
+        }
+        
+        .author {
+            font-style: italic;
+            text-align: center;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .btn {
+            background: #007cba;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 14px;
+        }
+        
+        .btn:hover {
+            background: #005a8b;
+        }
+        
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .status {
+            text-align: center;
+            margin: 10px 0;
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 50px;
+            font-size: 18px;
+        }
+        
+        .error {
+            color: #dc3545;
+            text-align: center;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="header">
+            <h1 class="title">Daily Quote Puzzle</h1>
+            <div class="date" id="date-display"></div>
+        </div>
+        
+        <div class="quote-area" id="quote-area">
+            <div class="loading">Loading game...</div>
+        </div>
+        
+        <div class="controls">
+            <button class="btn" id="reset-btn" onclick="resetGame()">Reset</button>
+            <button class="btn" id="hint-btn" onclick="showHint()">Hint</button>
+        </div>
+        
+        <div class="status" id="status">Ready to play!</div>
+    </div>
+
+    <script>
+        // Game state
+        let currentQuote = null;
+        let solvedWords = new Set();
+        let authorSolved = false;
+        let sdk = null;
+        let sdkInitialized = false;
+        
+        // Sample quotes for testing
+        const sampleQuotes = [
+            {
+                date: "2024-01-15",
+                text: "The only way to do great work is to love what you do.",
+                author: "Steve Jobs",
+                scrambledWords: ["only", "way", "do", "great", "work", "is", "to", "love", "what", "you", "do"],
+                scrambledAuthor: "Steve Jobs"
+            },
+            {
+                date: "2024-01-16", 
+                text: "Life is what happens when you're busy making other plans.",
+                author: "John Lennon",
+                scrambledWords: ["life", "is", "what", "happens", "when", "you're", "busy", "making", "other", "plans"],
+                scrambledAuthor: "John Lennon"
+            }
+        ];
+        
+        // Initialize Arkadium SDK
+        async function initializeSDK() {
+            try {
+                console.log('Initializing Arkadium SDK...');
+                
+                // Wait for SDK to be available
+                let attempts = 0;
+                const maxAttempts = 10;
+                
+                while (typeof window.ArkadiumGameSDK === 'undefined' && attempts < maxAttempts) {
+                    console.log(`Waiting for SDK... Attempt ${attempts + 1}/${maxAttempts}`);
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                    attempts++;
+                }
+                
+                if (typeof window.ArkadiumGameSDK === 'undefined') {
+                    throw new Error('SDK not available');
+                }
+                
+                sdk = await window.ArkadiumGameSDK.getInstance();
+                
+                if (sdk && typeof sdk.debugMode === 'function') {
+                    sdk.debugMode(true);
+                }
+                
+                sdkInitialized = true;
+                console.log('SDK initialized successfully');
+                
+                // Set up lifecycle events
+                if (sdk.lifecycle) {
+                    if (typeof sdk.lifecycle.onTestReady === 'function') {
+                        sdk.lifecycle.onTestReady();
+                    }
+                    if (typeof sdk.lifecycle.onGameStart === 'function') {
+                        sdk.lifecycle.onGameStart();
+                    }
+                }
+                
+                return true;
+            } catch (error) {
+                console.warn('SDK initialization failed:', error);
+                return false;
+            }
+        }
+        
+        // Initialize game
+        async function initGame() {
+            try {
+                console.log('Initializing game...');
+                
+                // Initialize SDK first
+                await initializeSDK();
+                
+                // Load today's quote
+                loadTodaysQuote();
+                
+                // Render the game
+                renderGame();
+                
+                console.log('Game initialized successfully');
+                
+            } catch (error) {
+                console.error('Game initialization failed:', error);
+                showError('Failed to initialize game. Please refresh the page.');
+            }
+        }
+        
+        // Load today's quote
+        function loadTodaysQuote() {
+            const today = new Date();
+            const dateStr = today.toISOString().split('T')[0];
+            
+            // For testing, use a sample quote
+            currentQuote = sampleQuotes[0];
+            
+            // Update date display
+            document.getElementById('date-display').textContent = today.toLocaleDateString();
+        }
+        
+        // Render the game
+        function renderGame() {
+            if (!currentQuote) {
+                showError('No quote available');
+                return;
+            }
+            
+            const quoteArea = document.getElementById('quote-area');
+            
+            // Create quote text with scrambled words
+            let quoteHTML = '';
+            const words = currentQuote.scrambledWords;
+            
+            words.forEach((word, index) => {
+                const isSolved = solvedWords.has(index);
+                const displayWord = isSolved ? word : scrambleWord(word);
+                
+                quoteHTML += `<span class="word ${isSolved ? 'solved' : ''}" onclick="solveWord(${index})">${displayWord}</span>`;
+            });
+            
+            // Add author
+            const authorDisplay = authorSolved ? currentQuote.scrambledAuthor : scrambleWord(currentQuote.scrambledAuthor);
+            quoteHTML += `<div class="author ${authorSolved ? 'solved' : ''}" onclick="solveAuthor()">— ${authorDisplay}</div>`;
+            
+            quoteArea.innerHTML = quoteHTML;
+            
+            updateStatus();
+        }
+        
+        // Scramble a word
+        function scrambleWord(word) {
+            if (word.length <= 2) return word;
+            
+            const letters = word.split('');
+            const first = letters[0];
+            const last = letters[letters.length - 1];
+            const middle = letters.slice(1, -1);
+            
+            // Shuffle middle letters
+            for (let i = middle.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [middle[i], middle[j]] = [middle[j], middle[i]];
+            }
+            
+            return first + middle.join('') + last;
+        }
+        
+        // Solve a word
+        function solveWord(index) {
+            if (solvedWords.has(index)) return;
+            
+            solvedWords.add(index);
+            renderGame();
+            
+            // Track analytics
+            if (sdk && sdkInitialized && sdk.analytics) {
+                try {
+                    sdk.analytics.trackEvent('word_solved', { word: currentQuote.scrambledWords[index] });
+                } catch (error) {
+                    console.warn('Failed to track analytics:', error);
+                }
+            }
+            
+            checkGameComplete();
+        }
+        
+        // Solve author
+        function solveAuthor() {
+            if (authorSolved) return;
+            
+            authorSolved = true;
+            renderGame();
+            
+            // Track analytics
+            if (sdk && sdkInitialized && sdk.analytics) {
+                try {
+                    sdk.analytics.trackEvent('author_solved', { author: currentQuote.scrambledAuthor });
+                } catch (error) {
+                    console.warn('Failed to track analytics:', error);
+                }
+            }
+            
+            checkGameComplete();
+        }
+        
+        // Check if game is complete
+        function checkGameComplete() {
+            const allWordsSolved = currentQuote.scrambledWords.every((_, index) => solvedWords.has(index));
+            
+            if (allWordsSolved && authorSolved) {
+                // Game completed!
+                if (sdk && sdkInitialized && sdk.lifecycle) {
+                    try {
+                        sdk.lifecycle.onGameWin();
+                        sdk.analytics.trackEvent('game_completed');
+                    } catch (error) {
+                        console.warn('Failed to track game completion:', error);
+                    }
+                }
+                
+                updateStatus('Congratulations! You solved the puzzle!');
+            }
+        }
+        
+        // Reset game
+        function resetGame() {
+            solvedWords.clear();
+            authorSolved = false;
+            renderGame();
+            updateStatus('Game reset!');
+        }
+        
+        // Show hint
+        function showHint() {
+            const unsolvedWords = currentQuote.scrambledWords.filter((_, index) => !solvedWords.has(index));
+            
+            if (unsolvedWords.length > 0) {
+                const randomWord = unsolvedWords[Math.floor(Math.random() * unsolvedWords.length)];
+                updateStatus(`Hint: Try solving "${randomWord}"`);
+            } else if (!authorSolved) {
+                updateStatus('Hint: Try solving the author name');
+            } else {
+                updateStatus('All words are solved!');
+            }
+        }
+        
+        // Update status
+        function updateStatus(message = null) {
+            const statusEl = document.getElementById('status');
+            
+            if (message) {
+                statusEl.textContent = message;
+            } else {
+                const solvedCount = solvedWords.size + (authorSolved ? 1 : 0);
+                const totalCount = currentQuote.scrambledWords.length + 1;
+                statusEl.textContent = `Solved: ${solvedCount}/${totalCount}`;
+            }
+        }
+        
+        // Show error
+        function showError(message) {
+            const quoteArea = document.getElementById('quote-area');
+            quoteArea.innerHTML = `<div class="error">${message}</div>`;
+        }
+        
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', initGame);
+    </script>
+</body>
+</html> 

@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Object Hunter - Simple Version</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .game-header {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            color: #6366f1;
+            margin-top: 0;
+        }
+        
+        .input-area {
+            display: flex;
+            margin-bottom: 20px;
+        }
+        
+        input {
+            flex: 1;
+            padding: 12px;
+            font-size: 16px;
+            border: 2px solid #d1d5db;
+            border-radius: 8px 0 0 8px;
+            outline: none;
+        }
+        
+        input:focus {
+            border-color: #6366f1;
+        }
+        
+        button {
+            background: #6366f1;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 0 8px 8px 0;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        button:hover {
+            background: #4f46e5;
+        }
+        
+        button:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+        
+        .guesses {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .guess-item {
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .perfect { background-color: #10b981; color: white; }
+        .very-close { background-color: #22c55e; color: white; }
+        .warm { background-color: #eab308; color: white; }
+        .similar { background-color: #f97316; color: white; }
+        .distant { background-color: #ef4444; color: white; }
+        .different { background-color: #6b7280; color: white; }
+        
+        .win-message {
+            background: linear-gradient(to right, #10b981, #059669);
+            color: white;
+            text-align: center;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            animation: bounce 1s;
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-20px); }
+            60% { transform: translateY(-10px); }
+        }
+        
+        .instructions {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .similarity-levels {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .similarity-level {
+            padding: 8px;
+            text-align: center;
+            border-radius: 6px;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="game-header">
+            <h1>🎯 Object Hunter</h1>
+            <p>Find the hidden physical object by guessing similar things</p>
+            <div>
+                <span id="guess-count">Guesses: 0</span>
+                <button id="new-game-btn" style="margin-left: 10px; border-radius: 8px;">🎲 New Game</button>
+            </div>
+        </div>
+        
+        <div id="win-message" style="display: none;" class="win-message">
+            <h2>🎉 Found it!</h2>
+            <p id="win-text"></p>
+        </div>
+        
+        <div class="input-area">
+            <input type="text" id="guess-input" placeholder="Guess a physical object...">
+            <button id="submit-btn">🔍 Hunt</button>
+        </div>
+        
+        <div class="guesses">
+            <h2>🎯 Your Objects</h2>
+            <div id="guesses-list"></div>
+        </div>
+        
+        <div id="instructions" class="instructions">
+            <p>🎮 Guess physical objects that exist in the real world!</p>
+            <p>Examples: apple, chair, bicycle, book, hammer, flower...</p>
+            <div class="similarity-levels">
+                <div class="similarity-level perfect">🎯 Perfect</div>
+                <div class="similarity-level very-close">🔥 Very Close</div>
+                <div class="similarity-level warm">♨️ Getting Warm</div>
+                <div class="similarity-level similar">🌡️ Somewhat Similar</div>
+                <div class="similarity-level distant">❄️ Distantly Related</div>
+                <div class="similarity-level different">🧊 Very Different</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Game data
+        const WORD_BANK = [
+            'apple', 'chair', 'bicycle', 'lamp', 'book', 'guitar', 'hammer', 'pillow',
+            'telephone', 'camera', 'scissors', 'umbrella', 'clock', 'mirror', 'candle',
+            'keyboard', 'backpack', 'toothbrush', 'wallet', 'headphones', 'pencil',
+            'bottle', 'shoe', 'flower', 'tree', 'rock', 'shell', 'coin', 'knife', 'cup'
+        ];
+
+        const PHYSICAL_ATTRIBUTES = {
+            apple: { size: 15, hardness: 30, weight: 20, temperature: 40, material: 'Organic', category: 'Food', function: 'Eating' },
+            chair: { size: 70, hardness: 85, weight: 60, temperature: 35, material: 'Wood', category: 'Furniture', function: 'Sitting' },
+            bicycle: { size: 85, hardness: 90, weight: 75, temperature: 35, material: 'Metal', category: 'Vehicle', function: 'Transportation' },
+            lamp: { size: 45, hardness: 75, weight: 40, temperature: 60, material: 'Mixed', category: 'Electronics', function: 'Lighting' },
+            book: { size: 25, hardness: 40, weight: 30, temperature: 35, material: 'Paper', category: 'Media', function: 'Reading' },
+            guitar: { size: 80, hardness: 70, weight: 50, temperature: 35, material: 'Wood', category: 'Instrument', function: 'Music' },
+            hammer: { size: 35, hardness: 95, weight: 70, temperature: 35, material: 'Metal', category: 'Tool', function: 'Building' },
+            pillow: { size: 50, hardness: 10, weight: 15, temperature: 40, material: 'Fabric', category: 'Bedding', function: 'Comfort' },
+            telephone: { size: 30, hardness: 80, weight: 40, temperature: 35, material: 'Plastic', category: 'Electronics', function: 'Communication' },
+            camera: { size: 40, hardness: 85, weight: 55, temperature: 35, material: 'Plastic', category: 'Electronics', function: 'Photography' },
+            scissors: { size: 20, hardness: 90, weight: 25, temperature: 35, material: 'Metal', category: 'Tool', function: 'Cutting' },
+            umbrella: { size: 60, hardness: 50, weight: 35, temperature: 35, material: 'Fabric', category: 'Accessory', function: 'Protection' },
+            clock: { size: 35, hardness: 80, weight: 45, temperature: 35, material: 'Plastic', category: 'Electronics', function: 'Time' },
+            mirror: { size: 55, hardness: 95, weight: 60, temperature: 35, material: 'Glass', category: 'Furniture', function: 'Reflection' },
+            candle: { size: 15, hardness: 40, weight: 20, temperature: 70, material: 'Wax', category: 'Decoration', function: 'Lighting' },
+            keyboard: { size: 45, hardness: 75, weight: 50, temperature: 35, material: 'Plastic', category: 'Electronics', function: 'Typing' },
+            backpack: { size: 65, hardness: 25, weight: 40, temperature: 35, material: 'Fabric', category: 'Accessory', function: 'Carrying' },
+            toothbrush: { size: 18, hardness: 60, weight: 10, temperature: 35, material: 'Plastic', category: 'Hygiene', function: 'Cleaning' },
+            wallet: { size: 20, hardness: 50, weight: 15, temperature: 35, material: 'Leather', category: 'Accessory', function: 'Storage' },
+            headphones: { size: 35, hardness: 70, weight: 30, temperature: 35, material: 'Plastic', category: 'Electronics', function: 'Audio' },
+            pencil: { size: 12, hardness: 60, weight: 5, temperature: 35, material: 'Wood', category: 'Tool', function: 'Writing' },
+            bottle: { size: 35, hardness: 90, weight: 45, temperature: 40, material: 'Glass', category: 'Container', function: 'Storage' },
+            shoe: { size: 30, hardness: 65, weight: 40, temperature: 35, material: 'Leather', category: 'Clothing', function: 'Protection' },
+            flower: { size: 10, hardness: 15, weight: 5, temperature: 40, material: 'Organic', category: 'Plant', function: 'Beauty' },
+            tree: { size: 95, hardness: 85, weight: 90, temperature: 35, material: 'Wood', category: 'Plant', function: 'Oxygen' },
+            rock: { size: 25, hardness: 100, weight: 80, temperature: 30, material: 'Stone', category: 'Natural', function: 'Building' },
+            shell: { size: 8, hardness: 85, weight: 10, temperature: 35, material: 'Calcium', category: 'Natural', function: 'Protection' },
+            coin: { size: 3, hardness: 90, weight: 8, temperature: 35, material: 'Metal', category: 'Currency', function: 'Payment' },
+            knife: { size: 25, hardness: 95, weight: 30, temperature: 35, material: 'Metal', category: 'Tool', function: 'Cutting' },
+            cup: { size: 20, hardness: 85, weight: 25, temperature: 45, material: 'Ceramic', category: 'Container', function: 'Drinking' }
+        };
+
+        const SIMILARITY_LEVELS = [
+            { min: 100, max: 100, text: '🎯 Perfect!', class: 'perfect' },
+            { min: 80, max: 99, text: '🔥 Very Close', class: 'very-close' },
+            { min: 60, max: 79, text: '♨️ Getting Warm', class: 'warm' },
+            { min: 40, max: 59, text: '🌡️ Somewhat Similar', class: 'similar' },
+            { min: 20, max: 39, text: '❄️ Distantly Related', class: 'distant' },
+            { min: 0, max: 19, text: '🧊 Very Different', class: 'different' }
+        ];
+
+        // Game state
+        let targetWord = '';
+        let guesses = [];
+        let guessCount = 0;
+        let gameWon = false;
+
+        // DOM elements
+        const guessInput = document.getElementById('guess-input');
+        const submitBtn = document.getElementById('submit-btn');
+        const newGameBtn = document.getElementById('new-game-btn');
+        const guessesList = document.getElementById('guesses-list');
+        const guessCountEl = document.getElementById('guess-count');
+        const winMessage = document.getElementById('win-message');
+        const winText = document.getElementById('win-text');
+        const instructions = document.getElementById('instructions');
+
+        // Start a new game
+        function startNewGame() {
+            targetWord = WORD_BANK[Math.floor(Math.random() * WORD_BANK.length)];
+            guesses = [];
+            guessCount = 0;
+            gameWon = false;
+            
+            guessCountEl.textContent = `Guesses: ${guessCount}`;
+            guessesList.innerHTML = '';
+            winMessage.style.display = 'none';
+            guessInput.disabled = false;
+            submitBtn.disabled = false;
+            guessInput.value = '';
+            guessInput.focus();
+            
+            console.log('New game started. Target word:', targetWord);
+        }
+
+        // Calculate similarity between guess and target
+        function calculateSimilarity(guessWord) {
+            if (guessWord === targetWord) return 100;
+
+            const targetData = PHYSICAL_ATTRIBUTES[targetWord];
+            const guessData = PHYSICAL_ATTRIBUTES[guessWord];
+
+            if (!targetData || !guessData) return Math.floor(Math.random() * 20) + 5;
+
+            const sizeDiff = Math.abs(targetData.size - guessData.size);
+            const hardnessDiff = Math.abs(targetData.hardness - guessData.hardness);
+            const weightDiff = Math.abs(targetData.weight - guessData.weight);
+            const temperatureDiff = Math.abs(targetData.temperature - guessData.temperature);
+
+            const physicalSimilarity = 100 - ((sizeDiff + hardnessDiff + weightDiff + temperatureDiff) / 4);
+
+            const categoryBonus = targetData.category === guessData.category ? 25 : 0;
+            const materialBonus = targetData.material === guessData.material ? 15 : 0;
+            const functionBonus = targetData.function === guessData.function ? 15 : 0;
+
+            const totalSimilarity = physicalSimilarity + categoryBonus + materialBonus + functionBonus;
+
+            return Math.min(95, Math.max(5, Math.round(totalSimilarity)));
+        }
+
+        // Get similarity level info
+        function getSimilarityLevel(similarity) {
+            for (const level of SIMILARITY_LEVELS) {
+                if (similarity >= level.min && similarity <= level.max) {
+                    return level;
+                }
+            }
+            return SIMILARITY_LEVELS[5]; // Default to "different"
+        }
+
+        // Process a guess
+        function processGuess() {
+            const guessWord = guessInput.value.toLowerCase().trim();
+            
+            if (!guessWord || gameWon) return;
+            
+            // Check if already guessed
+            if (guesses.some(g => g.word === guessWord)) {
+                alert('You already guessed that!');
+                return;
+            }
+            
+            const similarity = calculateSimilarity(guessWord);
+            const newGuess = {
+                word: guessWord,
+                similarity,
+                attributes: PHYSICAL_ATTRIBUTES[guessWord] || null
+            };
+            
+            guesses.push(newGuess);
+            guessCount++;
+            guessCountEl.textContent = `Guesses: ${guessCount}`;
+            
+            // Sort guesses by similarity
+            guesses.sort((a, b) => b.similarity - a.similarity);
+            
+            // Update UI
+            renderGuesses();
+            
+            // Check if won
+            if (similarity === 100) {
+                gameWon = true;
+                winMessage.style.display = 'block';
+                winText.textContent = `The object was "${targetWord}" - discovered in ${guessCount} guesses!`;
+                guessInput.disabled = true;
+                submitBtn.disabled = true;
+            }
+            
+            guessInput.value = '';
+            guessInput.focus();
+            
+            // Hide instructions after first guess
+            instructions.style.display = 'none';
+        }
+
+        // Render guesses list
+        function renderGuesses() {
+            guessesList.innerHTML = '';
+            
+            guesses.forEach((guess, index) => {
+                const level = getSimilarityLevel(guess.similarity);
+                
+                const guessEl = document.createElement('div');
+                guessEl.className = `guess-item ${level.class}`;
+                
+                let attributesText = '';
+                if (guess.attributes) {
+                    attributesText = `<div>${guess.attributes.material} • ${guess.attributes.category} • Used for ${guess.attributes.function}</div>`;
+                }
+                
+                guessEl.innerHTML = `
+                    <div>
+                        <strong>#${index + 1}</strong> ${guess.word}
+                        ${attributesText}
+                    </div>
+                    <div>
+                        <div>${level.text}</div>
+                        <strong>${guess.similarity}%</strong>
+                    </div>
+                `;
+                
+                guessesList.appendChild(guessEl);
+            });
+        }
+
+        // Event listeners
+        submitBtn.addEventListener('click', processGuess);
+        
+        guessInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                processGuess();
+            }
+        });
+        
+        newGameBtn.addEventListener('click', startNewGame);
+
+        // Initialize game
+        startNewGame();
+    </script>
+</body>
+</html>

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head> 
+	<title>exclusive mode</title>
+
+	<link rel="stylesheet" href="css/global.css" />
+	<link rel="stylesheet" href="css/fonts.css" />
+	<link rel="stylesheet" href="css/notification.css" />
+
+
+	<meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+
+	<script src="js/lib/jquery-1.10.2.min.js"></script>
+
+	<script src="js/window-control.js"></script>
+	<script src="js/block_inputs.js"></script>
+	<script src="js/main.js"></script>
+</head>
+
+<body style="margin:0;padding:0;background:transparent;">
+
+	<div class="overlay"></div>
+
+	<div class="notification">
+		<i class="logo">
+			<svg class="svg-icon-fill">
+				<use xlink:href="assets/svg/sprite.svg#logo" />
+			</svg>
+		</i>
+
+		<div class="notification-text notification-text-dock hide">
+			<span class="hotkey">Ctrl</span>
+			<span class="hotkey">Tab</span>
+			<h1>to return to the game</h1>
+		</div>
+
+		<div class="notification-text notification-text-app hide">
+			<!-- <span class="hotkey">Ctrl</span> -->
+			<span class="hotkey">Shift</span>
+			<span class="hotkey">F9</span>
+			<h1>to hide this app and return to the game</h1>
+		</div>
+
+ 		<div class="notification-text notification-text-apps hide">
+			<h1>Hide all apps to return to the game</h1>
+		</div>
+	</div>
+
+	<button class="window-control window-control-close" onclick="closeWindow();">
+		<svg class="svg-icon-fill">
+			<use xlink:href="assets/svg/sprite.svg#window-control_close" />
+		</svg>
+	</button>
+
+</body>
+</html>

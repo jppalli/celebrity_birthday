@@ -1,0 +1,3078 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Quote Puzzle</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Special Elite Font for vintage typewriter aesthetic -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Special+Elite&display=swap" rel="stylesheet">
+    <!-- PixiJS for smooth animations and transitions -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/7.3.2/pixi.min.js"></script>
+    <!-- Arkadium Game SDK -->
+    <script src="https://developers.arkadium.com/cdn/sdk/v2/sdk.js"></script>
+    <style>
+        html, body {
+            width: 100vw;
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        body {
+            background: #f0f0f0;
+            color: #222;
+            line-height: 1.6;
+            min-height: 100vh;
+            min-width: 100vw;
+            background-image: linear-gradient(#f9f9f9 1px, transparent 1px),
+                linear-gradient(90deg, #f9f9f9 1px, transparent 1px);
+            background-size: 20px 20px;
+            background-color: #fafafa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .newspaper-container {
+            width: 100vw;
+            height: 100vh;
+            min-width: 0;
+            min-height: 0;
+            max-width: 100vw;
+            max-height: 100vh;
+            background: white;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            border-top: 4px solid #333;
+            position: relative;
+            padding: 0;
+            box-sizing: border-box;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        /* Remove or reduce padding/margin from all direct children if needed */
+        .header, .quote-container, .congrats, .input-area {
+            margin: 0;
+            padding-left: 0;
+            padding-right: 0;
+        }
+        .header {
+            position: relative;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #222;
+            margin-bottom: 25px;
+        }
+
+        .header-content {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .title-date-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+        }
+
+        .newspaper-title {
+            font-size: 42px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            font-family: 'Special Elite', 'Courier New', monospace;
+            color: #222;
+            line-height: 1;
+        }
+
+        .date-line {
+            font-size: 13px;
+            color: #666;
+            font-style: italic;
+            letter-spacing: 0.5px;
+            margin-top: -2px;
+        }
+
+        .header-icons {
+            position: absolute;
+            top: 5px;
+            right: 0;
+            display: flex;
+            gap: 8px;
+        }
+
+        .header-left-icons {
+            position: absolute;
+            top: 5px;
+            left: 0;
+            display: flex;
+            gap: 8px;
+        }
+
+        .settings-icon {
+            background: #222;
+            color: white;
+        }
+
+        .header-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .help-icon {
+            background: #222;
+            color: white;
+        }
+
+        .calendar-icon {
+            background: #222;
+            color: white;
+        }
+
+        .stats-icon {
+            background: #222;
+            color: white;
+        }
+
+        .header-icon:hover {
+            transform: scale(1.1);
+        }
+
+        .congrats {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: #f9f9f9;
+            border: 2px solid #222;
+            text-align: center;
+            display: none;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            font-style: italic;
+        }
+
+        .congrats.show {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+
+        .congrats h2 {
+            font-size: 26px;
+            margin-bottom: 12px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .congrats p {
+            font-size: 18px;
+            color: #444;
+        }
+
+        .quote-container {
+            padding: 30px 0;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+
+
+        .quote-container:before,
+        .quote-container:after {
+            content: """;
+            position: absolute;
+            font-size: 80px;
+            color: #ddd;
+            font-family: Georgia, serif;
+        }
+
+        .quote-container:before {
+            top: 0;
+            left: -25px;
+        }
+
+        .quote-container:after {
+            bottom: -10px;
+            right: -25px;
+            transform: rotate(180deg);
+        }
+
+        .quote-text {
+            font-size: 24px;
+            line-height: 1.8;
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 0 20px;
+            font-weight: 400;
+            letter-spacing: 0.3px;
+            font-style: italic;
+        }
+
+        .quote-word {
+            margin: 0 2px;
+            padding: 3px 8px;
+            display: inline-block;
+            transition: all 0.2s;
+            border-radius: 2px;
+        }
+
+        .quote-word.scrambled {
+            background: #f0f0f0;
+            border: 1px solid #ddd;
+            text-decoration: underline;
+            text-decoration-style: wavy;
+            text-decoration-color: #999;
+            text-underline-offset: 3px;
+            cursor: pointer;
+        }
+
+        .quote-word.scrambled.active {
+            background: #e0e0e0;
+            border: 1px solid #222;
+        }
+
+        .quote-word.scrambled:hover {
+            background: #e5e5e5;
+        }
+
+        .author {
+            text-align: center;
+            font-size: 20px;
+            font-weight: 500;
+            font-style: italic;
+            padding-top: 15px;
+        }
+
+        .author.scrambled {
+            background: #f0f0f0;
+            border: 1px solid #ddd;
+            padding: 5px 15px;
+            display: inline-block;
+            text-decoration: underline;
+            text-decoration-style: wavy;
+            text-decoration-color: #999;
+            text-underline-offset: 3px;
+            cursor: pointer;
+        }
+
+        .author.scrambled.active {
+            background: #e0e0e0;
+            border: 1px solid #222;
+        }
+
+        .author.scrambled:hover {
+            background: #e5e5e5;
+        }
+
+        .input-area {
+            padding: 25px;
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            margin-bottom: 30px;
+            max-width: 600px;
+            margin: 0 auto;
+            min-height: 200px;
+            /* Always reserve space - use visibility instead of display */
+            visibility: hidden;
+            opacity: 0;
+            transition: opacity 0.3s ease-out;
+        }
+
+        .input-area.show {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .input-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            text-align: center;
+            letter-spacing: 1px;
+        }
+
+        .letter-cells {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .letter-cell {
+            width: 50px;
+            height: 50px;
+            border: 2px solid #222;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: 600;
+            position: relative;
+        }
+
+        .letter-cell:after {
+            content: "";
+            position: absolute;
+            bottom: 5px;
+            width: 80%;
+            height: 2px;
+            background: #222;
+        }
+
+        .available-letters {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .letter-btn {
+            width: 50px;
+            height: 50px;
+            border: 1px solid #222;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .letter-btn:not(.used):hover {
+            background: #e0e0e0;
+        }
+
+        .letter-btn.used {
+            background: #ddd;
+            color: #888;
+            cursor: default;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            background: #fff;
+            border: 1px solid #222;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn:hover {
+            background: #222;
+            color: white;
+        }
+
+        .btn:disabled {
+            background: #f5f5f5;
+            color: #999;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .btn:disabled:hover {
+            background: #f5f5f5;
+            color: #999;
+        }
+
+        /* Modal Styles */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            display: none;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+            padding: 30px;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.3);
+            position: relative;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .modal-header h2 {
+            font-size: 24px;
+            font-weight: 600;
+            color: #222;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+            transition: color 0.3s;
+        }
+
+        .close-modal:hover {
+            color: #222;
+        }
+
+        /* Calendar Specific Styles */
+        .calendar-navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 0 10px;
+        }
+
+        .calendar-nav-btn {
+            background: #222;
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            transition: all 0.2s;
+        }
+
+        .calendar-nav-btn:hover {
+            background: #444;
+            transform: scale(1.1);
+        }
+
+        .calendar-nav-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        #calendarMonthYear {
+            font-size: 20px;
+            font-weight: 600;
+            color: #222;
+            margin: 0;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+            margin-bottom: 20px;
+        }
+
+        .calendar-day {
+            text-align: center;
+            padding: 5px 0;
+            font-weight: bold;
+            color: #444;
+        }
+
+        .calendar-dates {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+        }
+
+        .calendar-date {
+            text-align: center;
+            padding: 10px 5px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .calendar-date:hover {
+            background: #f0f0f0;
+        }
+
+        .calendar-date.active {
+            background: #222;
+            color: white;
+        }
+
+        .calendar-date.past {
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        .calendar-date.today {
+            background: #e0e0e0;
+            font-weight: bold;
+        }
+
+        .calendar-date.future {
+            background: #f9f9f9;
+            color: #999;
+            cursor: not-allowed;
+        }
+
+        .calendar-date.solved:after {
+            content: "★";
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            font-size: 14px;
+            color: #222;
+            font-weight: normal;
+            text-shadow: 0 0 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .calendar-date.solved {
+            background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
+            border: 1px solid #ccc;
+            font-weight: 600;
+        }
+
+        .calendar-status {
+            text-align: center;
+            font-size: 14px;
+            color: #666;
+            margin-top: 15px;
+        }
+
+        /* Help Modal Specific Styles */
+        .help-content {
+            font-size: 16px;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .help-content h3 {
+            font-size: 20px;
+            margin-bottom: 15px;
+            color: #222;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .help-content ul {
+            list-style-type: none;
+            padding-left: 20px;
+            margin-bottom: 20px;
+        }
+
+        .help-content li {
+            margin-bottom: 12px;
+            position: relative;
+            padding-left: 25px;
+        }
+
+        .help-content li:before {
+            content: "•";
+            position: absolute;
+            left: 10px;
+            font-size: 20px;
+            color: #222;
+        }
+
+        .help-content p {
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+
+        .help-content .highlight {
+            background: #f0f0f0;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+
+        /* Stats Modal Styles */
+        .stats-content {
+            text-align: center;
+            padding: 15px 0;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin: 25px 0;
+        }
+
+        .stat-card {
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 36px;
+            font-weight: 700;
+            color: #222;
+            margin: 10px 0;
+        }
+
+        .stat-label {
+            font-size: 16px;
+            color: #666;
+        }
+
+        .progress-container {
+            width: 100%;
+            height: 20px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: #4caf50;
+            border-radius: 10px;
+            transition: width 0.5s;
+        }
+
+        .streak-container {
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+            margin: 20px 0;
+        }
+
+        .streak-day {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            background: #e0e0e0;
+            color: #666;
+        }
+
+        .streak-day.active {
+            background: #4caf50;
+            color: white;
+            font-weight: bold;
+        }
+
+        .stats-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .stats-table th,
+        .stats-table td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .stats-table th {
+            background: #f5f5f5;
+            font-weight: 600;
+        }
+
+        .stats-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Settings Modal Styles */
+        .settings-content {
+            padding: 20px 0;
+        }
+
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .setting-item:last-of-type {
+            border-bottom: none;
+        }
+
+        .setting-label {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .setting-label i {
+            width: 20px;
+            text-align: center;
+            color: #666;
+        }
+
+        .setting-toggle {
+            display: flex;
+            align-items: center;
+        }
+
+        /* Toggle Switch Styles */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: 0.3s;
+            border-radius: 24px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: 0.3s;
+            border-radius: 50%;
+        }
+
+        input:checked + .toggle-slider {
+            background-color: #222;
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(26px);
+        }
+
+        .toggle-slider:hover {
+            background-color: #bbb;
+        }
+
+        input:checked + .toggle-slider:hover {
+            background-color: #444;
+        }
+
+        .settings-info {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        .settings-info p {
+            margin: 0;
+            font-size: 14px;
+            color: #666;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .settings-info i {
+            color: #888;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Word completion animation */
+        @keyframes wordComplete {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.1);
+                background: #e8e8e8;
+            }
+
+            100% {
+                transform: scale(1);
+                background: #f5f5f5;
+            }
+        }
+
+        /* Author completion animation */
+        @keyframes authorComplete {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+                background: #e8e8e8;
+            }
+
+            100% {
+                transform: scale(1);
+                background: #f5f5f5;
+            }
+        }
+
+        /* Puzzle completion animation */
+        @keyframes puzzleComplete {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            25% {
+                transform: scale(1.02);
+                opacity: 0.9;
+            }
+
+            50% {
+                transform: scale(1.04);
+                opacity: 0.8;
+            }
+
+            75% {
+                transform: scale(1.02);
+                opacity: 0.9;
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        /* Small celebration animation */
+        @keyframes smallCelebration {
+            0% {
+                transform: scale(1) rotate(0deg);
+                opacity: 1;
+            }
+
+            25% {
+                transform: scale(1.2) rotate(-2deg);
+                opacity: 0.8;
+            }
+
+            50% {
+                transform: scale(1.3) rotate(2deg);
+                opacity: 0.6;
+            }
+
+            75% {
+                transform: scale(1.1) rotate(-1deg);
+                opacity: 0.8;
+            }
+
+            100% {
+                transform: scale(1) rotate(0deg);
+                opacity: 1;
+            }
+        }
+
+        /* Smooth word reveal */
+        @keyframes wordReveal {
+            0% {
+                opacity: 0;
+                transform: translateY(-5px);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Animation classes */
+        .word-completed {
+            animation: wordComplete 0.6s ease-out;
+        }
+
+        .author-completed {
+            animation: authorComplete 0.6s ease-out;
+        }
+
+        .puzzle-completed {
+            animation: puzzleComplete 1s ease-out;
+        }
+
+        .quote-complete {
+            font-weight: bold;
+        }
+
+        .quote-complete .quote-text {
+            font-weight: 700;
+        }
+
+        .quote-complete .author {
+            font-weight: 600;
+        }
+
+        .small-celebration {
+            animation: smallCelebration 0.8s ease-out;
+        }
+
+        .word-reveal {
+            animation: wordReveal 0.4s ease-out;
+        }
+
+        /* Enhanced transitions for PixiJS integration */
+        .quote-word,
+        .author {
+            transition: all 0.3s ease-out;
+        }
+
+        .input-area {
+            transition: opacity 0.3s ease-out;
+        }
+
+        .letter-cell,
+        .letter-btn {
+            transition: all 0.2s ease-out;
+        }
+
+        /* Smooth input area content transitions */
+        .input-title {
+            transition: opacity 0.2s ease-out;
+        }
+
+        .letter-cells {
+            transition: opacity 0.2s ease-out;
+        }
+
+        .available-letters {
+            transition: opacity 0.2s ease-out;
+        }
+
+        /* Prevent flashing during transitions */
+        .input-area * {
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+        }
+
+        /* Simple smooth transitions */
+        .input-title,
+        .letter-cells,
+        .available-letters {
+            transition: opacity 0.2s ease-out;
+        }
+
+        @media (max-width: 650px) {
+            .newspaper-container {
+                padding: 20px;
+            }
+
+            .newspaper-title {
+                font-size: 32px;
+            }
+
+            .quote-text {
+                font-size: 20px;
+                padding: 0 10px;
+            }
+
+            .letter-btn,
+            .letter-cell {
+                width: 40px;
+                height: 40px;
+                font-size: 20px;
+            }
+
+            .modal-content {
+                width: 95%;
+                padding: 20px;
+            }
+
+            .help-content li {
+                padding-left: 20px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            /* Responsive header icons for mobile */
+            .header-icon {
+                width: 28px;
+                height: 28px;
+                font-size: 14px;
+            }
+
+            .header-icons {
+                gap: 6px;
+                top: 3px;
+                right: 5px;
+            }
+
+            .header-left-icons {
+                gap: 6px;
+                top: 3px;
+                left: 5px;
+            }
+
+            /* Ensure icons don't overlap with title on very small screens */
+            .header-content {
+                padding: 0 10px;
+            }
+
+            .title-date-container {
+                max-width: 60%;
+                margin: 0 auto;
+            }
+
+            .newspaper-title {
+                font-size: 28px;
+            }
+        }
+
+        /* Additional responsive styles for very small screens */
+        @media (max-width: 480px) {
+            .header-icon {
+                width: 24px;
+                height: 24px;
+                font-size: 11px;
+            }
+
+            .header-icons {
+                gap: 3px;
+                right: 3px;
+            }
+
+            .header-left-icons {
+                gap: 3px;
+                left: 3px;
+            }
+
+            .newspaper-title {
+                font-size: 24px;
+            }
+
+            .title-date-container {
+                max-width: 55%;
+                margin: 0 auto;
+            }
+
+            .header-content {
+                padding: 0 8px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="newspaper-container">
+        <div class="header">
+            <div class="header-content">
+                <div class="header-left-icons">
+                    <div class="header-icon settings-icon" id="settingsIcon">
+                        <i class="fas fa-cog"></i>
+                    </div>
+                </div>
+                <div class="title-date-container">
+                    <div class="newspaper-title">Daily Quote Puzzle</div>
+                    <div class="date-line" id="dateLine">Thursday, July 24, 2025</div>
+                </div>
+                <div class="header-icons">
+                    <div class="header-icon stats-icon" id="statsIcon">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <div class="header-icon calendar-icon" id="calendarIcon">
+                        <i class="fas fa-calendar"></i>
+                    </div>
+                    <div class="header-icon help-icon" id="helpIcon">
+                        <i class="fas fa-question"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="quote-container">
+            <div class="quote-text" id="quoteText"></div>
+            <div class="author" id="quoteAuthor"></div>
+        </div>
+
+        <div class="congrats" id="congrats">
+            <h2>Puzzle Complete!</h2>
+            <p>You've successfully solved today's quote puzzle!</p>
+        </div>
+
+        <div class="input-area" id="inputArea">
+            <div class="input-title" id="inputTitle">Unscramble Word</div>
+            <div class="letter-cells" id="letterCells"></div>
+            <div class="available-letters" id="availableLetters"></div>
+
+            <div class="controls">
+                <button class="btn" id="resetBtn">
+                    <i class="fas fa-redo"></i> Reset
+                </button>
+                <button class="btn" id="backspaceBtn">
+                    <i class="fas fa-backspace"></i> Backspace
+                </button>
+                <button class="btn" id="unscrambleBtn">
+                    <i class="fas fa-lightbulb"></i> Unscramble
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Calendar Modal -->
+    <div class="modal" id="calendarModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Past Challenges</h2>
+                <button class="close-modal" id="closeCalendar">&times;</button>
+            </div>
+            <div class="calendar-navigation">
+                <button class="calendar-nav-btn" id="prevMonth">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <h3 id="calendarMonthYear">July 2025</h3>
+                <button class="calendar-nav-btn" id="nextMonth">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+            <div class="calendar-grid">
+                <div class="calendar-day">Sun</div>
+                <div class="calendar-day">Mon</div>
+                <div class="calendar-day">Tue</div>
+                <div class="calendar-day">Wed</div>
+                <div class="calendar-day">Thu</div>
+                <div class="calendar-day">Fri</div>
+                <div class="calendar-day">Sat</div>
+            </div>
+            <div class="calendar-dates" id="calendarDates">
+                <!-- Dates will be populated by JavaScript -->
+            </div>
+            <div class="calendar-status" id="calendarStatus">
+                Select a date to play that day's challenge
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <!-- Help Modal -->
+    <div class="modal" id="helpModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>How to Play</h2>
+                <button class="close-modal" id="closeHelp">&times;</button>
+            </div>
+            <div class="help-content">
+                <p>Unscramble the words in the daily quote to reveal the inspirational message!</p>
+
+                <ul>
+                    <li><span class="highlight">Click on scrambled words</span> to start unscrambling them</li>
+                    <li><span class="highlight">Click letters</span> or <span class="highlight">type on keyboard</span>
+                        to spell the word</li>
+                    <li>Use <span class="highlight">Backspace</span> to remove letters and <span
+                            class="highlight">Reset</span> to clear</li>
+                    <li>Don't forget to <span class="highlight">unscramble the author's name</span> at the bottom</li>
+                </ul>
+
+                <p>Come back daily for a new challenging quote to unscramble!</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Modal -->
+    <div class="modal" id="statsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Your Puzzle Stats</h2>
+                <button class="close-modal" id="closeStats">&times;</button>
+            </div>
+            <div class="stats-content">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalSolved">0</div>
+                        <div class="stat-label">Puzzles Solved</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="currentStreak">0</div>
+                        <div class="stat-label">Current Streak</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="successRate">0%</div>
+                        <div class="stat-label">Success Rate</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="avgTime">0s</div>
+                        <div class="stat-label">Average Time</div>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal" id="settingsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Settings</h2>
+                <button class="close-modal" id="closeSettings">&times;</button>
+            </div>
+            <div class="settings-content">
+                <div class="setting-item">
+                    <div class="setting-label">
+                        <i class="fas fa-volume-up"></i>
+                        <span>Sound Effects</span>
+                    </div>
+                    <div class="setting-toggle">
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="soundEffectsToggle" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+                <div class="setting-item">
+                    <div class="setting-label">
+                        <i class="fas fa-music"></i>
+                        <span>Background Music</span>
+                    </div>
+                    <div class="setting-toggle">
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="backgroundMusicToggle" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+                <div class="settings-info">
+                    <p><i class="fas fa-info-circle"></i> Changes are saved automatically</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Load quotes from external file -->
+    <script src="quotes_calendar.js"></script>
+
+    <script>
+        // Load quotes from external calendar file
+        const quotes = quotesCalendar;
+
+        // Simple animation system
+        let animationQueue = [];
+
+        // Calendar navigation state
+        let currentCalendarMonth = new Date().getMonth();
+        let currentCalendarYear = new Date().getFullYear();
+
+        // Smooth word completion animation with CSS
+        function animateWordCompletion(wordElement, newText) {
+            // Add celebration animation
+            wordElement.classList.add('small-celebration');
+
+            // After celebration, smoothly reveal the correct word
+            setTimeout(() => {
+                wordElement.textContent = newText;
+                wordElement.className = 'quote-word word-reveal';
+                wordElement.removeAttribute('data-word-index');
+
+                // Clean up animation class
+                setTimeout(() => {
+                    wordElement.classList.remove('word-reveal');
+                }, 400);
+            }, 400);
+
+            // Clean up celebration class
+            setTimeout(() => {
+                wordElement.classList.remove('small-celebration');
+            }, 800);
+        }
+
+        // Smooth author completion animation with CSS
+        function animateAuthorCompletion(authorElement, newText) {
+            // Add celebration animation
+            authorElement.classList.add('small-celebration');
+
+            // After celebration, smoothly reveal the correct author
+            setTimeout(() => {
+                authorElement.textContent = newText;
+                authorElement.className = 'author word-reveal';
+
+                // Clean up animation class
+                setTimeout(() => {
+                    authorElement.classList.remove('word-reveal');
+                }, 400);
+            }, 400);
+
+            // Clean up celebration class
+            setTimeout(() => {
+                authorElement.classList.remove('small-celebration');
+            }, 800);
+        }
+
+
+
+        // Smooth input area transition without DOM rebuilding
+        function smoothInputTransition() {
+            // Ensure input area is visible without rebuilding
+            if (!inputAreaEl.classList.contains('show')) {
+                inputAreaEl.classList.add('show');
+            }
+
+            // Update title smoothly
+            inputTitleEl.textContent = activeWord.isAuthor ? 'Unscramble Author' : 'Unscramble Word';
+
+            // Update letter cells without rebuilding if possible
+            const targetLength = activeWord.original.length;
+            const currentCells = letterCellsEl.children.length;
+
+            if (currentCells !== targetLength) {
+                // Only rebuild if absolutely necessary
+                letterCellsEl.innerHTML = '';
+                for (let i = 0; i < targetLength; i++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'letter-cell';
+                    letterCellsEl.appendChild(cell);
+                }
+            } else {
+                // Just clear existing cells without rebuilding
+                Array.from(letterCellsEl.children).forEach(cell => {
+                    cell.textContent = '';
+                });
+            }
+
+            // Update available letters without innerHTML clearing
+            const currentButtons = availableLettersEl.children.length;
+            const neededButtons = availableLetters.length;
+
+            if (currentButtons !== neededButtons) {
+                // Only rebuild if different number of letters
+                availableLettersEl.innerHTML = '';
+                availableLetters.forEach((letter, index) => {
+                    const btn = document.createElement('div');
+                    btn.className = 'letter-btn';
+                    btn.textContent = letter;
+                    btn.dataset.index = index;
+                    btn.addEventListener('click', () => handleLetterClick(letter, index));
+                    availableLettersEl.appendChild(btn);
+                });
+            } else {
+                // Just update existing buttons
+                Array.from(availableLettersEl.children).forEach((btn, index) => {
+                    btn.textContent = availableLetters[index];
+                    btn.className = 'letter-btn';
+                    btn.dataset.index = index;
+                    // Remove old event listeners and add new ones
+                    const newBtn = btn.cloneNode(true);
+                    newBtn.addEventListener('click', () => handleLetterClick(availableLetters[index], index));
+                    btn.parentNode.replaceChild(newBtn, btn);
+                });
+            }
+        }
+
+        // Game state
+        let currentQuote = quotes[0];
+        let activeWord = null;
+        let solvedWords = new Set();
+        let isUnscrambling = false;
+
+        // Settings state
+        let soundEffectsEnabled = true;
+        let backgroundMusicEnabled = true;
+
+        // Sound effects system
+        const sounds = {
+            keyType: null,
+            wordComplete: null,
+            authorComplete: null,
+            puzzleComplete: null,
+            buttonClick: null,
+            wordActivate: null,
+            error: null,
+            celebration: null,
+            reset: null,
+            quoteComplete: null,
+            backgroundMusic: null
+        };
+
+        // Initialize sound effects from audio files
+        function initializeSounds() {
+            try {
+                // Load sound files
+                const soundFiles = {
+                    keyType: 'sounds/keytype.mp3',
+                    wordComplete: 'sounds/word-complete.mp3',
+                    authorComplete: 'sounds/author-complete.mp3',
+                    puzzleComplete: 'sounds/puzzle-complete.mp3',
+                    buttonClick: 'sounds/button-click.mp3',
+                    wordActivate: 'sounds/word-activate.mp3',
+                    error: 'sounds/error.mp3',
+                    celebration: 'sounds/celebration.mp3',
+                    reset: 'sounds/reset.mp3',
+                    quoteComplete: 'sounds/quote-complete.mp3',
+                    backgroundMusic: 'sounds/background-music.mp3'
+                };
+
+                // Create Audio objects for each sound
+                Object.keys(soundFiles).forEach(soundName => {
+                    const audio = new Audio(soundFiles[soundName]);
+                    audio.preload = 'auto';
+                    
+                    // Special handling for background music
+                    if (soundName === 'backgroundMusic') {
+                        audio.loop = true;
+                        audio.volume = 0.2; // Lower volume for background music
+                    } else {
+                        audio.volume = 0.5; // Default volume for sound effects
+                    }
+                    
+                    // Handle loading errors gracefully
+                    audio.addEventListener('error', () => {
+                        console.log(`Could not load sound: ${soundFiles[soundName]}`);
+                        sounds[soundName] = null;
+                    });
+                    
+                    audio.addEventListener('canplaythrough', () => {
+                        sounds[soundName] = audio;
+                        
+                        // Auto-start background music if enabled
+                        if (soundName === 'backgroundMusic' && backgroundMusicEnabled) {
+                            setTimeout(() => {
+                                playBackgroundMusic();
+                            }, 1000); // Small delay to ensure user interaction
+                        }
+                    });
+                });
+
+            } catch (error) {
+                console.log('Audio initialization failed:', error);
+            }
+        }
+
+        // Generic function to play a sound
+        function playSound(soundName, volume = 0.5) {
+            try {
+                if (sounds[soundName] && soundEffectsEnabled) {
+                    // Clone the audio to allow overlapping plays
+                    const audioClone = sounds[soundName].cloneNode();
+                    audioClone.volume = volume;
+                    audioClone.play().catch(e => {
+                        // Silently handle play errors (user interaction required, etc.)
+                        console.log(`Could not play sound: ${soundName}`);
+                    });
+                }
+            } catch (error) {
+                console.log(`Error playing sound ${soundName}:`, error);
+            }
+        }
+
+        // Fallback sound generation for typing (if no audio file available)
+        function generateTypingSound() {
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                
+                if (audioContext.state === 'suspended') {
+                    audioContext.resume();
+                }
+                
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+                oscillator.frequency.exponentialRampToValueAtTime(200, audioContext.currentTime + 0.1);
+                
+                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.15);
+                
+                oscillator.type = 'square';
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.15);
+            } catch (error) {
+                console.log('Could not generate typing sound:', error);
+            }
+        }
+
+        // Specific sound functions
+        function playTypingSound() {
+            if (!soundEffectsEnabled) return;
+            
+            if (sounds.keyType) {
+                playSound('keyType', 0.3);
+            } else {
+                // Fallback to generated sound if no audio file
+                generateTypingSound();
+            }
+        }
+
+        function playWordCompleteSound() {
+            playSound('wordComplete', 0.4);
+        }
+
+        function playAuthorCompleteSound() {
+            playSound('authorComplete', 0.4);
+        }
+
+        function playPuzzleCompleteSound() {
+            playSound('puzzleComplete', 0.6);
+        }
+
+        function playButtonClickSound() {
+            playSound('buttonClick', 0.3);
+        }
+
+        function playWordActivateSound() {
+            playSound('wordActivate', 0.3);
+        }
+
+        function playErrorSound() {
+            playSound('error', 0.4);
+        }
+
+        function playCelebrationSound() {
+            playSound('celebration', 0.5);
+        }
+
+        function playResetSound() {
+            playSound('reset', 0.4);
+        }
+
+        function playQuoteCompleteSound() {
+            playSound('quoteComplete', 0.6);
+        }
+
+        // Background music control functions
+        function playBackgroundMusic() {
+    try {
+        if (sounds.backgroundMusic && backgroundMusicEnabled) {
+            // Only reset position if not currently playing
+            if (sounds.backgroundMusic.paused) {
+                sounds.backgroundMusic.currentTime = 0;
+            }
+            sounds.backgroundMusic.play().catch(e => {
+                console.log('Could not play background music:', e);
+            });
+        }
+    } catch (error) {
+        console.log('Error playing background music:', error);
+    }
+}
+
+        function pauseBackgroundMusic() {
+            try {
+                if (sounds.backgroundMusic) {
+                    sounds.backgroundMusic.pause();
+                }
+            } catch (error) {
+                console.log('Error pausing background music:', error);
+            }
+        }
+
+        function toggleBackgroundMusic() {
+    if (backgroundMusicEnabled) {
+        // Only play if not already playing
+        if (sounds.backgroundMusic && sounds.backgroundMusic.paused) {
+            playBackgroundMusic();
+        }
+    } else {
+        pauseBackgroundMusic();
+    }
+}
+
+        // Settings management
+        function saveSettings() {
+            const settings = {
+                soundEffectsEnabled,
+                backgroundMusicEnabled
+            };
+            localStorage.setItem('dailyQuotePuzzleSettings', JSON.stringify(settings));
+        }
+
+        function loadSettings() {
+            try {
+                const savedSettings = localStorage.getItem('dailyQuotePuzzleSettings');
+                if (savedSettings) {
+                    const settings = JSON.parse(savedSettings);
+                    soundEffectsEnabled = settings.soundEffectsEnabled !== undefined ? settings.soundEffectsEnabled : true;
+                    backgroundMusicEnabled = settings.backgroundMusicEnabled !== undefined ? settings.backgroundMusicEnabled : true;
+                }
+            } catch (error) {
+                console.log('Could not load settings:', error);
+                soundEffectsEnabled = true;
+                backgroundMusicEnabled = true;
+            }
+            
+            // Update toggle states
+            soundEffectsToggleEl.checked = soundEffectsEnabled;
+            backgroundMusicToggleEl.checked = backgroundMusicEnabled;
+            
+            // Apply background music setting
+            toggleBackgroundMusic();
+        }
+
+        // Function to properly capitalize words based on context
+        function getProperCapitalization(word, index, allWords) {
+            const lowerWord = word.toLowerCase();
+            
+            // Always capitalize first word
+            if (index === 0) {
+                return lowerWord.charAt(0).toUpperCase() + lowerWord.slice(1);
+            }
+            
+            // Check if previous word ends with sentence-ending punctuation
+            if (index > 0) {
+                const prevWord = allWords[index - 1];
+                if (prevWord && /[.!?]$/.test(prevWord.trim())) {
+                    return lowerWord.charAt(0).toUpperCase() + lowerWord.slice(1);
+                }
+            }
+            
+            // Common proper nouns and names that should be capitalized
+            const properNouns = [
+                // Names
+                'jobs', 'steve', 'lennon', 'john', 'wilde', 'oscar', 'roosevelt', 'eleanor', 
+                'disney', 'walt', 'mandela', 'nelson', 'einstein', 'albert', 'gandhi', 'mahatma',
+                'luther', 'martin', 'king', 'teresa', 'mother', 'ford', 'henry', 'edison', 'thomas',
+                'curie', 'marie', 'lincoln', 'abraham', 'washington', 'george', 'jefferson', 'thomas',
+                'franklin', 'benjamin', 'churchill', 'winston', 'kennedy', 'john', 'reagan', 'ronald',
+                'obama', 'barack', 'clinton', 'bill', 'bush', 'george', 'carter', 'jimmy',
+                
+                // Countries and places
+                'america', 'american', 'united', 'states', 'england', 'britain', 'france', 'germany',
+                'italy', 'spain', 'russia', 'china', 'japan', 'india', 'africa', 'europe', 'asia',
+                'australia', 'canada', 'mexico', 'brazil', 'argentina', 'egypt', 'israel', 'turkey',
+                'greece', 'poland', 'sweden', 'norway', 'denmark', 'finland', 'ireland', 'scotland',
+                'wales', 'london', 'paris', 'berlin', 'rome', 'madrid', 'moscow', 'beijing', 'tokyo',
+                'delhi', 'mumbai', 'sydney', 'toronto', 'montreal', 'vancouver', 'new', 'york',
+                'los', 'angeles', 'chicago', 'houston', 'philadelphia', 'phoenix', 'san', 'antonio',
+                'diego', 'dallas', 'jose', 'austin', 'jacksonville', 'francisco', 'columbus',
+                'charlotte', 'fort', 'worth', 'indianapolis', 'seattle', 'denver', 'washington',
+                'boston', 'nashville', 'baltimore', 'oklahoma', 'portland', 'vegas', 'louisville',
+                'milwaukee', 'albuquerque', 'tucson', 'fresno', 'sacramento', 'mesa', 'kansas',
+                'atlanta', 'long', 'beach', 'colorado', 'springs', 'raleigh', 'omaha', 'miami',
+                'oakland', 'minneapolis', 'tulsa', 'cleveland', 'wichita', 'arlington',
+                
+                // Days and months
+                'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday',
+                'january', 'february', 'march', 'april', 'may', 'june', 'july', 'august',
+                'september', 'october', 'november', 'december',
+                
+                // Other proper nouns
+                'god', 'lord', 'jesus', 'christ', 'buddha', 'allah', 'christmas', 'easter',
+                'thanksgiving', 'halloween', 'valentine', 'patrick', 'internet', 'facebook',
+                'google', 'apple', 'microsoft', 'amazon', 'twitter', 'instagram', 'youtube',
+                'netflix', 'disney', 'marvel', 'dc', 'batman', 'superman', 'spiderman'
+            ];
+            
+            // Check if word should be capitalized
+            if (properNouns.includes(lowerWord)) {
+                return lowerWord.charAt(0).toUpperCase() + lowerWord.slice(1);
+            }
+            
+            // Check for "I" (always capitalized)
+            if (lowerWord === 'i') {
+                return 'I';
+            }
+            
+            // Default to lowercase
+            return lowerWord;
+        }
+        let authorSolved = false;
+        let userInput = '';
+        let availableLetters = [];
+        let usedLetters = [];
+        let gameComplete = false;
+        let startTime = null;
+        let endTime = null;
+        let gameTime = 0;
+
+        // DOM Elements
+        const quoteTextEl = document.getElementById('quoteText');
+        const quoteAuthorEl = document.getElementById('quoteAuthor');
+        const congratsEl = document.getElementById('congrats');
+        const inputAreaEl = document.getElementById('inputArea');
+        const inputTitleEl = document.getElementById('inputTitle');
+        const letterCellsEl = document.getElementById('letterCells');
+        const availableLettersEl = document.getElementById('availableLetters');
+        const resetBtnEl = document.getElementById('resetBtn');
+        const backspaceBtnEl = document.getElementById('backspaceBtn');
+        const unscrambleBtnEl = document.getElementById('unscrambleBtn');
+        const helpIconEl = document.getElementById('helpIcon');
+        const calendarIconEl = document.getElementById('calendarIcon');
+        const statsIconEl = document.getElementById('statsIcon');
+        const calendarModalEl = document.getElementById('calendarModal');
+        const closeCalendarEl = document.getElementById('closeCalendar');
+        const calendarDatesEl = document.getElementById('calendarDates');
+        const dateLineEl = document.getElementById('dateLine');
+        const calendarStatusEl = document.getElementById('calendarStatus');
+        const helpModalEl = document.getElementById('helpModal');
+        const closeHelpEl = document.getElementById('closeHelp');
+        const statsModalEl = document.getElementById('statsModal');
+        const closeStatsEl = document.getElementById('closeStats');
+        const settingsModalEl = document.getElementById('settingsModal');
+        const closeSettingsEl = document.getElementById('closeSettings');
+        const settingsIconEl = document.getElementById('settingsIcon');
+        const soundEffectsToggleEl = document.getElementById('soundEffectsToggle');
+        const backgroundMusicToggleEl = document.getElementById('backgroundMusicToggle');
+        const totalSolvedEl = document.getElementById('totalSolved');
+        const currentStreakEl = document.getElementById('currentStreak');
+        const successRateEl = document.getElementById('successRate');
+        const avgTimeEl = document.getElementById('avgTime');
+
+        // Initialize game
+        function initGame() {
+            console.log('Starting game initialization...');
+            
+            try {
+                startTime = new Date();
+                initializeSounds();
+                loadSettings();
+                loadUserData();
+                renderQuote();
+                updateDateDisplay();
+
+                // Initialize input area to maintain container size
+                renderInputArea();
+
+                // Add event listeners with proper handling
+                attachEventListeners();
+
+            // Calendar functionality
+            calendarIconEl.addEventListener('click', () => {
+                calendarModalEl.style.display = 'flex';
+                renderCalendar();
+            });
+
+            closeCalendarEl.addEventListener('click', () => {
+                calendarModalEl.style.display = 'none';
+            });
+
+            // Calendar navigation
+            document.getElementById('prevMonth').addEventListener('click', () => {
+                currentCalendarMonth--;
+                if (currentCalendarMonth < 0) {
+                    currentCalendarMonth = 11;
+                    currentCalendarYear--;
+                }
+                renderCalendar();
+            });
+
+            document.getElementById('nextMonth').addEventListener('click', () => {
+                currentCalendarMonth++;
+                if (currentCalendarMonth > 11) {
+                    currentCalendarMonth = 0;
+                    currentCalendarYear++;
+                }
+                renderCalendar();
+            });
+
+            // Help functionality
+            helpIconEl.addEventListener('click', () => {
+                helpModalEl.style.display = 'flex';
+            });
+
+            closeHelpEl.addEventListener('click', () => {
+                helpModalEl.style.display = 'none';
+            });
+
+            // Stats functionality
+            statsIconEl.addEventListener('click', () => {
+                updateStatsDisplay();
+                statsModalEl.style.display = 'flex';
+            });
+
+            closeStatsEl.addEventListener('click', () => {
+                statsModalEl.style.display = 'none';
+            });
+
+            // Settings functionality
+            settingsIconEl.addEventListener('click', () => {
+                loadSettings();
+                settingsModalEl.style.display = 'flex';
+            });
+
+            closeSettingsEl.addEventListener('click', () => {
+                settingsModalEl.style.display = 'none';
+            });
+
+            // Settings toggle listeners
+            soundEffectsToggleEl.addEventListener('change', (e) => {
+                soundEffectsEnabled = e.target.checked;
+                saveSettings();
+            });
+
+            backgroundMusicToggleEl.addEventListener('change', (e) => {
+                backgroundMusicEnabled = e.target.checked;
+                toggleBackgroundMusic();
+                saveSettings();
+            });
+
+            // Close modals when clicking outside
+            document.addEventListener('click', (e) => {
+                if (e.target === calendarModalEl) {
+                    calendarModalEl.style.display = 'none';
+                }
+                if (e.target === helpModalEl) {
+                    helpModalEl.style.display = 'none';
+                }
+                if (e.target === statsModalEl) {
+                    statsModalEl.style.display = 'none';
+                }
+                if (e.target === settingsModalEl) {
+                    settingsModalEl.style.display = 'none';
+                }
+            });
+
+            // Activate the first word automatically
+            if (currentQuote.scrambledWords.length > 0) {
+                setTimeout(() => {
+                    handleWordClick(currentQuote.scrambledWords[0]);
+                }, 500);
+            }
+            
+            console.log('Game initialization completed successfully');
+        } catch (error) {
+            console.error('Error during game initialization:', error);
+            // Try to at least render the basic game
+            try {
+                renderQuote();
+                updateDateDisplay();
+                console.log('Basic game rendering completed');
+            } catch (renderError) {
+                console.error('Failed to render basic game:', renderError);
+            }
+        }
+
+        // User data management
+        function loadUserData() {
+            const userData = JSON.parse(localStorage.getItem('quotePuzzleUserData')) || {
+                puzzles: {},
+                stats: {
+                    totalSolved: 0,
+                    currentStreak: 0,
+                    maxStreak: 0,
+                    totalTime: 0,
+                    lastPlayed: null
+                }
+            };
+            return userData;
+        }
+
+        function saveUserData(userData) {
+            localStorage.setItem('quotePuzzleUserData', JSON.stringify(userData));
+        }
+
+        function recordPuzzleCompletion() {
+            const userData = loadUserData();
+            const dateStr = currentQuote.date;
+            endTime = new Date();
+            gameTime = Math.floor((endTime - startTime) / 1000); // in seconds
+
+            // Update puzzle completion
+            userData.puzzles[dateStr] = {
+                solved: true,
+                time: gameTime,
+                date: dateStr
+            };
+
+            // Update stats
+            userData.stats.totalSolved = Object.values(userData.puzzles).filter(p => p.solved).length;
+
+            // Update streak
+            const today = new Date(dateStr);
+            const yesterday = new Date(today);
+            yesterday.setDate(yesterday.getDate() - 1);
+            const yesterdayStr = formatDate(yesterday);
+
+            if (userData.puzzles[yesterdayStr]?.solved) {
+                userData.stats.currentStreak++;
+            } else {
+                // Reset streak if not consecutive
+                userData.stats.currentStreak = 1;
+            }
+
+            // Update max streak
+            if (userData.stats.currentStreak > userData.stats.maxStreak) {
+                userData.stats.maxStreak = userData.stats.currentStreak;
+            }
+
+            // Update total time
+            userData.stats.totalTime += gameTime;
+
+            // Update last played
+            userData.stats.lastPlayed = dateStr;
+
+            saveUserData(userData);
+        }
+
+        function updateStatsDisplay() {
+            const userData = loadUserData();
+            const stats = userData.stats;
+            const puzzles = Object.values(userData.puzzles);
+
+            // Update stats values
+            totalSolvedEl.textContent = stats.totalSolved;
+            currentStreakEl.textContent = stats.currentStreak;
+
+            // Calculate success rate
+            const totalPlayed = Object.keys(userData.puzzles).length;
+            const successRate = totalPlayed > 0 ? Math.round((stats.totalSolved / totalPlayed) * 100) : 0;
+            successRateEl.textContent = `${successRate}%`;
+
+            // Calculate average time
+            const avgTime = stats.totalSolved > 0 ? Math.round(stats.totalTime / stats.totalSolved) : 0;
+            avgTimeEl.textContent = `${avgTime}s`;
+
+
+        }
+
+        // Update date display
+        function updateDateDisplay() {
+            const date = new Date(currentQuote.date);
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            dateLineEl.textContent = date.toLocaleDateString('en-US', options);
+        }
+
+        // Render calendar
+        function renderCalendar() {
+            const today = new Date();
+
+            // Update month/year display
+            const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+                'July', 'August', 'September', 'October', 'November', 'December'];
+            document.getElementById('calendarMonthYear').textContent =
+                `${monthNames[currentCalendarMonth]} ${currentCalendarYear}`;
+
+            // Get first day of month and number of days
+            const firstDay = new Date(currentCalendarYear, currentCalendarMonth, 1);
+            const lastDay = new Date(currentCalendarYear, currentCalendarMonth + 1, 0);
+            const daysInMonth = lastDay.getDate();
+            const startingDayOfWeek = firstDay.getDay();
+
+            let html = '';
+
+            // Add empty cells for days before month starts
+            for (let i = 0; i < startingDayOfWeek; i++) {
+                html += '<div class="calendar-date"></div>';
+            }
+
+            // Add days of month
+            const userData = loadUserData();
+            for (let day = 1; day <= daysInMonth; day++) {
+                const date = new Date(currentCalendarYear, currentCalendarMonth, day);
+                const dateStr = formatDate(date);
+                const isToday = dateStr === formatDate(today);
+                const isPast = date < today;
+                const isFuture = date > today;
+
+                let classes = 'calendar-date';
+                if (isToday) classes += ' today';
+                else if (isPast) classes += ' past';
+                else if (isFuture) classes += ' future';
+
+                if (userData.puzzles && userData.puzzles[dateStr] && userData.puzzles[dateStr].solved) {
+                    classes += ' solved';
+                }
+
+                const quote = quotes.find(q => q.date === dateStr);
+                if (quote) {
+                    // Quote available - make it clickable
+                    html += `<div class="${classes}" data-date="${dateStr}" style="cursor: pointer;" title="Play ${dateStr} puzzle">${day}</div>`;
+                } else {
+                    // No quote available
+                    html += `<div class="${classes}" style="opacity: 0.3;" title="No puzzle available">${day}</div>`;
+                }
+            }
+
+            calendarDatesEl.innerHTML = html;
+
+            // Add click listeners to available dates
+            document.querySelectorAll('.calendar-date[data-date]').forEach(el => {
+                el.addEventListener('click', () => {
+                    const dateStr = el.dataset.date;
+                    loadChallengeForDate(dateStr);
+                    calendarModalEl.style.display = 'none';
+                });
+            });
+
+            // Update navigation button states
+            updateCalendarNavigation();
+        }
+
+        // Update calendar navigation button states
+        function updateCalendarNavigation() {
+            const prevBtn = document.getElementById('prevMonth');
+            const nextBtn = document.getElementById('nextMonth');
+            const today = new Date();
+
+            // Find the earliest and latest quote dates
+            const quoteDates = quotes.map(q => new Date(q.date));
+            const earliestDate = new Date(Math.min(...quoteDates));
+            const latestDate = new Date(Math.max(...quoteDates));
+
+            // Disable prev button if we're at or before the earliest quote month
+            const currentViewDate = new Date(currentCalendarYear, currentCalendarMonth, 1);
+            const earliestViewDate = new Date(earliestDate.getFullYear(), earliestDate.getMonth(), 1);
+            prevBtn.disabled = currentViewDate <= earliestViewDate;
+
+            // Disable next button if we're at or after the current month
+            const currentMonthDate = new Date(today.getFullYear(), today.getMonth(), 1);
+            nextBtn.disabled = currentViewDate >= currentMonthDate;
+        }
+
+        // Format date as YYYY-MM-DD
+        function formatDate(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        // Load challenge for a specific date
+        function loadChallengeForDate(dateStr) {
+            const quote = quotes.find(q => q.date === dateStr);
+            if (quote) {
+                currentQuote = quote;
+                solvedWords = new Set();
+                authorSolved = false;
+                activeWord = null;
+                userInput = '';
+                availableLetters = [];
+                usedLetters = [];
+                gameComplete = false;
+                startTime = new Date();
+
+                congratsEl.classList.remove('show');
+                renderQuote();
+                updateDateDisplay();
+                renderInputArea();
+
+                // Activate the first word
+                if (currentQuote.scrambledWords.length > 0) {
+                    setTimeout(() => {
+                        handleWordClick(currentQuote.scrambledWords[0]);
+                    }, 300);
+                }
+            }
+        }
+
+        // Render the quote with scrambled words
+        function renderQuote() {
+            const words = currentQuote.text.split(' ');
+            let html = '';
+
+            words.forEach((word, index) => {
+                const scrambledWord = currentQuote.scrambledWords.find(sw => sw.index === index);
+                const isSolved = scrambledWord && solvedWords.has(scrambledWord.original);
+
+                if (scrambledWord && !isSolved) {
+                    const isActive = activeWord && activeWord.original === scrambledWord.original;
+                    html += `<span class="quote-word scrambled ${isActive ? 'active' : ''}" 
+                                data-word-index="${index}">${scrambledWord.scrambled}</span> `;
+                } else {
+                    const displayWord = isSolved ? 
+                        getProperCapitalization(scrambledWord.original, index, words) : 
+                        getProperCapitalization(word, index, words);
+                    html += `<span class="quote-word">${displayWord}</span> `;
+                }
+            });
+
+            quoteTextEl.innerHTML = html;
+
+            // Add click listeners to scrambled words
+            document.querySelectorAll('.quote-word.scrambled').forEach(el => {
+                el.addEventListener('mousedown', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    e.stopImmediatePropagation();
+                    console.log('Word clicked:', el.dataset.wordIndex);
+                    handleWordClick(
+                        currentQuote.scrambledWords.find(sw => sw.index === parseInt(el.dataset.wordIndex))
+                    );
+                    return false;
+                }, true);
+                
+                el.addEventListener('touchstart', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    e.stopImmediatePropagation();
+                    console.log('Word touched:', el.dataset.wordIndex);
+                    handleWordClick(
+                        currentQuote.scrambledWords.find(sw => sw.index === parseInt(el.dataset.wordIndex))
+                    );
+                    return false;
+                }, true);
+            });
+
+            // Render author
+            if (authorSolved) {
+                const authorName = currentQuote.author.charAt(0).toUpperCase() + currentQuote.author.slice(1).toLowerCase();
+                quoteAuthorEl.textContent = `- ${authorName}`;
+                quoteAuthorEl.className = 'author';
+            } else {
+                const isActive = activeWord && activeWord.isAuthor;
+                quoteAuthorEl.innerHTML = `<span class="author scrambled ${isActive ? 'active' : ''}" 
+                                                id="authorScrambled">${currentQuote.scrambledAuthor}</span>`;
+                document.getElementById('authorScrambled').addEventListener('mousedown', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    e.stopImmediatePropagation();
+                    console.log('Author clicked');
+                    handleAuthorClick();
+                    return false;
+                }, true);
+                
+                document.getElementById('authorScrambled').addEventListener('touchstart', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    e.stopImmediatePropagation();
+                    console.log('Author touched');
+                    handleAuthorClick();
+                    return false;
+                }, true);
+            }
+        }
+
+        // Handle word click
+        function handleWordClick(wordData) {
+            if (solvedWords.has(wordData.original) || isUnscrambling) return;
+
+            // Remove active class from previously active word
+            document.querySelectorAll('.quote-word.active').forEach(el => {
+                el.classList.remove('active');
+            });
+            document.querySelectorAll('.author.active').forEach(el => {
+                el.classList.remove('active');
+            });
+
+            // Add active class to clicked word
+            const wordElements = document.querySelectorAll('.quote-word');
+            const targetWordEl = Array.from(wordElements).find(el =>
+                el.dataset.wordIndex == wordData.index
+            );
+            if (targetWordEl) {
+                targetWordEl.classList.add('active');
+            }
+
+            activeWord = wordData;
+            userInput = '';
+            availableLetters = wordData.scrambled.split('');
+            usedLetters = [];
+
+            renderInputArea();
+        }
+
+        // Handle author click
+        function handleAuthorClick() {
+            if (authorSolved || isUnscrambling) return;
+
+            // Remove active class from previously active elements
+            document.querySelectorAll('.quote-word.active').forEach(el => {
+                el.classList.remove('active');
+            });
+            document.querySelectorAll('.author.active').forEach(el => {
+                el.classList.remove('active');
+            });
+
+            // Add active class to author
+            const authorEl = document.querySelector('.author.scrambled');
+            if (authorEl) {
+                authorEl.classList.add('active');
+            }
+
+            activeWord = {
+                original: currentQuote.author.toLowerCase(),
+                scrambled: currentQuote.scrambledAuthor,
+                isAuthor: true
+            };
+
+            userInput = '';
+            availableLetters = currentQuote.scrambledAuthor.split('');
+            usedLetters = [];
+
+            renderInputArea();
+        }
+
+        // Render input area
+        function renderInputArea() {
+            if (!activeWord) {
+                // Check if game is complete
+                if (solvedWords.size === currentQuote.scrambledWords.length && authorSolved) {
+                    // Game is complete - hide input area
+                    inputAreaEl.classList.remove('show');
+                    return;
+                }
+
+                // Auto-select first available word if none is active
+                const firstWord = currentQuote.scrambledWords.find(word => !solvedWords.has(word.original));
+                if (firstWord) {
+                    setTimeout(() => handleWordClick(firstWord), 100);
+                } else if (!authorSolved) {
+                    setTimeout(() => handleAuthorClick(), 100);
+                }
+                return;
+            }
+
+            // Show input area for active word
+            inputAreaEl.classList.add('show');
+            inputTitleEl.textContent = activeWord.isAuthor
+                ? 'Unscramble Author'
+                : 'Unscramble Word';
+
+            // Render letter cells
+            const targetLength = activeWord.original.length;
+            letterCellsEl.innerHTML = '';
+
+            for (let i = 0; i < targetLength; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'letter-cell';
+                cell.textContent = userInput[i] || '';
+                letterCellsEl.appendChild(cell);
+            }
+
+            // Render available letters
+            availableLettersEl.innerHTML = '';
+
+            availableLetters.forEach((letter, index) => {
+                const btn = document.createElement('div');
+                btn.className = `letter-btn ${usedLetters.includes(index) ? 'used' : ''}`;
+                btn.textContent = letter;
+                btn.dataset.index = index;
+
+                if (!usedLetters.includes(index)) {
+                    // Use mousedown instead of click to avoid SDK interception
+                    btn.addEventListener('mousedown', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        e.stopImmediatePropagation();
+                        console.log('Letter button clicked:', letter, index);
+                        handleLetterClick(letter, index);
+                        return false;
+                    }, true);
+                    
+                    // Also add touchstart for mobile
+                    btn.addEventListener('touchstart', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        e.stopImmediatePropagation();
+                        console.log('Letter button touched:', letter, index);
+                        handleLetterClick(letter, index);
+                        return false;
+                    }, true);
+                }
+
+                availableLettersEl.appendChild(btn);
+            });
+        }
+
+        // Handle letter click
+        function handleLetterClick(letter, index) {
+            console.log('Letter clicked:', letter, 'at index:', index);
+            
+            if (usedLetters.includes(index) || isUnscrambling) {
+                console.log('Letter already used or unscrambling in progress');
+                return;
+            }
+
+            userInput += letter;
+            usedLetters = [...usedLetters, index];
+            
+            console.log('Current user input:', userInput);
+            
+            // Play typing sound
+            playTypingSound();
+
+            renderInputArea();
+
+            // Check if word is complete
+            if (userInput.length === activeWord.original.length) {
+                const inputWord = userInput.toLowerCase();
+                const targetWord = activeWord.original.toLowerCase();
+
+                console.log('Word complete check:', inputWord, 'vs', targetWord);
+
+                if (inputWord === targetWord) {
+                    console.log('Word correct!');
+                    // Correct!
+                    if (activeWord.isAuthor) {
+                        authorSolved = true;
+                        updateAuthorDisplay();
+                        playAuthorCompleteSound();
+                    } else {
+                        solvedWords.add(activeWord.original);
+                        updateWordDisplay(activeWord);
+                        playWordCompleteSound();
+                    }
+
+                    // Auto-activate next word smoothly after celebration
+                    setTimeout(() => {
+                        activateNextWordSmoothly();
+                    }, 1200);
+                } else {
+                    console.log('Word incorrect, will reset');
+                    // Wrong - reset after delay
+                    setTimeout(() => {
+                        resetInput();
+                    }, 1000);
+                }
+            }
+        }
+
+        // Update individual word display smoothly with PixiJS
+        function updateWordDisplay(wordData) {
+            const wordElements = document.querySelectorAll('.quote-word');
+            const targetWordEl = Array.from(wordElements).find(el =>
+                el.dataset.wordIndex == wordData.index
+            );
+
+            if (targetWordEl) {
+                // Get properly capitalized word
+                const words = currentQuote.text.split(' ');
+                const properWord = getProperCapitalization(wordData.original, wordData.index, words);
+                
+                // Use PixiJS for smooth animation
+                animateWordCompletion(targetWordEl, properWord);
+            }
+        }
+
+        // Update author display smoothly with PixiJS
+        function updateAuthorDisplay() {
+            const authorEl = document.getElementById('quoteAuthor');
+            
+            // Capitalize author name properly
+            const authorName = currentQuote.author.charAt(0).toUpperCase() + currentQuote.author.slice(1).toLowerCase();
+
+            // Use PixiJS for smooth animation
+            animateAuthorCompletion(authorEl, `- ${authorName}`);
+        }
+
+        // Smooth activation of next word without full refresh
+        function activateNextWordSmooth() {
+            // Clear current input
+            activeWord = null;
+            userInput = '';
+            availableLetters = [];
+            usedLetters = [];
+            renderInputArea();
+
+            // Check if game is complete
+            if (solvedWords.size === currentQuote.scrambledWords.length && authorSolved) {
+                gameComplete = true;
+                congratsEl.classList.add('show');
+                
+                // Play quote complete sound
+                playQuoteCompleteSound();
+
+                // Trigger puzzle completion animation and add bolding effect
+                const quoteContainer = document.querySelector('.quote-container');
+                quoteContainer.classList.add('puzzle-completed', 'quote-complete');
+                setTimeout(() => {
+                    quoteContainer.classList.remove('puzzle-completed');
+                }, 1000);
+
+                recordPuzzleCompletion();
+                return;
+            }
+
+            // Try to find next unsolved word smoothly
+            if (!authorSolved && solvedWords.size === currentQuote.scrambledWords.length) {
+                // Activate author smoothly without DOM refresh
+                setTimeout(() => {
+                    activateAuthorSmoothly();
+                }, 300);
+            } else {
+                // Find next unsolved word and activate smoothly
+                for (const word of currentQuote.scrambledWords) {
+                    if (!solvedWords.has(word.original)) {
+                        setTimeout(() => {
+                            activateWordSmoothly(word);
+                        }, 300);
+                        return;
+                    }
+                }
+            }
+        }
+
+        // Clear input area after word completion without auto-activating next word
+        function clearInputAfterCompletion() {
+            // Remove active class from completed word
+            document.querySelectorAll('.quote-word.active, .author.active').forEach(el => {
+                el.classList.remove('active');
+            });
+
+            // Clear current input
+            activeWord = null;
+            userInput = '';
+            availableLetters = [];
+            usedLetters = [];
+            renderInputArea();
+
+            // Check if game is complete
+            if (solvedWords.size === currentQuote.scrambledWords.length && authorSolved) {
+                gameComplete = true;
+                congratsEl.classList.add('show');
+                
+                // Play quote complete sound
+                playQuoteCompleteSound();
+
+                // Trigger puzzle completion animation and add bolding effect
+                const quoteContainer = document.querySelector('.quote-container');
+                quoteContainer.classList.add('puzzle-completed', 'quote-complete');
+                setTimeout(() => {
+                    quoteContainer.classList.remove('puzzle-completed');
+                }, 1000);
+
+                recordPuzzleCompletion();
+            }
+        }
+
+        // Activate next word smoothly with auto-progression
+        function activateNextWordSmoothly() {
+            // Remove active class from completed word
+            document.querySelectorAll('.quote-word.active, .author.active').forEach(el => {
+                el.classList.remove('active');
+            });
+
+            // Clear current input
+            activeWord = null;
+            userInput = '';
+            availableLetters = [];
+            usedLetters = [];
+            renderInputArea();
+
+            // Check if game is complete
+            if (solvedWords.size === currentQuote.scrambledWords.length && authorSolved) {
+                gameComplete = true;
+                congratsEl.classList.add('show');
+                
+                // Play quote complete sound
+                playQuoteCompleteSound();
+
+                // Trigger puzzle completion animation and add bolding effect
+                const quoteContainer = document.querySelector('.quote-container');
+                quoteContainer.classList.add('puzzle-completed', 'quote-complete');
+                setTimeout(() => {
+                    quoteContainer.classList.remove('puzzle-completed');
+                }, 1000);
+
+                recordPuzzleCompletion();
+                return;
+            }
+
+            // Auto-activate next unsolved word smoothly
+            if (!authorSolved && solvedWords.size === currentQuote.scrambledWords.length) {
+                // Activate author smoothly without DOM refresh
+                setTimeout(() => {
+                    activateAuthorSmoothly();
+                }, 300);
+            } else {
+                // Find next unsolved word and activate smoothly
+                for (const word of currentQuote.scrambledWords) {
+                    if (!solvedWords.has(word.original)) {
+                        setTimeout(() => {
+                            activateWordSmoothly(word);
+                        }, 300);
+                        return;
+                    }
+                }
+            }
+        }
+
+        // Keep original function for compatibility
+        function activateNextWord() {
+            activateNextWordSmooth();
+        }
+
+        // Handle keyboard input
+        function handleKeyDown(event) {
+            if (!activeWord || availableLetters.length === 0 || isUnscrambling) return;
+
+            // Backspace handling
+            if (event.key === 'Backspace') {
+                handleBackspace();
+                return;
+            }
+
+            // Only process letter keys
+            if (event.key.length !== 1) return;
+
+            const key = event.key.toLowerCase();
+            const availableIndex = availableLetters.findIndex((letter, index) =>
+                letter.toLowerCase() === key && !usedLetters.includes(index)
+            );
+
+            if (availableIndex !== -1) {
+                handleLetterClick(availableLetters[availableIndex], availableIndex);
+            }
+        }
+
+        // Handle backspace
+        function handleBackspace() {
+            if (!activeWord || userInput.length === 0 || isUnscrambling) return;
+
+            // Remove last character from user input
+            userInput = userInput.slice(0, -1);
+
+            // Remove last index from usedLetters
+            usedLetters = usedLetters.slice(0, -1);
+
+            renderInputArea();
+        }
+
+        // Reset input
+        function resetInput() {
+            if (isUnscrambling) return;
+            
+            // Play reset sound
+            playResetSound();
+            
+            userInput = '';
+            usedLetters = [];
+            renderInputArea();
+        }
+
+        // Unscramble current word letter by letter
+        function unscrambleCurrentWord() {
+            if (!activeWord || isUnscrambling) return;
+            
+            // Set unscrambling state to prevent other interactions
+            isUnscrambling = true;
+            
+            // Disable buttons during unscrambling
+            resetBtnEl.disabled = true;
+            backspaceBtnEl.disabled = true;
+            unscrambleBtnEl.disabled = true;
+            
+            const targetWord = activeWord.original;
+            const scrambledLetters = activeWord.scrambled.split('');
+            
+            // Clear current input
+            userInput = '';
+            usedLetters = [];
+            
+            // Add letters one by one with delay
+            let letterIndex = 0;
+            
+            function addNextLetter() {
+                if (letterIndex >= targetWord.length) return;
+                
+                const targetLetter = targetWord[letterIndex];
+                
+                // Find the index of this letter in the scrambled array
+                const scrambledIndex = scrambledLetters.findIndex((letter, index) => 
+                    letter.toLowerCase() === targetLetter.toLowerCase() && !usedLetters.includes(index)
+                );
+                
+                if (scrambledIndex !== -1) {
+                    // Add the letter using the same logic as normal input
+                    userInput += scrambledLetters[scrambledIndex];
+                    usedLetters = [...usedLetters, scrambledIndex];
+                    
+                    // Play typing sound for unscramble animation
+                    playTypingSound();
+                    
+                    renderInputArea();
+                    
+                    letterIndex++;
+                    
+                    // Check if word is complete after adding this letter
+                    if (userInput.length === activeWord.original.length) {
+                        const inputWord = userInput.toLowerCase();
+                        const targetWordLower = activeWord.original.toLowerCase();
+                        
+                        if (inputWord === targetWordLower) {
+                            // Word is complete - use the existing completion logic
+                            setTimeout(() => {
+                                if (activeWord.isAuthor) {
+                                    authorSolved = true;
+                                    updateAuthorDisplay();
+                                    playAuthorCompleteSound();
+                                } else {
+                                    solvedWords.add(activeWord.original);
+                                    updateWordDisplay(activeWord);
+                                    playWordCompleteSound();
+                                }
+
+                                // Auto-activate next word smoothly after celebration
+                                setTimeout(() => {
+                                    isUnscrambling = false; // Clear unscrambling state
+                                    
+                                    // Re-enable buttons
+                                    resetBtnEl.disabled = false;
+                                    backspaceBtnEl.disabled = false;
+                                    unscrambleBtnEl.disabled = false;
+                                    
+                                    activateNextWordSmoothly();
+                                }, 1200);
+                            }, 300);
+                            return;
+                        }
+                    }
+                    
+                    // Continue with next letter after a short delay
+                    setTimeout(addNextLetter, 200);
+                }
+            }
+            
+            addNextLetter();
+        }
+
+
+
+        // Smooth word activation without container resizing
+        function activateWordSmoothly(wordData) {
+            if (solvedWords.has(wordData.original)) return;
+
+            // Set game state
+            activeWord = wordData;
+            userInput = '';
+            availableLetters = wordData.scrambled.split('');
+            usedLetters = [];
+
+            // Use simple renderInputArea
+            renderInputArea();
+
+            // Find and activate only the specific word element
+            const wordElements = document.querySelectorAll('.quote-word.scrambled');
+            const targetWordEl = Array.from(wordElements).find(el =>
+                el.dataset.wordIndex == wordData.index
+            );
+
+            // Remove active from all elements first
+            document.querySelectorAll('.quote-word.active, .author.active').forEach(el => {
+                el.classList.remove('active');
+            });
+
+            // Add active to target word
+            if (targetWordEl) {
+                targetWordEl.classList.add('active');
+            }
+        }
+
+        // Smooth author activation without container resizing
+        function activateAuthorSmoothly() {
+            if (authorSolved) return;
+
+            // Set game state
+            activeWord = {
+                original: currentQuote.author.toLowerCase(),
+                scrambled: currentQuote.scrambledAuthor,
+                isAuthor: true
+            };
+
+            userInput = '';
+            availableLetters = currentQuote.scrambledAuthor.split('');
+            usedLetters = [];
+
+            // Use simple renderInputArea
+            renderInputArea();
+
+            // Remove active from all elements first
+            document.querySelectorAll('.quote-word.active, .author.active').forEach(el => {
+                el.classList.remove('active');
+            });
+
+            // Add active to author element
+            const authorEl = document.querySelector('.author.scrambled');
+            if (authorEl) {
+                authorEl.classList.add('active');
+            }
+        }
+
+        // Arkadium SDK Integration
+        let arkadiumSDK = null;
+
+        // Initialize Arkadium SDK
+        async function initializeArkadiumSDK() {
+            try {
+                arkadiumSDK = await window.ArkadiumGameSDK.getInstance();
+                
+                // Enable debug mode for development
+                arkadiumSDK.debugMode(true);
+                
+                // Set up SDK event listeners
+                setupSDKEvents();
+                
+                console.log('Arkadium SDK initialized successfully');
+            } catch (error) {
+                console.error('Failed to initialize Arkadium SDK:', error);
+            }
+        }
+
+        // Set up SDK event listeners
+        function setupSDKEvents() {
+            if (!arkadiumSDK) return;
+
+            // Lifecycle events
+            arkadiumSDK.lifecycle.onGameStart(() => {
+                console.log('Game started');
+                // Track game start analytics
+                arkadiumSDK.analytics.trackEvent('game_started');
+            });
+
+            arkadiumSDK.lifecycle.onGameEnd(() => {
+                console.log('Game ended');
+                // Track game end analytics
+                arkadiumSDK.analytics.trackEvent('game_completed');
+            });
+
+            // Track puzzle completion
+            arkadiumSDK.lifecycle.onGameWin(() => {
+                console.log('Game won');
+                arkadiumSDK.analytics.trackEvent('puzzle_completed');
+            });
+
+            // Handle ads when needed
+            arkadiumSDK.ads.onAdStart(() => {
+                console.log('Ad started - pausing game');
+                // Pause game during ads
+                pauseGame();
+            });
+
+            arkadiumSDK.ads.onAdEnd(() => {
+                console.log('Ad ended - resuming game');
+                // Resume game after ads
+                resumeGame();
+            });
+        }
+
+        // Game pause/resume functionality for ads
+        let gamePaused = false;
+
+        function pauseGame() {
+            gamePaused = true;
+            // Disable user interactions
+            document.querySelectorAll('.header-icon, .letter-btn, .btn').forEach(el => {
+                el.style.pointerEvents = 'none';
+            });
+        }
+
+        function resumeGame() {
+            gamePaused = false;
+            // Re-enable user interactions
+            document.querySelectorAll('.header-icon, .letter-btn, .btn').forEach(el => {
+                el.style.pointerEvents = 'auto';
+            });
+        }
+
+        // Enhanced persistence with SDK
+        async function saveGameStateWithSDK() {
+            const gameState = {
+                currentQuote: currentQuote,
+                solvedWords: Array.from(solvedWords),
+                authorSolved: authorSolved,
+                gameTime: gameTime,
+                lastPlayed: new Date().toISOString()
+            };
+
+            try {
+                if (arkadiumSDK) {
+                    // Save to SDK persistence
+                    await arkadiumSDK.persistence.setItem('dailyQuotePuzzleState', JSON.stringify(gameState));
+                }
+                // Also save to localStorage as backup
+                localStorage.setItem('dailyQuotePuzzleState', JSON.stringify(gameState));
+            } catch (error) {
+                console.error('Failed to save game state:', error);
+            }
+        }
+
+        async function loadGameStateWithSDK() {
+            try {
+                let gameState = null;
+                
+                if (arkadiumSDK) {
+                    // Try to load from SDK persistence first
+                    const sdkState = await arkadiumSDK.persistence.getItem('dailyQuotePuzzleState');
+                    if (sdkState) {
+                        gameState = JSON.parse(sdkState);
+                    }
+                }
+                
+                // Fallback to localStorage
+                if (!gameState) {
+                    const localState = localStorage.getItem('dailyQuotePuzzleState');
+                    if (localState) {
+                        gameState = JSON.parse(localState);
+                    }
+                }
+
+                if (gameState) {
+                    // Restore game state
+                    currentQuote = gameState.currentQuote;
+                    solvedWords = new Set(gameState.solvedWords);
+                    authorSolved = gameState.authorSolved;
+                    gameTime = gameState.gameTime;
+                    
+                    // Re-render with restored state
+                    renderQuote();
+                    updateDateDisplay();
+                    renderInputArea();
+                }
+            } catch (error) {
+                console.error('Failed to load game state:', error);
+            }
+        }
+
+        // Track user interactions for analytics
+        function trackUserInteraction(action, details = {}) {
+            if (arkadiumSDK) {
+                arkadiumSDK.analytics.trackEvent('user_interaction', {
+                    action: action,
+                    ...details
+                });
+            }
+        }
+
+        // Enhanced game initialization with SDK
+        async function initGameWithSDK() {
+            try {
+                // Override SDK event handling first
+                overrideSDKEventHandling();
+                
+                // Initialize Arkadium SDK first (with timeout)
+                const sdkPromise = initializeArkadiumSDK();
+                const timeoutPromise = new Promise((_, reject) => 
+                    setTimeout(() => reject(new Error('SDK timeout')), 5000)
+                );
+                
+                try {
+                    await Promise.race([sdkPromise, timeoutPromise]);
+                } catch (error) {
+                    console.warn('SDK initialization failed or timed out, continuing without SDK:', error);
+                }
+                
+                // Load saved game state if available
+                try {
+                    await loadGameStateWithSDK();
+                } catch (error) {
+                    console.warn('Failed to load game state:', error);
+                }
+                
+                // Initialize the game (this is critical)
+                initGame();
+                
+                // Notify SDK that game is ready
+                if (arkadiumSDK) {
+                    try {
+                        arkadiumSDK.lifecycle.onTestReady();
+                        arkadiumSDK.lifecycle.onGameStart();
+                    } catch (error) {
+                        console.warn('Failed to notify SDK lifecycle events:', error);
+                    }
+                }
+                
+                console.log('Game initialized successfully');
+            } catch (error) {
+                console.error('Game initialization failed:', error);
+                // Fallback: try to initialize just the game without SDK
+                try {
+                    initGame();
+                    console.log('Game initialized in fallback mode');
+                } catch (fallbackError) {
+                    console.error('Fallback initialization also failed:', fallbackError);
+                }
+            }
+        }
+
+        // Enhanced puzzle completion with SDK integration
+        async function recordPuzzleCompletionWithSDK() {
+            // Original puzzle completion logic
+            recordPuzzleCompletion();
+            
+            // Save game state
+            await saveGameStateWithSDK();
+            
+            // SDK integration
+            if (arkadiumSDK) {
+                // Track puzzle completion
+                arkadiumSDK.analytics.trackEvent('puzzle_solved', {
+                    date: currentQuote.date,
+                    time: gameTime,
+                    totalWords: currentQuote.scrambledWords.length
+                });
+                
+                // Notify SDK of game win
+                arkadiumSDK.lifecycle.onGameWin();
+            }
+        }
+
+        // Enhanced word completion tracking
+        function trackWordCompletion(wordData) {
+            if (arkadiumSDK) {
+                arkadiumSDK.analytics.trackEvent('word_completed', {
+                    word: wordData.original,
+                    isAuthor: wordData.isAuthor || false
+                });
+            }
+        }
+
+        // Enhanced letter click tracking
+        function trackLetterClick(letter, index) {
+            if (arkadiumSDK) {
+                arkadiumSDK.analytics.trackEvent('letter_clicked', {
+                    letter: letter,
+                    position: index
+                });
+            }
+        }
+
+        // Override original functions to include SDK tracking
+        const originalHandleLetterClick = handleLetterClick;
+        handleLetterClick = function(letter, index) {
+            console.log('SDK tracking letter click:', letter, index);
+            trackLetterClick(letter, index);
+            // Ensure the original function is called with proper context
+            return originalHandleLetterClick.call(this, letter, index);
+        };
+
+        const originalUpdateWordDisplay = updateWordDisplay;
+        updateWordDisplay = function(wordData) {
+            console.log('SDK tracking word completion:', wordData);
+            trackWordCompletion(wordData);
+            return originalUpdateWordDisplay.call(this, wordData);
+        };
+
+        const originalRecordPuzzleCompletion = recordPuzzleCompletion;
+        recordPuzzleCompletion = function() {
+            return recordPuzzleCompletionWithSDK();
+        };
+
+        // Ensure event listeners are properly attached and not blocked
+        function attachEventListeners() {
+            console.log('Attaching event listeners...');
+            
+            // Remove existing listeners to prevent duplicates
+            resetBtnEl.removeEventListener('click', resetInput);
+            backspaceBtnEl.removeEventListener('click', handleBackspace);
+            unscrambleBtnEl.removeEventListener('click', unscrambleCurrentWord);
+            window.removeEventListener('keydown', handleKeyDown);
+            
+            // Re-attach listeners with proper event handling
+            resetBtnEl.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                e.stopImmediatePropagation();
+                console.log('Reset button clicked');
+                resetInput();
+                return false;
+            }, true);
+            
+            backspaceBtnEl.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                e.stopImmediatePropagation();
+                console.log('Backspace button clicked');
+                handleBackspace();
+                return false;
+            }, true);
+            
+            unscrambleBtnEl.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                e.stopImmediatePropagation();
+                console.log('Unscramble button clicked');
+                unscrambleCurrentWord();
+                return false;
+            }, true);
+            
+            window.addEventListener('keydown', function(e) {
+                console.log('Key pressed:', e.key);
+                handleKeyDown(e);
+            }, true);
+            
+            console.log('Event listeners attached successfully');
+        }
+
+        // Override SDK event handling to ensure game events work
+        function overrideSDKEventHandling() {
+            // Store original addEventListener
+            const originalAddEventListener = EventTarget.prototype.addEventListener;
+            
+            // Override addEventListener to prevent SDK from blocking our events
+            EventTarget.prototype.addEventListener = function(type, listener, options) {
+                // If this is a click event and it's not our game's listener, modify it
+                if (type === 'click' && !listener.toString().includes('handleLetterClick') && 
+                    !listener.toString().includes('handleWordClick') && 
+                    !listener.toString().includes('handleAuthorClick') &&
+                    !listener.toString().includes('resetInput') &&
+                    !listener.toString().includes('handleBackspace') &&
+                    !listener.toString().includes('unscrambleCurrentWord')) {
+                    
+                    const wrappedListener = function(e) {
+                        // Only call the original listener if it's not a game element
+                        if (!e.target.closest('.letter-btn') && 
+                            !e.target.closest('.quote-word') && 
+                            !e.target.closest('.author') &&
+                            !e.target.closest('.btn')) {
+                            return listener.call(this, e);
+                        }
+                    };
+                    
+                    return originalAddEventListener.call(this, type, wrappedListener, options);
+                }
+                
+                return originalAddEventListener.call(this, type, listener, options);
+            };
+        }
+
+        // Initialize the game with SDK when page loads
+        window.addEventListener('DOMContentLoaded', initGameWithSDK);
+    </script>
+</body>
+
+</html>

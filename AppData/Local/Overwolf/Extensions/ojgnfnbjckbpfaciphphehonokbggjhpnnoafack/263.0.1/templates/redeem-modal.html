@@ -1,0 +1,51 @@
+<div class="redeem-modal">
+    <div class="redeem-overlay" ng-click="owModal.close($event)"></div>
+    <div class="popup" ng-class="{'error': redeem.error, 'popup-redeemed': redeem.redeemed}">
+        <span class="icon-window-controls_close" ng-click="owModal.close($event)"></span>
+
+        <div class="popup-container">
+            <div class="popup-inner" ng-show="!userService.isLoggedIn">
+                Please log in in order to redeem your code.
+            </div>
+            <div class="popup-inner" ng-show="!redeem.redeemed && userService.isLoggedIn">
+                <h3>Redeem</h3>
+                <p>Please enter the product code you wish to redeem</p>
+
+                <form>
+                    <div class="controls">
+                        <div class="error-msg" ng-show="redeem.error">
+                            <div class="msg" ng-bind="redeem.error"></div>
+                        </div>
+
+                        <input type="text" placeholder="Enter your code" autofocus="true" ng-model="redeem.code"
+                               ng-keydown="redeem.hideErrors($event)" ow-capitalize>
+                    </div>
+
+                    <button type="submit" ng-click="redeem.launch($event)">Redeem</button>
+                </form>
+
+                <div class="hint">
+                    <small>The product code can be found in the email<br>you received.</small>
+                    <!-- <small>Code example:<br>
+                        XXXXXXXXXXXXXXXXXXXXXXXX
+                    </small> -->
+                </div>
+            </div>
+
+            <div class="popup-inner" ng-show="redeem.redeemed && userService.isLoggedIn">
+                <h3>Congratulations!</h3>
+
+                <p>You have successfully redeemed {{ redeem.appname }}</p>
+
+                <form>
+                    <button type="submit" ng-click="redeem.install($event)"
+                            ng-show="!redeem.isInstalled && redeem.finishedQuery">Install
+                    </button>
+                    <button type="submit" ng-click="redeem.launchApp($event)"
+                            ng-show="redeem.isInstalled && redeem.finishedQuery">Launch
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,77 @@
+<div class="lightbox-wrap" ng-class="splashShowing ? 'transparent' : ''" ng-click="owModal.closeIfNotStrict($event)">
+  <div class="block">
+    <section class="modal-page subscription-page" ng-keydown="keyPress($event)">
+      <header>
+        <button class="modal-page-control back" ng-click="goBack()">
+          <svg class="icon">
+            <use xlink:href=".content/assets/svg/sprite.svg#back" />
+          </svg>
+        </button>
+        <p>{{appName}} Subscription</p>
+        <button class="modal-page-control close" ng-click="closeSubscription()">
+          <svg class="icon">
+            <use xlink:href=".content/assets/svg/sprite.svg#window-control_close" />
+          </svg>
+        </button>
+      </header>
+      <section class="subscription-page__intro">
+        <header>
+          <div class="app-icon-container">
+            <img class="app-icon" ng-src="https://storeapi.overwolf.com/asset/logo-image/{{appId}}" />
+            <img ng-show="isSubscribed" class="subscription-bubble" src="/images/subscription/subscription-bubble.svg" />
+          </div>
+          <p ng-show="!isSubscribed">Subscribe to {{appName}}</p>
+          <p ng-show="isSubscribed">Subscribed to {{appName}}!</p>
+        </header>
+        <div class="subscription-page__intro__benefits">
+          <section ng-repeat="tile in plans[0].tiles">
+            <header>
+              <div class="sprite" style="--sprite-width:150px;"
+                ng-class="{
+                  'is-active': isTileActive[$index] && tile.image.dimensions.width === 2250,
+                  'small-is-active': isTileActive[$index] && tile.image.dimensions.width !== 2250
+                }"
+                ng-mouseover="hoverOverSprite($event, tile.image.dimensions.width !== 2250)">
+                <img src="{{tile.image.url}}"/>
+              </div>
+              <p>{{tile.title}}</p>
+            </header>
+            <p>{{tile.description}}</p>
+          </section>
+        </div>
+      </section>
+      <section class="subscription-page__actions">
+        <section class="subscription-page__actions__subscribe" ng-if="!isSubscribed">
+          <p class="action-info" ng-class="{'active': isShowingActionInfo}">
+            {{actionInfo}}
+          </p>
+          <p class="action-error" ng-class="{'active': !!errorText}">
+            {{errorText}}
+          </p>
+          <button ng-class="{'loading': isInProgress}" class="button--subscribe"
+            ng-click="onClickSubscribe()"
+          >
+            <div class="loader">
+              <svg><use xlink:href=".content/assets/svg/sprite.svg#button-loading-ring" /></svg>
+            </div>
+            <div class="button-text">
+              <span>Subscribe</span>
+              <span class="button-text__price">${{plans[0].price}}/Month</span>
+            </div>
+          </button>
+          <p class="fine-print with-paypal">
+            <img src="/images/subscription/xsolla.png" />
+          </p>
+          <!-- <p class="fine-print billing-info">
+              Billing agreement info: by approving this payment you give Overwolf permission to charge you for stuff
+          </p> -->
+        </section>
+        <section class="subscription-page__actions__manage" ng-if="isSubscribed">
+          <p>{{appName}} subscription - basic (${{subscriptionPrice}}/Month)</p>
+          <p>Subscription {{endOfPeriodAction}} at: {{subscriptionExpiryText}}</p>
+          <button class="button--secondary" ng-click="onClickManage()">Manage</button>
+        </section>
+      </section>
+    </section>
+  </div>
+</div>

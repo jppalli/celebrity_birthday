@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Quote Puzzle | NYT Style</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Source+Sans+3:wght@300;400;600&display=swap"
+        rel="stylesheet">
+
+    <!-- Arkadium SDK - Sandbox Environment -->
+    <script src="https://sandbox-cdn.arkadium.com/sdk/arkadium-sdk.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #f8f8f8;
+            color: #121212;
+            font-family: 'Source Sans 3', sans-serif;
+            line-height: 1.6;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 700px;
+            width: 100%;
+            background: white;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+            margin: 40px 0;
+        }
+
+        header {
+            padding: 30px 40px 20px;
+            border-bottom: 1px solid #e2e2e2;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        h1 {
+            font-family: 'Libre Baskerville', serif;
+            font-size: 36px;
+            font-weight: 700;
+            color: #121212;
+            letter-spacing: 0.5px;
+        }
+
+        .date-display {
+            font-size: 15px;
+            color: #666;
+            font-weight: 300;
+        }
+
+        .subtitle {
+            font-size: 18px;
+            color: #444;
+            font-weight: 300;
+        }
+
+        .puzzle-container {
+            padding: 40px;
+        }
+
+        .quote-section {
+            margin-bottom: 40px;
+            padding: 30px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .quote-text {
+            font-family: 'Libre Baskerville', serif;
+            font-size: 28px;
+            line-height: 1.7;
+            color: #333;
+            font-style: italic;
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .quote-text::before {
+            content: "" ";
+ font-family: Georgia, serif;
+            font-size: 80px;
+            position: absolute;
+            top: -30px;
+            left: -20px;
+            color: #e8e8e8;
+            z-index: -1;
+        }
+
+        .author {
+            font-size: 18px;
+            color: #666;
+            text-align: right;
+            font-family: 'Libre Baskerville', serif;
+            font-weight: 700;
+        }
+
+        .puzzle-section {
+            margin-bottom: 30px;
+        }
+
+        .instructions {
+            background: #f8f8f8;
+            padding: 20px;
+            margin-bottom: 30px;
+            font-size: 16px;
+            color: #444;
+        }
+
+        .blanks-container {
+            margin-bottom: 30px;
+        }
+
+        .input-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .input-label {
+            width: 40px;
+            height: 40px;
+            border: 1px solid #ddd;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: 600;
+            margin-right: 20px;
+            font-size: 18px;
+            color: #444;
+        }
+
+        .scramble {
+            font-family: 'Courier New', monospace;
+            font-size: 20px;
+            letter-spacing: 2px;
+            padding: 8px 15px;
+            margin-right: 20px;
+            background: #f8f8f8;
+        }
+
+        input {
+            flex: 1;
+            padding: 12px 15px;
+            font-size: 18px;
+            border: 1px solid #ddd;
+            font-family: 'Source Sans 3', sans-serif;
+            transition: all 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #888;
+            background: #fcfcfc;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        button {
+            padding: 14px 30px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Source Sans 3', sans-serif;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        #check-btn {
+            background: #121212;
+            color: white;
+            border-color: #121212;
+        }
+
+        #check-btn:hover {
+            background: #333;
+        }
+
+        #hint-btn:hover {
+            background: #f8f8f8;
+        }
+
+        .message {
+            margin-top: 25px;
+            padding: 20px;
+            border-left: 4px solid #ddd;
+            display: none;
+            font-size: 17px;
+        }
+
+        .success {
+            background: #f8f8f8;
+            border-left-color: #4CAF50;
+        }
+
+        .error {
+            background: #f8f8f8;
+            border-left-color: #f44336;
+        }
+
+        .hint {
+            background: #f8f8f8;
+            border-left-color: #FFC107;
+        }
+
+        .past-challenges-section {
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 1px solid #eee;
+        }
+
+        .past-challenges-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .past-challenges-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #121212;
+        }
+
+        .stats-tooltip {
+            position: relative;
+            display: inline-block;
+            cursor: help;
+            padding: 8px 12px;
+            background: #f8f8f8;
+            border-radius: 4px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .stats-tooltip:hover .tooltip-content {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .tooltip-content {
+            visibility: hidden;
+            opacity: 0;
+            position: absolute;
+            top: -120px;
+            right: 0;
+            background: #333;
+            color: white;
+            padding: 15px;
+            border-radius: 6px;
+            font-size: 13px;
+            white-space: nowrap;
+            z-index: 1000;
+            transition: opacity 0.3s;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .tooltip-content::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            right: 20px;
+            border: 5px solid transparent;
+            border-top-color: #333;
+        }
+
+        .calendar-container {
+            background: #f8f8f8;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 15px;
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .calendar-nav {
+            background: none;
+            border: 1px solid #ddd;
+            padding: 8px 12px;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        .calendar-nav:hover {
+            background: #e8e8e8;
+        }
+
+        .calendar-month {
+            font-size: 18px;
+            font-weight: 600;
+            color: #121212;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 2px;
+            margin-top: 10px;
+        }
+
+        .calendar-day-header {
+            text-align: center;
+            padding: 10px 5px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #666;
+            text-transform: uppercase;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            border: 1px solid #e8e8e8;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .calendar-day:hover {
+            background: #f0f0f0;
+            border-color: #ccc;
+        }
+
+        .calendar-day.today {
+            background: #121212;
+            color: white;
+            font-weight: 600;
+        }
+
+        .calendar-day.completed {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .calendar-day.completed:hover {
+            background: #45a049;
+        }
+
+        .calendar-day.other-month {
+            color: #ccc;
+            background: #f8f8f8;
+        }
+
+        .calendar-day.disabled {
+            color: #ccc;
+            cursor: not-allowed;
+            background: #f8f8f8;
+        }
+
+        .calendar-day.disabled:hover {
+            background: #f8f8f8;
+            border-color: #e8e8e8;
+        }
+
+
+
+        @media (max-width: 650px) {
+            .container {
+                margin: 20px 0;
+            }
+
+            header,
+            .puzzle-container {
+                padding: 25px;
+            }
+
+            .header-top {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .quote-text {
+                font-size: 22px;
+            }
+
+            .input-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .scramble {
+                margin: 10px 0;
+            }
+
+            input {
+                width: 100%;
+            }
+
+            .buttons {
+                flex-direction: column;
+            }
+
+            .streak-container {
+                flex-direction: column;
+                gap: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <div class="header-top">
+                <h1>Daily Quote Puzzle</h1>
+                <div class="date-display" id="current-date">Wednesday, July 23, 2025</div>
+            </div>
+            <p class="subtitle">Unscramble words to reveal today's inspirational quote</p>
+        </header>
+
+        <div class="puzzle-container">
+            <div class="quote-section">
+                <div class="quote-text" id="quote-text">
+                    The only way to do <span class="blank">________</span> work is to <span
+                        class="blank">________</span> what you do.
+                </div>
+                <div class="author" id="quote-author">- <span class="blank">________</span></div>
+            </div>
+
+            <div class="puzzle-section">
+                <div class="instructions">
+                    <p>Unscramble the letters to fill in the missing words and reveal the author to complete the quote.
+                    </p>
+                </div>
+
+                <div class="blanks-container" id="blanks-container">
+                    <div class="input-row">
+                        <div class="input-label">1</div>
+                        <div class="scramble">TAERG</div>
+                        <input type="text" id="input1" placeholder="Type the unscrambled word">
+                    </div>
+                    <div class="input-row">
+                        <div class="input-label">2</div>
+                        <div class="scramble">ELOV</div>
+                        <input type="text" id="input2" placeholder="Type the unscrambled word">
+                    </div>
+                    <div class="input-row">
+                        <div class="input-label">3</div>
+                        <div class="scramble">BJOS</div>
+                        <input type="text" id="input3" placeholder="Type the author's name">
+                    </div>
+                </div>
+
+                <div class="buttons">
+                    <button id="check-btn">Check Solution</button>
+                    <button id="hint-btn">Get a Hint</button>
+                </div>
+
+                <div id="message" class="message">
+                    <p>Welcome to today's puzzle! Unscramble the words and identify the author to complete this
+                        inspirational quote.</p>
+                </div>
+            </div>
+
+            <div class="past-challenges-section">
+                <div class="past-challenges-header">
+                    <h2 class="past-challenges-title">Past Challenges</h2>
+                    <div class="stats-tooltip">
+                        📊 Your Stats
+                        <div class="tooltip-content">
+                            Puzzles Solved: 137<br>
+                            Current Streak: 42 days<br>
+                            Average Time: 2:18
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="calendar-container">
+                    <div class="calendar-header">
+                        <button class="calendar-nav" id="prev-month">‹</button>
+                        <div class="calendar-month" id="calendar-month">July 2025</div>
+                        <button class="calendar-nav" id="next-month">›</button>
+                    </div>
+                    
+                    <div class="calendar-grid" id="calendar-grid">
+                        <!-- Calendar will be generated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Arkadium SDK Integration
+        let arkadiumSDK = null;
+        let gameStartTime = null;
+        let hintsUsed = 0;
+
+        // Initialize Arkadium SDK
+        function initArkadiumSDK() {
+            if (typeof Arkadium !== 'undefined') {
+                arkadiumSDK = new Arkadium({
+                    gameId: 'daily-quote-puzzle',
+                    version: '1.0.0',
+                    debug: false
+                });
+
+                arkadiumSDK.init().then(() => {
+                    console.log('Arkadium SDK initialized successfully');
+                    trackGameStart();
+                }).catch(error => {
+                    console.warn('Arkadium SDK initialization failed:', error);
+                });
+            }
+        }
+
+        // Track game events
+        function trackGameStart() {
+            gameStartTime = Date.now();
+            hintsUsed = 0;
+            if (arkadiumSDK) {
+                arkadiumSDK.trackEvent('game_start', {
+                    timestamp: gameStartTime,
+                    quote_id: todayQuote.answers.join('_')
+                });
+            }
+        }
+
+        function trackGameComplete(success, timeSpent) {
+            if (arkadiumSDK) {
+                arkadiumSDK.trackEvent('game_complete', {
+                    success: success,
+                    time_spent: timeSpent,
+                    hints_used: hintsUsed,
+                    quote_id: todayQuote.answers.join('_'),
+                    timestamp: Date.now()
+                });
+
+                if (success) {
+                    arkadiumSDK.trackEvent('puzzle_solved', {
+                        time_spent: timeSpent,
+                        hints_used: hintsUsed
+                    });
+                }
+            }
+        }
+
+        function trackHintUsed(hintNumber) {
+            hintsUsed++;
+            if (arkadiumSDK) {
+                arkadiumSDK.trackEvent('hint_used', {
+                    hint_number: hintNumber,
+                    total_hints_used: hintsUsed,
+                    timestamp: Date.now()
+                });
+            }
+        }
+
+        function trackUserEngagement(action, data = {}) {
+            if (arkadiumSDK) {
+                arkadiumSDK.trackEvent('user_engagement', {
+                    action: action,
+                    timestamp: Date.now(),
+                    ...data
+                });
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            // Initialize Arkadium SDK
+            initArkadiumSDK();
+
+            // Set current date
+            const now = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('current-date').textContent = now.toLocaleDateString('en-US', options);
+
+            // Quote data with multiple blanks and author scrambles
+            const quotes = [
+                {
+                    text: "The only way to do {0} work is to {1} what you do.",
+                    author: "{2}",
+                    answers: ["great", "love", "jobs"],
+                    scrambles: ["TAERG", "ELOV", "BJOS"],
+                    hints: [
+                        "Excellent or remarkable in quality",
+                        "To have deep affection for something",
+                        "Co-founder of Apple Inc."
+                    ]
+                },
+                {
+                    text: "The {0} to get started is to quit talking and begin {1}.",
+                    author: "{2}",
+                    answers: ["way", "doing", "disney"],
+                    scrambles: ["YAW", "GNOID", "YENSID"],
+                    hints: [
+                        "A method or route to achieve something",
+                        "To perform an action or activity",
+                        "Creator of Mickey Mouse and Disneyland"
+                    ]
+                },
+                {
+                    text: "In the {0} of difficulty lies {1}.",
+                    author: "{2}",
+                    answers: ["middle", "opportunity", "einstein"],
+                    scrambles: ["DDEILM", "YTINUTROPPO", "NIETSNIE"],
+                    hints: [
+                        "The center point of something",
+                        "A chance for advancement or progress",
+                        "Famous physicist known for E=mc²"
+                    ]
+                },
+                {
+                    text: "It is during our {0} moments that we must {1} to see the light.",
+                    author: "{2}",
+                    answers: ["darkest", "focus", "aristotle"],
+                    scrambles: ["TSETKRAD", "SUCOF", "ELTOTSIRA"],
+                    hints: [
+                        "The most difficult or gloomy times",
+                        "To concentrate attention or effort",
+                        "Ancient Greek philosopher and student of Plato"
+                    ]
+                },
+                {
+                    text: "The {0} thing in life is to {1} yourself.",
+                    author: "{2}",
+                    answers: ["hardest", "be", "wilde"],
+                    scrambles: ["TSEDRAH", "EB", "EDLIW"],
+                    hints: [
+                        "Most difficult or challenging",
+                        "To exist as one's authentic self",
+                        "Irish playwright known for 'The Picture of Dorian Gray'"
+                    ]
+                },
+                {
+                    text: "An {0} life is not worth {1}.",
+                    author: "{2}",
+                    answers: ["unexamined", "living", "socrates"],
+                    scrambles: ["DENIMAEXNU", "GNIVIL", "SETARCOS"],
+                    hints: [
+                        "Not subjected to careful analysis or consideration",
+                        "The state of being alive and active",
+                        "Ancient Greek philosopher and teacher of Plato"
+                    ]
+                },
+                {
+                    text: "The {0} is not afraid of the {1}.",
+                    author: "{2}",
+                    answers: ["wise", "storm", "confucius"],
+                    scrambles: ["ESIW", "MROTS", "SUICUFNOC"],
+                    hints: [
+                        "Having deep understanding and good judgment",
+                        "A violent weather condition with strong winds",
+                        "Ancient Chinese philosopher and teacher"
+                    ]
+                }
+            ];
+
+            // Select today's quote (you could randomize this or use date-based selection)
+            const todayQuote = quotes[Math.floor(Math.random() * quotes.length)];
+
+            // DOM elements
+            const quoteText = document.getElementById('quote-text');
+            const authorText = document.getElementById('quote-author');
+            const checkBtn = document.getElementById('check-btn');
+            const hintBtn = document.getElementById('hint-btn');
+            const messageDiv = document.getElementById('message');
+            const blanksContainer = document.getElementById('blanks-container');
+
+            let currentHintIndex = 0;
+            let solvedCount = 0;
+
+            // Initialize the puzzle
+            function initPuzzle() {
+                // Clear existing inputs
+                blanksContainer.innerHTML = '';
+
+                // Create input rows for each scramble
+                todayQuote.scrambles.forEach((scramble, index) => {
+                    const inputRow = document.createElement('div');
+                    inputRow.className = 'input-row';
+
+                    const label = index < todayQuote.answers.length - 1 ? 'Quote' : 'Author';
+                    const placeholder = index < todayQuote.answers.length - 1 ?
+                        'Type the unscrambled word' : 'Type the author\'s name';
+
+                    inputRow.innerHTML = `
+                        <div class="input-label">${index + 1}</div>
+                        <div class="scramble">${scramble}</div>
+                        <input type="text" id="input${index + 1}" placeholder="${placeholder}">
+                    `;
+
+                    blanksContainer.appendChild(inputRow);
+                });
+
+                // Format the quote with blanks
+                let formattedQuote = todayQuote.text;
+                for (let i = 0; i < todayQuote.answers.length - 1; i++) {
+                    formattedQuote = formattedQuote.replace(`{${i}}`, '<span class="blank">________</span>');
+                }
+
+                quoteText.innerHTML = formattedQuote;
+                authorText.innerHTML = `- <span class="blank">________</span>`;
+
+                // Add event listeners to new inputs
+                addInputEventListeners();
+            }
+
+            // Add event listeners to inputs
+            function addInputEventListeners() {
+                todayQuote.scrambles.forEach((_, index) => {
+                    const input = document.getElementById(`input${index + 1}`);
+                    input.addEventListener('keypress', function (e) {
+                        if (e.key === 'Enter') {
+                            checkAnswers();
+                        }
+                    });
+                });
+            }
+
+            // Check answers
+            function checkAnswers() {
+                const userAnswers = [];
+                let allFilled = true;
+
+                // Track user engagement
+                trackUserEngagement('check_solution_clicked');
+
+                // Get all user inputs
+                for (let i = 0; i < todayQuote.answers.length; i++) {
+                    const input = document.getElementById(`input${i + 1}`);
+                    const answer = input.value.trim().toLowerCase();
+                    userAnswers.push(answer);
+
+                    if (answer === "") {
+                        allFilled = false;
+                    }
+                }
+
+                if (!allFilled) {
+                    messageDiv.className = "message error";
+                    messageDiv.innerHTML = "<p>Please fill in all fields before checking your solution.</p>";
+                    messageDiv.style.display = "block";
+                    trackUserEngagement('incomplete_submission');
+                    return;
+                }
+
+                // Check each answer
+                let correctCount = 0;
+                for (let i = 0; i < todayQuote.answers.length; i++) {
+                    const input = document.getElementById(`input${i + 1}`);
+                    const userAnswer = userAnswers[i];
+                    const correctAnswer = todayQuote.answers[i].toLowerCase();
+
+                    if (userAnswer === correctAnswer) {
+                        input.style.borderColor = "#4CAF50";
+                        input.style.backgroundColor = "#f8f8f8";
+                        correctCount++;
+                    } else {
+                        input.style.borderColor = "#f44336";
+                        input.style.backgroundColor = "#fff8f8";
+                    }
+                }
+
+                const timeSpent = gameStartTime ? Date.now() - gameStartTime : 0;
+                const success = correctCount === todayQuote.answers.length;
+
+                // Track game completion
+                trackGameComplete(success, timeSpent);
+
+                if (success) {
+                    // All correct
+                    messageDiv.className = "message success";
+
+                    // Build the complete quote
+                    let completeQuote = todayQuote.text;
+                    for (let i = 0; i < todayQuote.answers.length - 1; i++) {
+                        completeQuote = completeQuote.replace(`{${i}}`, todayQuote.answers[i]);
+                    }
+
+                    messageDiv.innerHTML = `
+                        <p>🎉 <strong>Excellent!</strong> You've solved today's complete quote puzzle.</p>
+                        <p style="margin-top: 12px;">"${completeQuote}" - ${todayQuote.answers[todayQuote.answers.length - 1]}</p>
+                    `;
+
+                    // Update the display with solved words
+                    let solvedQuote = todayQuote.text;
+                    for (let i = 0; i < todayQuote.answers.length - 1; i++) {
+                        solvedQuote = solvedQuote.replace(`{${i}}`, `<span class="solved">${todayQuote.answers[i]}</span>`);
+                    }
+                    quoteText.innerHTML = solvedQuote;
+                    authorText.innerHTML = `- <span class="solved">${todayQuote.answers[todayQuote.answers.length - 1]}</span>`;
+
+                } else {
+                    // Some incorrect
+                    messageDiv.className = "message error";
+                    messageDiv.innerHTML = `<p>You got ${correctCount} out of ${todayQuote.answers.length} correct. Keep trying or get a hint!</p>`;
+
+                    // Track partial success
+                    trackUserEngagement('partial_solution', {
+                        correct_count: correctCount,
+                        total_count: todayQuote.answers.length
+                    });
+                }
+
+                messageDiv.style.display = "block";
+            }
+
+            // Show hint
+            function showHint() {
+                if (currentHintIndex < todayQuote.hints.length) {
+                    // Track hint usage
+                    trackHintUsed(currentHintIndex + 1);
+
+                    messageDiv.className = "message hint";
+                    messageDiv.innerHTML = `<p>💡 <strong>Hint ${currentHintIndex + 1}:</strong> ${todayQuote.hints[currentHintIndex]}</p>`;
+                    messageDiv.style.display = "block";
+                    currentHintIndex++;
+                } else {
+                    messageDiv.className = "message hint";
+                    messageDiv.innerHTML = "<p>💡 No more hints available. You've got this!</p>";
+                    messageDiv.style.display = "block";
+
+                    // Track when user has exhausted all hints
+                    trackUserEngagement('all_hints_used');
+                }
+            }
+
+            // Calendar functionality
+            let currentCalendarDate = new Date();
+            let completedDates = new Set(); // Store completed puzzle dates
+            
+            // Generate some sample completed dates for demo
+            function generateSampleCompletedDates() {
+                const today = new Date();
+                const sampleDates = [];
+                
+                // Add some random completed dates in the past month
+                for (let i = 1; i < today.getDate(); i++) {
+                    if (Math.random() > 0.3) { // 70% chance of completion
+                        const date = new Date(today.getFullYear(), today.getMonth(), i);
+                        sampleDates.push(date.toDateString());
+                    }
+                }
+                
+                return new Set(sampleDates);
+            }
+            
+            completedDates = generateSampleCompletedDates();
+            
+            function renderCalendar() {
+                const calendarGrid = document.getElementById('calendar-grid');
+                const calendarMonth = document.getElementById('calendar-month');
+                
+                const year = currentCalendarDate.getFullYear();
+                const month = currentCalendarDate.getMonth();
+                
+                // Update month display
+                const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+                    'July', 'August', 'September', 'October', 'November', 'December'];
+                calendarMonth.textContent = `${monthNames[month]} ${year}`;
+                
+                // Clear calendar
+                calendarGrid.innerHTML = '';
+                
+                // Add day headers
+                const dayHeaders = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+                dayHeaders.forEach(day => {
+                    const dayHeader = document.createElement('div');
+                    dayHeader.className = 'calendar-day-header';
+                    dayHeader.textContent = day;
+                    calendarGrid.appendChild(dayHeader);
+                });
+                
+                // Get first day of month and number of days
+                const firstDay = new Date(year, month, 1);
+                const lastDay = new Date(year, month + 1, 0);
+                const daysInMonth = lastDay.getDate();
+                const startingDayOfWeek = firstDay.getDay();
+                
+                const today = new Date();
+                const isCurrentMonth = year === today.getFullYear() && month === today.getMonth();
+                
+                // Add empty cells for days before month starts
+                for (let i = 0; i < startingDayOfWeek; i++) {
+                    const emptyDay = document.createElement('div');
+                    emptyDay.className = 'calendar-day other-month';
+                    calendarGrid.appendChild(emptyDay);
+                }
+                
+                // Add days of the month
+                for (let day = 1; day <= daysInMonth; day++) {
+                    const dayElement = document.createElement('div');
+                    dayElement.className = 'calendar-day';
+                    dayElement.textContent = day;
+                    
+                    const currentDate = new Date(year, month, day);
+                    const dateString = currentDate.toDateString();
+                    
+                    // Check if this is today
+                    if (isCurrentMonth && day === today.getDate()) {
+                        dayElement.classList.add('today');
+                    }
+                    
+                    // Check if this date is completed
+                    if (completedDates.has(dateString)) {
+                        dayElement.classList.add('completed');
+                    }
+                    
+                    // Disable future dates
+                    if (currentDate > today) {
+                        dayElement.classList.add('disabled');
+                    } else {
+                        // Add click handler for past dates
+                        dayElement.addEventListener('click', () => {
+                            if (!dayElement.classList.contains('disabled')) {
+                                loadPastChallenge(currentDate);
+                            }
+                        });
+                    }
+                    
+                    calendarGrid.appendChild(dayElement);
+                }
+            }
+            
+            function loadPastChallenge(date) {
+                // Track calendar interaction
+                trackUserEngagement('past_challenge_selected', {
+                    selected_date: date.toDateString()
+                });
+                
+                // Use date to seed random selection for consistent daily puzzles
+                const dateString = date.toDateString();
+                const dateHash = dateString.split('').reduce((a, b) => {
+                    a = ((a << 5) - a) + b.charCodeAt(0);
+                    return a & a;
+                }, 0);
+                
+                const quoteIndex = Math.abs(dateHash) % quotes.length;
+                const selectedQuote = quotes[quoteIndex];
+                
+                // Update the current puzzle
+                Object.assign(todayQuote, selectedQuote);
+                
+                // Update date display
+                const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                document.getElementById('current-date').textContent = date.toLocaleDateString('en-US', options);
+                
+                // Reset game state
+                currentHintIndex = 0;
+                hintsUsed = 0;
+                gameStartTime = Date.now();
+                
+                // Reinitialize puzzle
+                initPuzzle();
+                
+                // Clear message
+                messageDiv.style.display = 'none';
+                
+                // Show success message for past challenges
+                if (completedDates.has(dateString)) {
+                    setTimeout(() => {
+                        messageDiv.className = "message success";
+                        messageDiv.innerHTML = `<p>📅 <strong>Past Challenge:</strong> You completed this puzzle on ${date.toLocaleDateString()}!</p>`;
+                        messageDiv.style.display = "block";
+                    }, 100);
+                }
+            }
+            
+            // Calendar navigation
+            document.getElementById('prev-month').addEventListener('click', () => {
+                currentCalendarDate.setMonth(currentCalendarDate.getMonth() - 1);
+                renderCalendar();
+                trackUserEngagement('calendar_navigation', { direction: 'previous' });
+            });
+            
+            document.getElementById('next-month').addEventListener('click', () => {
+                const today = new Date();
+                const nextMonth = new Date(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth() + 1);
+                
+                // Don't allow navigation beyond current month
+                if (nextMonth <= today) {
+                    currentCalendarDate.setMonth(currentCalendarDate.getMonth() + 1);
+                    renderCalendar();
+                    trackUserEngagement('calendar_navigation', { direction: 'next' });
+                }
+            });
+
+            // Event listeners
+            checkBtn.addEventListener('click', checkAnswers);
+            hintBtn.addEventListener('click', showHint);
+
+            // Initialize the puzzle and calendar
+            initPuzzle();
+            renderCalendar();
+        });
+    </script>
+</body>
+
+</html>

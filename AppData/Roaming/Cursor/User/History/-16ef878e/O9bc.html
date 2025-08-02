@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Word Weaver Chronicles - Past Chronicles</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Special+Elite&display=swap">
+    <style>
+        :root {
+            --paper-color: #f9f3e9;
+            --ink-color: #1a1a1a;
+            --accent-color: #8b0000;
+            --border-color: #d4c5a3;
+            --tab-bg: #e0d4bb;
+            --active-tab-bg: #d4c5a3;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Special Elite', cursive;
+            background: #e6d9c1 url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="%23e6d9c1"/><path d="M0,0 L100,100 M100,0 L0,100" stroke="%23d4c5a3" stroke-width="0.5" opacity="0.3"/></svg>');
+            color: var(--ink-color);
+            line-height: 1.4;
+            padding: 10px;
+            min-height: 100vh;
+            letter-spacing: 0.5px;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .newspaper-container {
+            width: 100%;
+            max-width: 900px;
+            height: 95vh;
+            max-height: 800px;
+            margin: 0 auto;
+            background-color: var(--paper-color);
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+            border: 2px solid var(--border-color);
+            position: relative;
+            overflow: hidden;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .date-stamp {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: var(--accent-color);
+            color: white;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 0.8rem;
+            font-weight: normal;
+        }
+        
+        .game-area {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            overflow: hidden;
+        }
+        
+
+        
+        .content-container {
+            flex-grow: 1;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            border: 1px dashed var(--border-color);
+            background: rgba(255, 255, 255, 0.7);
+            position: relative;
+            padding: 20px;
+        }
+        
+        .archive-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .archive-title {
+            font-size: 2rem;
+            color: var(--accent-color);
+            margin-bottom: 10px;
+            font-weight: normal;
+            letter-spacing: 2px;
+        }
+        
+        .archive-subtitle {
+            font-style: italic;
+            color: #666;
+            font-size: 1rem;
+        }
+        
+        .archive-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            overflow-y: auto;
+            padding: 10px;
+        }
+        
+        .archive-card {
+            background: white;
+            border: 2px solid var(--border-color);
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+            height: 150px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .archive-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+            border-color: var(--accent-color);
+        }
+        
+        .archive-card h3 {
+            font-size: 1.2rem;
+            color: var(--accent-color);
+            margin-bottom: 8px;
+            font-weight: normal;
+            text-align: center;
+        }
+        
+        .archive-date {
+            font-size: 0.8rem;
+            color: #777;
+            font-weight: normal;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        
+        .archive-description {
+            font-size: 0.9rem;
+            color: #555;
+            text-align: center;
+            line-height: 1.3;
+            flex-grow: 1;
+        }
+        
+        .archive-tag {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: var(--accent-color);
+            color: white;
+            padding: 3px 8px;
+            font-size: 0.7rem;
+            font-weight: normal;
+            border-radius: 12px;
+        }
+        
+        .active-challenge {
+            box-shadow: 0 0 0 3px var(--accent-color);
+            border-color: var(--accent-color);
+            background: rgba(139, 0, 0, 0.05);
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: auto;
+            padding-top: 10px;
+            border-top: 1px solid var(--border-color);
+            font-size: 0.8rem;
+            color: #777;
+            font-weight: normal;
+            flex-shrink: 0;
+        }
+        
+        .ink-splotch {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            background: radial-gradient(circle, rgba(139,0,0,0.1) 0%, rgba(139,0,0,0) 70%);
+            z-index: 1;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="newspaper-container">
+        <div class="date-stamp" id="currentDate">August 1, 2025</div>
+        
+        <div class="game-area">
+            
+            <div class="content-container">
+                <div class="archive-header">
+                    <h1 class="archive-title">Past Chronicles Archive</h1>
+                    <p class="archive-subtitle">Click on any story below to play it</p>
+                </div>
+                
+                <div class="archive-grid" id="archiveGrid">
+                    <!-- Archive items will be generated here -->
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>Word Weaver Chronicles • Est. 2023 • All stories are your own creations</p>
+        </div>
+    </div>
+
+    <script>
+        // Story database
+        const stories = [
+            {
+                id: 1,
+                title: "The Mysterious Quest",
+                date: "August 1, 2025",
+                description: "A brave adventurer embarks on a quest to find a legendary treasure in an enchanted forest.",
+                lines: [
+                    { text: "In the heart of the", inputs: [{type: "adjective"}] },
+                    { text: "forest, a brave", inputs: [{type: "noun"}] },
+                    { text: "named", inputs: [{type: "person's name"}] },
+                    { text: "embarked on a quest to find the legendary", inputs: [
+                        {type: "adjective"}, 
+                        {type: "object"}
+                    ]},
+                    { text: "Along the way, they encountered a", inputs: [
+                        {type: "adjective"}, 
+                        {type: "animal"}
+                    ]},
+                    { text: "who spoke in", inputs: [
+                        {type: "adverb"}, 
+                        {type: "plural noun"}
+                    ]},
+                    { text: "\"To find what you seek,\" the creature", inputs: [{type: "verb, past tense"}] },
+                    { text: "\"you must solve the riddle of the", inputs: [
+                        {type: "adjective"}, 
+                        {type: "object"}
+                    ]},
+                    { text: "After", inputs: [{type: "verb ending in -ing"}] },
+                    { text: "for what felt like", inputs: [{type: "number"}] },
+                    { text: "days,", inputs: [{type: "person's name"}] },
+                    { text: "finally discovered the", inputs: [{type: "object"}] },
+                    { text: "hidden beneath a", inputs: [
+                        {type: "adjective"}, 
+                        {type: "plant"}
+                    ]},
+                    { text: "They returned to their village as a", inputs: [{type: "adjective"}] },
+                    { text: "hero, forever changed by their", inputs: [{type: "adjective"}] },
+                    { text: "adventure." }
+                ]
+            },
+            {
+                id: 2,
+                title: "Space Adventure",
+                date: "July 28, 2025",
+                description: "Captain and crew explore the galaxy, encountering alien worlds and mysterious space phenomena.",
+                lines: [
+                    { text: "Captain", inputs: [{type: "person's name"}] },
+                    { text: "and the crew of the starship", inputs: [{type: "cool ship name"}] },
+                    { text: "were on a", inputs: [{type: "adjective"}] },
+                    { text: "mission to explore the", inputs: [
+                        {type: "adjective"}, 
+                        {type: "planet name"}
+                    ]},
+                    { text: "Suddenly, their sensors detected a", inputs: [
+                        {type: "adjective"}, 
+                        {type: "space object"}
+                    ]},
+                    { text: "approaching at", inputs: [{type: "adverb"}] },
+                    { text: "speed. \"Brace for impact!\" shouted the captain as the ship", inputs: [{type: "verb, past tense"}] },
+                    { text: "violently. They found themselves on a", inputs: [
+                        {type: "adjective"}, 
+                        {type: "planet type"}
+                    ]},
+                    { text: "where the inhabitants spoke in", inputs: [
+                        {type: "adjective"}, 
+                        {type: "plural noun"}
+                    ]},
+                    { text: "The alien leader", inputs: [{type: "verb, past tense"}] },
+                    { text: "to them, \"We have been expecting you. We need your help to fix our", inputs: [
+                        {type: "adjective"}, 
+                        {type: "device"}
+                    ]},
+                    { text: "After", inputs: [{type: "verb ending in -ing"}] },
+                    { text: "for", inputs: [{type: "number"}] },
+                    { text: "hours, they managed to repair the device and were hailed as", inputs: [{type: "adjective"}] },
+                    { text: "heroes across the", inputs: [{type: "adjective"}] },
+                    { text: "galaxy." }
+                ]
+            },
+            {
+                id: 3,
+                title: "Pirate's Tale",
+                date: "July 25, 2025",
+                description: "A fearsome pirate captain searches for treasure and battles rival ships on the high seas.",
+                lines: [
+                    { text: "The pirate captain", inputs: [{type: "pirate name"}] },
+                    { text: "was known as the most", inputs: [{type: "adjective"}] },
+                    { text: "buccaneer on the", inputs: [{type: "adjective"}] },
+                    { text: "seas. One day, while searching for the fabled", inputs: [
+                        {type: "adjective"}, 
+                        {type: "treasure item"}
+                    ]},
+                    { text: "the crew spotted a", inputs: [{type: "adjective"}] },
+                    { text: "ship on the horizon. \"Avast, ye", inputs: [{type: "insulting plural noun"}] },
+                    { text: "!\" cried the captain. The ships", inputs: [{type: "verb, past tense"}] },
+                    { text: "toward each other and soon they were", inputs: [{type: "verb ending in -ing"}] },
+                    { text: "in a fierce battle. After", inputs: [{type: "verb ending in -ing"}] },
+                    { text: "for", inputs: [{type: "number"}] },
+                    { text: "hours, they captured the enemy vessel and discovered a", inputs: [
+                        {type: "adjective"}, 
+                        {type: "treasure item"}
+                    ]},
+                    { text: "in the hold. The captain", inputs: [{type: "verb, past tense"}] },
+                    { text: "with glee as they sailed back to", inputs: [{type: "island name"}] },
+                    { text: "as", inputs: [{type: "adjective"}] },
+                    { text: "conquerors, their", inputs: [{type: "adjective"}] },
+                    { text: "adventure coming to a", inputs: [{type: "adjective"}] },
+                    { text: "end." }
+                ]
+            },
+            {
+                id: 4,
+                title: "Wizard's Duel",
+                date: "July 22, 2025",
+                description: "Two powerful mages face off in an epic battle of spells and magical creatures.",
+                lines: [
+                    { text: "In the ancient city of", inputs: [{type: "magical place"}] },
+                    { text: "the great wizard", inputs: [{type: "wizard name"}] },
+                    { text: "challenged the", inputs: [{type: "adjective"}] },
+                    { text: "sorcerer", inputs: [{type: "sorcerer name"}] },
+                    { text: "to a duel of", inputs: [{type: "plural noun"}] },
+                    { text: "The crowd gathered in the", inputs: [{type: "adjective"}] },
+                    { text: "arena as the two mages", inputs: [{type: "verb, past tense"}] },
+                    { text: "their staffs. First, the wizard conjured a", inputs: [
+                        {type: "adjective"}, 
+                        {type: "magical creature"}
+                    ]},
+                    { text: "made of pure", inputs: [{type: "element"}] },
+                    { text: "The sorcerer responded by casting a spell of", inputs: [{type: "adjective"}] },
+                    { text: "that turned the creature into a", inputs: [{type: "animal"}] },
+                    { text: "For", inputs: [{type: "number"}] },
+                    { text: "hours they battled, until finally the wizard", inputs: [{type: "verb, past tense"}] },
+                    { text: "the ultimate spell - the", inputs: [
+                        {type: "adjective"}, 
+                        {type: "spell name"}
+                    ]},
+                    { text: "With a flash of", inputs: [{type: "color"}] },
+                    { text: "light, the sorcerer was transformed into a", inputs: [
+                        {type: "adjective"}, 
+                        {type: "small object"}
+                    ]},
+                    { text: "The crowd", inputs: [{type: "verb, past tense"}] },
+                    { text: "in amazement as the wizard", inputs: [{type: "verb, past tense"}] },
+                    { text: "away with his", inputs: [{type: "adjective"}] },
+                    { text: "prize." }
+                ]
+            }
+        ];
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', () => {
+            // Set current date
+            const now = new Date();
+            document.getElementById('currentDate').textContent = 
+                now.toLocaleDateString('en-US', { 
+                    month: 'long', 
+                    day: 'numeric', 
+                    year: 'numeric' 
+                });
+            
+            // Generate archive items
+            generateArchiveItems();
+            
+            // Create ink splotches
+            for (let i = 0; i < 5; i++) {
+                const splotch = document.createElement('div');
+                splotch.className = 'ink-splotch';
+                splotch.style.top = `${Math.random() * 100}%`;
+                splotch.style.left = `${Math.random() * 100}%`;
+                splotch.style.opacity = Math.random() * 0.2 + 0.1;
+                splotch.style.transform = `scale(${Math.random() * 0.8 + 0.5}) rotate(${Math.random() * 360}deg)`;
+                document.querySelector('.newspaper-container').appendChild(splotch);
+            }
+        });
+        
+        // Generate archive items
+        function generateArchiveItems() {
+            const archiveGrid = document.getElementById('archiveGrid');
+            archiveGrid.innerHTML = '';
+            
+            stories.forEach(story => {
+                const card = document.createElement('div');
+                card.className = 'archive-card';
+                card.innerHTML = `
+                    <div class="archive-tag">Challenge</div>
+                    <h3>${story.title}</h3>
+                    <div class="archive-date">${story.date}</div>
+                    <div class="archive-description">${story.description}</div>
+                `;
+                
+                card.addEventListener('click', () => {
+                    // Store selected story in localStorage
+                    localStorage.setItem('selectedStory', JSON.stringify(story));
+                    // Redirect to game page
+                    window.location.href = 'game.html';
+                });
+                
+                archiveGrid.appendChild(card);
+            });
+        }
+    </script>
+</body>
+</html> 

@@ -1,0 +1,1133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MORPHEUS - Word Transformation</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            color: white;
+            min-height: 100vh;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+        }
+        
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            width: 100%;
+            max-width: 600px;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 8px;
+            text-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+            letter-spacing: 2px;
+            background: linear-gradient(to right, #ffd700, #ff8c00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .subtitle {
+            font-size: 1rem;
+            opacity: 0.9;
+            margin-bottom: 15px;
+            line-height: 1.4;
+        }
+        
+        .level-indicator {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin: 8px 0;
+            padding: 6px 15px;
+            background: rgba(255, 215, 0, 0.2);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 215, 0, 0.4);
+        }
+        
+        .game-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 500px;
+            gap: 20px;
+        }
+        
+        .game-info {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 12px;
+            padding: 15px;
+            width: 100%;
+            text-align: center;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 5px 12px rgba(0, 0, 0, 0.3);
+        }
+        
+        .word-pair {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin: 10px 0;
+            flex-wrap: wrap;
+        }
+        
+        .word-box {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            letter-spacing: 2px;
+            min-width: 120px;
+            text-align: center;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+        }
+        
+        .arrow {
+            font-size: 1.8rem;
+            opacity: 0.7;
+        }
+        
+        .grid-container {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 12px;
+            padding: 15px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 5px 12px rgba(0, 0, 0, 0.3);
+        }
+        
+        .attempt-counter {
+            margin-bottom: 15px;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .counter-dots {
+            display: flex;
+            gap: 6px;
+        }
+        
+        .counter-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .counter-dot.active {
+            background: #4CAF50;
+            transform: scale(1.2);
+        }
+        
+        .grid {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 15px;
+            width: 100%;
+            justify-content: center;
+        }
+        
+        .row {
+            display: flex;
+            gap: 6px;
+            justify-content: center;
+        }
+        
+        .cell {
+            width: 45px;
+            height: 45px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            background: rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+        }
+        
+        .row:nth-child(1) .cell {
+            background: rgba(106, 170, 100, 0.3);
+            border-color: rgba(106, 170, 100, 0.5);
+        }
+        
+        .cell.filled {
+            border-color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .cell.valid {
+            background: #2196F3;
+            border-color: #1976D2;
+        }
+        
+        .cell.correct {
+            background: #4CAF50;
+            border-color: #388E3C;
+            animation: blink 0.5s ease 3;
+        }
+        
+        .cell.incorrect {
+            background: #f44336;
+            border-color: #d32f2f;
+            animation: shake 0.5s;
+        }
+        
+        .cell.hint-letter {
+            background: #FFC107;
+            border-color: #FFA000;
+            animation: pulse 1s infinite;
+        }
+        
+        @keyframes blink {
+            0% { opacity: 1; }
+            50% { opacity: 0.3; }
+            100% { opacity: 1; }
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        .keyboard {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            width: 100%;
+        }
+        
+        .keyboard-row {
+            display: flex;
+            justify-content: center;
+            gap: 4px;
+        }
+        
+        .key {
+            height: 40px;
+            min-width: 30px;
+            padding: 0 10px;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.1);
+            font-weight: bold;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.2s;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+            font-size: 0.9rem;
+        }
+        
+        .key:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .key:active {
+            transform: scale(0.95);
+        }
+        
+        .key.enter, .key.delete {
+            min-width: 50px;
+            background: rgba(33, 150, 243, 0.3);
+            font-size: 0.8rem;
+        }
+        
+        .key.hint {
+            background: rgba(255, 193, 7, 0.3);
+        }
+        
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+            width: 100%;
+        }
+        
+        .btn {
+            padding: 10px 18px;
+            border-radius: 6px;
+            border: none;
+            font-size: 0.9rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn.submit {
+            background: linear-gradient(to right, #4CAF50, #2E7D32);
+            color: white;
+        }
+        
+        .btn.reset {
+            background: linear-gradient(to right, #f44336, #c62828);
+            color: white;
+        }
+        
+        .btn.level {
+            background: linear-gradient(to right, #2196F3, #1565C0);
+            color: white;
+        }
+        
+        .btn.hint {
+            background: linear-gradient(to right, #FFC107, #FF9800);
+            color: #1a2a6c;
+        }
+        
+        .instructions {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 12px;
+            padding: 15px;
+            width: 100%;
+            margin-top: 15px;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 5px 12px rgba(0, 0, 0, 0.3);
+        }
+        
+        .instructions h2 {
+            margin-bottom: 12px;
+            text-align: center;
+            color: #FFD700;
+            font-size: 1.3rem;
+        }
+        
+        .instructions ul {
+            padding-left: 20px;
+            margin-bottom: 15px;
+        }
+        
+        .instructions li {
+            margin-bottom: 8px;
+            line-height: 1.4;
+            font-size: 0.9rem;
+        }
+        
+        .example {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 12px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+        
+        .win-message {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #FFD700;
+            margin: 15px 0;
+            text-align: center;
+        }
+        
+        .hint-panel {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 12px;
+            margin: 10px 0;
+            text-align: center;
+            font-size: 0.95rem;
+            display: none;
+        }
+        
+        .hint-title {
+            font-weight: bold;
+            color: #FFC107;
+            margin-bottom: 5px;
+        }
+        
+        .hint-text {
+            line-height: 1.4;
+        }
+        
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            20% { transform: translateX(-8px); }
+            40% { transform: translateX(8px); }
+            60% { transform: translateX(-8px); }
+            80% { transform: translateX(8px); }
+            100% { transform: translateX(0); }
+        }
+        
+        /* Mobile-specific styles */
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .word-box {
+                font-size: 1.3rem;
+                min-width: 100px;
+                padding: 8px 12px;
+            }
+            
+            .cell {
+                width: 38px;
+                height: 38px;
+                font-size: 1.3rem;
+            }
+            
+            .key {
+                height: 36px;
+                min-width: 24px;
+                font-size: 0.8rem;
+                padding: 0 6px;
+            }
+            
+            .key.enter, .key.delete {
+                min-width: 40px;
+                font-size: 0.7rem;
+            }
+            
+            .btn {
+                padding: 8px 14px;
+                font-size: 0.85rem;
+            }
+            
+            .controls {
+                gap: 8px;
+            }
+        }
+        
+        @media (max-width: 360px) {
+            .cell {
+                width: 34px;
+                height: 34px;
+                font-size: 1.2rem;
+            }
+            
+            .key {
+                height: 32px;
+                min-width: 22px;
+                font-size: 0.75rem;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>MORPHEUS</h1>
+        <div class="subtitle">Transform words step by step. Change one letter at a time to reach the target!</div>
+    </header>
+    
+    <div class="level-indicator">Level <span id="level-number">1</span> of 10</div>
+    
+    <div class="game-container">
+        <div class="game-info">
+            <div class="word-pair">
+                <div class="word-box" id="start-word">COLD</div>
+                <div class="arrow">➔</div>
+                <div class="word-box" id="target-word">WARM</div>
+            </div>
+            
+            <div class="hint-panel" id="hint-panel">
+                <div class="hint-title">Hint:</div>
+                <div class="hint-text" id="hint-text"></div>
+            </div>
+        </div>
+        
+        <div class="grid-container">
+            <div class="attempt-counter">
+                <span>Steps:</span>
+                <div class="counter-dots" id="counter-dots">
+                    <div class="counter-dot"></div>
+                    <div class="counter-dot"></div>
+                    <div class="counter-dot"></div>
+                    <div class="counter-dot"></div>
+                    <div class="counter-dot"></div>
+                    <div class="counter-dot"></div>
+                </div>
+            </div>
+            
+            <div class="grid" id="game-grid">
+                <!-- Game grid will be generated by JavaScript -->
+            </div>
+            
+            <div class="keyboard" id="keyboard">
+                <!-- Keyboard will be generated by JavaScript -->
+            </div>
+            
+            <div class="controls">
+                <button class="btn submit" id="submit-btn">SUBMIT</button>
+                <button class="btn reset" id="reset-btn">RESET</button>
+                <button class="btn hint" id="letter-hint-btn">HINT: LETTER</button>
+                <button class="btn hint" id="word-hint-btn">HINT: MEANING</button>
+                <button class="btn level" id="level-btn">NEXT</button>
+            </div>
+        </div>
+        
+        <div class="instructions">
+            <h2>How to Play</h2>
+            <ul>
+                <li><strong>Goal:</strong> Transform the start word into the target word</li>
+                <li><strong>Rules:</strong> Change one letter per step to form a valid word</li>
+                <li><strong>Example:</strong> COLD → CORD → CARD → WARD → WARM</li>
+                <li><strong>Hints:</strong> Use hints when stuck - they show which letter to change or the meaning of next word</li>
+            </ul>
+            
+            <div class="example">
+                <div>Level: <span id="level-name">COLD to WARM</span></div>
+                <div>Optimal: <span id="optimal-steps">5</span> steps</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Game levels
+            const levels = [
+                {
+                    level: 1,
+                    start: 'COLD',
+                    target: 'WARM',
+                    optimal: 5,
+                    validWords: ['COLD', 'CORD', 'CARD', 'WARD', 'WARP', 'WARM'],
+                    definitions: {
+                        'COLD': 'Low temperature',
+                        'CORD': 'Thin flexible string or rope',
+                        'CARD': 'Piece of stiff paper with information',
+                        'WARD': 'A separate room in a hospital',
+                        'WARP': 'Become bent or twisted out of shape',
+                        'WARM': 'Having or giving out moderate heat'
+                    }
+                },
+                {
+                    level: 2,
+                    start: 'FISH',
+                    target: 'DUCK',
+                    optimal: 4,
+                    validWords: ['FISH', 'DISH', 'DISK', 'DUSK', 'DUCK'],
+                    definitions: {
+                        'FISH': 'Aquatic animal with gills and fins',
+                        'DISH': 'Shallow container for cooking or serving food',
+                        'DISK': 'Thin, flat, circular object',
+                        'DUSK': 'Darker stage of twilight',
+                        'DUCK': 'Waterbird with a broad bill'
+                    }
+                },
+                {
+                    level: 3,
+                    start: 'MOON',
+                    target: 'STAR',
+                    optimal: 5,
+                    validWords: ['MOON', 'MOAN', 'ROAN', 'ROAR', 'SOAR', 'STAR'],
+                    definitions: {
+                        'MOON': 'Earth\'s natural satellite',
+                        'MOAN': 'Long, low sound of pain or despair',
+                        'ROAN': 'Horse with a coat of mixed colors',
+                        'ROAR': 'Full, deep, prolonged cry of a lion',
+                        'SOAR': 'Fly or rise high in the air',
+                        'STAR': 'Luminous point in the night sky'
+                    }
+                },
+                {
+                    level: 4,
+                    start: 'LOVE',
+                    target: 'HATE',
+                    optimal: 3,
+                    validWords: ['LOVE', 'LAVE', 'LATE', 'HATE'],
+                    definitions: {
+                        'LOVE': 'Strong affection for another',
+                        'LAVE': 'Wash or bathe something',
+                        'LATE': 'Doing something after the expected time',
+                        'HATE': 'Intense or passionate dislike'
+                    }
+                },
+                {
+                    level: 5,
+                    start: 'FIRE',
+                    target: 'SNOW',
+                    optimal: 6,
+                    validWords: ['FIRE', 'SIRE', 'SORE', 'SORT', 'SOOT', 'SNOT', 'SNOW'],
+                    definitions: {
+                        'FIRE': 'Burning with flames and heat',
+                        'SIRE': 'Formal address for a king',
+                        'SORE': 'Painful or aching',
+                        'SORT': 'Category of things sharing characteristics',
+                        'SOOT': 'Black powder in smoke',
+                        'SNOT': 'Mucus from the nose',
+                        'SNOW': 'Atmospheric water vapor frozen into ice crystals'
+                    }
+                },
+                {
+                    level: 6,
+                    start: 'EAST',
+                    target: 'WEST',
+                    optimal: 3,
+                    validWords: ['EAST', 'PAST', 'PEST', 'WEST'],
+                    definitions: {
+                        'EAST': 'Direction where the sun rises',
+                        'PAST': 'Gone by in time',
+                        'PEST': 'Destructive insect or animal',
+                        'WEST': 'Direction where the sun sets'
+                    }
+                },
+                {
+                    level: 7,
+                    start: 'CAKE',
+                    target: 'TART',
+                    optimal: 3,
+                    validWords: ['CAKE', 'CARE', 'TARE', 'TART'],
+                    definitions: {
+                        'CAKE': 'Sweet baked dessert',
+                        'CARE': 'Provide for the needs of someone',
+                        'TARE': 'Empty weight of a container',
+                        'TART': 'Open pastry case with sweet filling'
+                    }
+                },
+                {
+                    level: 8,
+                    start: 'LOST',
+                    target: 'FIND',
+                    optimal: 5,
+                    validWords: ['LOST', 'LEST', 'LENT', 'LEND', 'FEND', 'FIND'],
+                    definitions: {
+                        'LOST': 'Unable to find one\'s way',
+                        'LEST': 'To avoid the risk of',
+                        'LENT': 'Past tense of lend',
+                        'LEND': 'Grant temporary use of something',
+                        'FEND': 'Look after and provide for oneself',
+                        'FIND': 'Discover something by chance'
+                    }
+                },
+                {
+                    level: 9,
+                    start: 'DARK',
+                    target: 'DAWN',
+                    optimal: 3,
+                    validWords: ['DARK', 'DARE', 'DARN', 'DAWN'],
+                    definitions: {
+                        'DARK': 'Absence of light',
+                        'DARE': 'Have the courage to do something',
+                        'DARN': 'Mend a hole in knitted material',
+                        'DAWN': 'First appearance of light in the morning'
+                    }
+                },
+                {
+                    level: 10,
+                    start: 'HATE',
+                    target: 'LOVE',
+                    optimal: 3,
+                    validWords: ['HATE', 'LATE', 'LAVE', 'LOVE'],
+                    definitions: {
+                        'HATE': 'Intense or passionate dislike',
+                        'LATE': 'Doing something after the expected time',
+                        'LAVE': 'Wash or bathe something',
+                        'LOVE': 'Strong affection for another'
+                    }
+                }
+            ];
+            
+            // Game state
+            let currentLevel = 0;
+            let gameState = {
+                currentAttempt: 1,
+                currentRow: 1,
+                currentCell: 0,
+                gameWon: false,
+                gameOver: false,
+                grid: []
+            };
+            
+            // DOM elements
+            const gameGrid = document.getElementById('game-grid');
+            const keyboardContainer = document.getElementById('keyboard');
+            const submitBtn = document.getElementById('submit-btn');
+            const resetBtn = document.getElementById('reset-btn');
+            const levelBtn = document.getElementById('level-btn');
+            const startWord = document.getElementById('start-word');
+            const targetWord = document.getElementById('target-word');
+            const levelNumber = document.getElementById('level-number');
+            const levelName = document.getElementById('level-name');
+            const optimalSteps = document.getElementById('optimal-steps');
+            const counterDotsContainer = document.getElementById('counter-dots');
+            const hintPanel = document.getElementById('hint-panel');
+            const hintText = document.getElementById('hint-text');
+            const letterHintBtn = document.getElementById('letter-hint-btn');
+            const wordHintBtn = document.getElementById('word-hint-btn');
+            
+            // Initialize the game
+            function initGame() {
+                loadLevel(currentLevel);
+            }
+            
+            // Load level data
+            function loadLevel(levelIndex) {
+                currentLevel = levelIndex;
+                const level = levels[levelIndex];
+                gameState = {
+                    currentAttempt: 1,
+                    currentRow: 1,
+                    currentCell: 0,
+                    gameWon: false,
+                    gameOver: false,
+                    grid: Array(level.optimal + 2).fill().map(() => Array(level.start.length).fill(''))
+                };
+                
+                // Set start word in grid
+                for (let i = 0; i < level.start.length; i++) {
+                    gameState.grid[0][i] = level.start[i];
+                }
+                
+                // Update UI
+                startWord.textContent = level.start;
+                targetWord.textContent = level.target;
+                levelNumber.textContent = levelIndex + 1;
+                levelName.textContent = `${level.start} to ${level.target}`;
+                optimalSteps.textContent = level.optimal;
+                
+                // Reset buttons
+                levelBtn.style.display = 'none';
+                levelBtn.textContent = 'NEXT LEVEL';
+                hintPanel.style.display = 'none';
+                
+                // Reset controls
+                const controls = document.querySelector('.controls');
+                controls.innerHTML = '';
+                controls.appendChild(submitBtn);
+                controls.appendChild(resetBtn);
+                controls.appendChild(letterHintBtn);
+                controls.appendChild(wordHintBtn);
+                controls.appendChild(levelBtn);
+                
+                // Recreate grid and keyboard
+                createGrid();
+                createKeyboard();
+                updateCounter();
+                renderGrid();
+            }
+            
+            // Create counter dots
+            function createCounterDots() {
+                counterDotsContainer.innerHTML = '';
+                for (let i = 0; i < levels[currentLevel].optimal + 2; i++) {
+                    const dot = document.createElement('div');
+                    dot.className = 'counter-dot';
+                    counterDotsContainer.appendChild(dot);
+                }
+                updateCounter();
+            }
+            
+            // Create game grid
+            function createGrid() {
+                gameGrid.innerHTML = '';
+                const wordLength = levels[currentLevel].start.length;
+                const maxRows = levels[currentLevel].optimal + 2;
+                
+                for (let row = 0; row < maxRows; row++) {
+                    const rowEl = document.createElement('div');
+                    rowEl.className = 'row';
+                    
+                    for (let col = 0; col < wordLength; col++) {
+                        const cell = document.createElement('div');
+                        cell.className = 'cell';
+                        cell.dataset.row = row;
+                        cell.dataset.col = col;
+                        
+                        if (row === 0) {
+                            cell.textContent = levels[currentLevel].start[col];
+                            cell.classList.add('filled');
+                        }
+                        
+                        rowEl.appendChild(cell);
+                    }
+                    
+                    gameGrid.appendChild(rowEl);
+                }
+            }
+            
+            // Create virtual keyboard
+            function createKeyboard() {
+                const keyboardRows = [
+                    ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'],
+                    ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L'],
+                    ['Z', 'X', 'C', 'V', 'B', 'N', 'M', 'DELETE', 'ENTER']
+                ];
+                
+                keyboardContainer.innerHTML = '';
+                
+                keyboardRows.forEach(row => {
+                    const rowEl = document.createElement('div');
+                    rowEl.className = 'keyboard-row';
+                    
+                    row.forEach(key => {
+                        const keyEl = document.createElement('div');
+                        keyEl.className = 'key';
+                        keyEl.textContent = key;
+                        
+                        if (key === 'ENTER' || key === 'DELETE') {
+                            keyEl.classList.add(key.toLowerCase());
+                        }
+                        
+                        keyEl.addEventListener('click', () => handleKeyPress(key));
+                        rowEl.appendChild(keyEl);
+                    });
+                    
+                    keyboardContainer.appendChild(rowEl);
+                });
+            }
+            
+            // Handle keyboard input
+            function handleKeyPress(key) {
+                if (gameState.gameWon || gameState.gameOver) return;
+                
+                if (key === 'DELETE') {
+                    deleteLetter();
+                } else if (key === 'ENTER') {
+                    submitAttempt();
+                } else if (gameState.currentCell < levels[currentLevel].start.length) {
+                    addLetter(key);
+                }
+            }
+            
+            // Add letter to grid
+            function addLetter(letter) {
+                const row = gameState.currentRow;
+                const col = gameState.currentCell;
+                
+                gameState.grid[row][col] = letter;
+                gameState.currentCell++;
+                
+                renderGrid();
+            }
+            
+            // Delete last letter
+            function deleteLetter() {
+                if (gameState.currentCell > 0) {
+                    gameState.currentCell--;
+                    gameState.grid[gameState.currentRow][gameState.currentCell] = '';
+                    
+                    renderGrid();
+                }
+            }
+            
+            // Submit current attempt
+            function submitAttempt() {
+                if (gameState.currentCell !== levels[currentLevel].start.length) {
+                    shakeRow();
+                    return;
+                }
+                
+                const currentWord = gameState.grid[gameState.currentRow].join('');
+                const prevWord = gameState.grid[gameState.currentRow - 1].join('');
+                
+                // Validate the word
+                if (!isValidWord(currentWord)) {
+                    markRowInvalid();
+                    return;
+                }
+                
+                // Mark the word as valid (intermediate step)
+                markRowValid();
+                
+                // Check if we've reached the target
+                if (currentWord === levels[currentLevel].target) {
+                    gameState.gameWon = true;
+                    
+                    // Add blinking effect to winning row
+                    const rowEls = document.querySelectorAll(`.row:nth-child(${gameState.currentRow + 1}) .cell`);
+                    rowEls.forEach(cell => cell.classList.add('correct', 'blink'));
+                    
+                    // Show win message
+                    setTimeout(() => {
+                        showWinMessage();
+                    }, 1500);
+                    
+                    return;
+                }
+                
+                // Move to next row
+                gameState.currentAttempt++;
+                gameState.currentRow++;
+                gameState.currentCell = 0;
+                updateCounter();
+                
+                // Check if out of attempts
+                if (gameState.currentAttempt > levels[currentLevel].optimal + 1) {
+                    gameState.gameOver = true;
+                    showGameOver();
+                }
+            }
+            
+            // Validate word
+            function isValidWord(word) {
+                const level = levels[currentLevel];
+                
+                // Check word is in our valid words list
+                if (!level.validWords.includes(word)) return false;
+                
+                // Check exactly one letter changed from previous word
+                const prevWord = gameState.grid[gameState.currentRow - 1].join('');
+                let diffCount = 0;
+                
+                for (let i = 0; i < word.length; i++) {
+                    if (word[i] !== prevWord[i]) diffCount++;
+                }
+                
+                return diffCount === 1;
+            }
+            
+            // Mark row as invalid
+            function markRowInvalid() {
+                const rowEls = document.querySelectorAll(`.row:nth-child(${gameState.currentRow + 1}) .cell`);
+                
+                rowEls.forEach(cell => {
+                    cell.classList.add('incorrect');
+                    setTimeout(() => {
+                        cell.classList.remove('incorrect');
+                    }, 1000);
+                });
+                
+                shakeRow();
+            }
+            
+            // Mark row as valid (intermediate step)
+            function markRowValid() {
+                const rowEls = document.querySelectorAll(`.row:nth-child(${gameState.currentRow + 1}) .cell`);
+                rowEls.forEach(cell => cell.classList.add('valid'));
+            }
+            
+            // Shake row animation
+            function shakeRow() {
+                const rowEl = document.querySelector(`.row:nth-child(${gameState.currentRow + 1})`);
+                rowEl.style.animation = 'shake 0.5s';
+                
+                setTimeout(() => {
+                    rowEl.style.animation = '';
+                }, 500);
+            }
+            
+            // Update attempt counter
+            function updateCounter() {
+                const dots = document.querySelectorAll('.counter-dot');
+                dots.forEach((dot, index) => {
+                    if (index < gameState.currentAttempt) {
+                        dot.classList.add('active');
+                    } else {
+                        dot.classList.remove('active');
+                    }
+                });
+            }
+            
+            // Show win message
+            function showWinMessage() {
+                const message = document.createElement('div');
+                message.className = 'win-message';
+                message.textContent = `Level Complete! Solved in ${gameState.currentAttempt} steps!`;
+                
+                // Show next level button
+                levelBtn.style.display = 'block';
+                
+                const container = document.querySelector('.controls');
+                container.innerHTML = '';
+                container.appendChild(message);
+                container.appendChild(levelBtn);
+            }
+            
+            // Show game over message
+            function showGameOver() {
+                const message = document.createElement('div');
+                message.className = 'win-message';
+                message.textContent = `Game Over! Solution: ${levels[currentLevel].start} → ${getSolutionPath().join(' → ')}`;
+                
+                const container = document.querySelector('.controls');
+                container.innerHTML = '';
+                container.appendChild(message);
+                container.appendChild(resetBtn);
+                container.appendChild(levelBtn);
+                levelBtn.textContent = 'TRY AGAIN';
+                levelBtn.style.display = 'block';
+            }
+            
+            // Get solution path for current level
+            function getSolutionPath() {
+                switch (currentLevel) {
+                    case 0: return ['COLD', 'CORD', 'CARD', 'WARD', 'WARP', 'WARM'];
+                    case 1: return ['FISH', 'DISH', 'DISK', 'DUSK', 'DUCK'];
+                    case 2: return ['MOON', 'MOAN', 'ROAN', 'ROAR', 'SOAR', 'STAR'];
+                    case 3: return ['LOVE', 'LAVE', 'LATE', 'HATE'];
+                    case 4: return ['FIRE', 'SIRE', 'SORE', 'SORT', 'SOOT', 'SNOT', 'SNOW'];
+                    case 5: return ['EAST', 'PAST', 'PEST', 'WEST'];
+                    case 6: return ['CAKE', 'CARE', 'TARE', 'TART'];
+                    case 7: return ['LOST', 'LEST', 'LENT', 'LEND', 'FEND', 'FIND'];
+                    case 8: return ['DARK', 'DARE', 'DARN', 'DAWN'];
+                    case 9: return ['HATE', 'LATE', 'LAVE', 'LOVE'];
+                    default: return [levels[currentLevel].start, levels[currentLevel].target];
+                }
+            }
+            
+            // Show letter hint
+            function showLetterHint() {
+                const solution = getSolutionPath();
+                const currentWord = solution[gameState.currentRow - 1];
+                const nextWord = solution[gameState.currentRow];
+                
+                if (!nextWord) return;
+                
+                // Find which letter needs to be changed
+                let changeIndex = -1;
+                for (let i = 0; i < currentWord.length; i++) {
+                    if (currentWord[i] !== nextWord[i]) {
+                        changeIndex = i;
+                        break;
+                    }
+                }
+                
+                if (changeIndex === -1) return;
+                
+                // Highlight the letter that needs to be changed
+                const rowEls = document.querySelectorAll(`.row:nth-child(${gameState.currentRow + 1}) .cell`);
+                if (rowEls[changeIndex]) {
+                    rowEls[changeIndex].classList.add('hint-letter');
+                    
+                    // Remove highlight after a delay
+                    setTimeout(() => {
+                        rowEls[changeIndex].classList.remove('hint-letter');
+                    }, 2000);
+                }
+                
+                // Show hint message
+                hintText.textContent = `Change the ${changeIndex + 1}${getOrdinalSuffix(changeIndex + 1)} letter`;
+                hintPanel.style.display = 'block';
+                
+                // Auto-hide after 3 seconds
+                setTimeout(() => {
+                    hintPanel.style.display = 'none';
+                }, 3000);
+            }
+            
+            // Helper function for ordinal numbers
+            function getOrdinalSuffix(number) {
+                if (number > 3 && number < 21) return 'th';
+                switch (number % 10) {
+                    case 1: return 'st';
+                    case 2: return 'nd';
+                    case 3: return 'rd';
+                    default: return 'th';
+                }
+            }
+            
+            // Show word meaning hint
+            function showWordMeaningHint() {
+                const solution = getSolutionPath();
+                const nextWord = solution[gameState.currentRow];
+                
+                if (!nextWord) return;
+                
+                const level = levels[currentLevel];
+                const definition = level.definitions[nextWord] || 'No definition available';
+                
+                hintText.textContent = `Next word: ${definition}`;
+                hintPanel.style.display = 'block';
+                
+                // Auto-hide after 4 seconds
+                setTimeout(() => {
+                    hintPanel.style.display = 'none';
+                }, 4000);
+            }
+            
+            // Render grid based on game state
+            function renderGrid() {
+                const cells = document.querySelectorAll('.cell');
+                
+                cells.forEach(cell => {
+                    const row = parseInt(cell.dataset.row);
+                    const col = parseInt(cell.dataset.col);
+                    
+                    // Set cell content
+                    cell.textContent = gameState.grid[row][col] || '';
+                    
+                    // Reset classes
+                    cell.className = 'cell';
+                    
+                    // Add filled class if not empty
+                    if (gameState.grid[row][col] && row > 0) {
+                        cell.classList.add('filled');
+                    }
+                    
+                    // First row styling
+                    if (row === 0) {
+                        cell.classList.add('filled');
+                    }
+                });
+            }
+            
+            // Event listeners
+            submitBtn.addEventListener('click', submitAttempt);
+            resetBtn.addEventListener('click', () => loadLevel(currentLevel));
+            levelBtn.addEventListener('click', () => {
+                if (currentLevel < levels.length - 1) {
+                    loadLevel(currentLevel + 1);
+                } else {
+                    loadLevel(0);
+                }
+            });
+            
+            // Hint event listeners
+            letterHintBtn.addEventListener('click', showLetterHint);
+            wordHintBtn.addEventListener('click', showWordMeaningHint);
+            
+            // Keyboard event listener
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    submitAttempt();
+                } else if (e.key === 'Backspace') {
+                    deleteLetter();
+                } else if (e.key.length === 1 && e.key.match(/[a-z]/i)) {
+                    handleKeyPress(e.key.toUpperCase());
+                }
+            });
+            
+            // Initialize the game
+            initGame();
+        });
+    </script>
+</body>
+</html>

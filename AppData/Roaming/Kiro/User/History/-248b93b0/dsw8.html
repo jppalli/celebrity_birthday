@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Quote Puzzle</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Times New Roman', Times, serif;
+        }
+        
+        body {
+            background: #f0f0f0;
+            color: #222;
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+            background-image: linear-gradient(#f9f9f9 1px, transparent 1px),
+                              linear-gradient(90deg, #f9f9f9 1px, transparent 1px);
+            background-size: 20px 20px;
+            background-color: #fafafa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .newspaper-container {
+            max-width: 800px;
+            width: 100%;
+            background: white;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            border-top: 4px solid #333;
+            position: relative;
+            padding: 30px 40px;
+        }
+        
+        .header {
+            position: relative;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #222;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+        
+        .newspaper-title {
+            font-size: 42px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            margin-bottom: 15px;
+            font-family: 'Playfair Display', serif;
+            color: #222;
+        }
+        
+        .date-line {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .help-tooltip {
+            position: absolute;
+            top: 5px;
+            right: 0;
+            background: #222;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        
+        .help-tooltip:hover {
+            background: #444;
+            transform: scale(1.1);
+        }
+        
+        .tooltip-content {
+            position: absolute;
+            top: 40px;
+            right: 0;
+            width: 300px;
+            background: white;
+            border: 1px solid #222;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            display: none;
+            z-index: 100;
+        }
+        
+        .tooltip-content h3 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .tooltip-content ul {
+            list-style-type: none;
+            padding-left: 20px;
+        }
+        
+        .tooltip-content li {
+            margin-bottom: 8px;
+            position: relative;
+            padding-left: 15px;
+            font-size: 14px;
+        }
+        
+        .tooltip-content li:before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: #222;
+        }
+        
+        .congrats {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: #f9f9f9;
+            border: 2px solid #222;
+            text-align: center;
+            display: none;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            font-style: italic;
+        }
+        
+        .congrats.show {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+        
+        .congrats h2 {
+            font-size: 26px;
+            margin-bottom: 12px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+        
+        .congrats p {
+            font-size: 18px;
+            color: #444;
+        }
+        
+        .quote-container {
+            padding: 30px 0;
+            margin-bottom: 30px;
+            position: relative;
+        }
+        
+        .quote-container:before, .quote-container:after {
+            content: """;
+            position: absolute;
+            font-size: 80px;
+            color: #ddd;
+            font-family: Georgia, serif;
+        }
+        
+        .quote-container:before {
+            top: 0;
+            left: -25px;
+        }
+        
+        .quote-container:after {
+            bottom: -10px;
+            right: -25px;
+            transform: rotate(180deg);
+        }
+        
+        .quote-text {
+            font-size: 24px;
+            line-height: 1.8;
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 0 20px;
+            font-weight: 400;
+            letter-spacing: 0.3px;
+            font-style: italic;
+        }
+        
+        .quote-word {
+            margin: 0 2px;
+            padding: 3px 8px;
+            display: inline-block;
+            transition: all 0.2s;
+            border-radius: 2px;
+        }
+        
+        .quote-word.scrambled {
+            background: #f0f0f0;
+            border: 1px solid #ddd;
+            text-decoration: underline;
+            text-decoration-style: wavy;
+            text-decoration-color: #999;
+            text-underline-offset: 3px;
+            cursor: pointer;
+        }
+        
+        .quote-word.scrambled.active {
+            background: #e0e0e0;
+            border: 1px solid #222;
+        }
+        
+        .quote-word.scrambled:hover {
+            background: #e5e5e5;
+        }
+        
+        .author {
+            text-align: center;
+            font-size: 20px;
+            font-weight: 500;
+            font-style: italic;
+            padding-top: 15px;
+        }
+        
+        .author.scrambled {
+            background: #f0f0f0;
+            border: 1px solid #ddd;
+            padding: 5px 15px;
+            display: inline-block;
+            text-decoration: underline;
+            text-decoration-style: wavy;
+            text-decoration-color: #999;
+            text-underline-offset: 3px;
+            cursor: pointer;
+        }
+        
+        .author.scrambled.active {
+            background: #e0e0e0;
+            border: 1px solid #222;
+        }
+        
+        .author.scrambled:hover {
+            background: #e5e5e5;
+        }
+        
+        .input-area {
+            padding: 25px;
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            margin-bottom: 30px;
+            display: none;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .input-area.show {
+            display: block;
+        }
+        
+        .input-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            text-align: center;
+            letter-spacing: 1px;
+        }
+        
+        .letter-cells {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .letter-cell {
+            width: 50px;
+            height: 50px;
+            border: 2px solid #222;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: 600;
+            position: relative;
+        }
+        
+        .letter-cell:after {
+            content: "";
+            position: absolute;
+            bottom: 5px;
+            width: 80%;
+            height: 2px;
+            background: #222;
+        }
+        
+        .available-letters {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+        
+        .letter-btn {
+            width: 50px;
+            height: 50px;
+            border: 1px solid #222;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .letter-btn:not(.used):hover {
+            background: #e0e0e0;
+        }
+        
+        .letter-btn.used {
+            background: #ddd;
+            color: #888;
+            cursor: default;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            background: #fff;
+            border: 1px solid #222;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn:hover {
+            background: #222;
+            color: white;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @media (max-width: 650px) {
+            .newspaper-container {
+                padding: 20px;
+            }
+            
+            .newspaper-title {
+                font-size: 32px;
+            }
+            
+            .quote-text {
+                font-size: 20px;
+                padding: 0 10px;
+            }
+            
+            .tooltip-content {
+                width: 250px;
+                right: -10px;
+            }
+            
+            .letter-btn, .letter-cell {
+                width: 40px;
+                height: 40px;
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="newspaper-container">
+        <div class="header">
+            <div class="newspaper-title">Daily Quote Puzzle</div>
+            <div class="date-line">Thursday, July 24, 2025</div>
+            
+            <div class="help-tooltip" id="helpTooltip">
+                <i class="fas fa-question"></i>
+                <div class="tooltip-content" id="tooltipContent">
+                    <h3>How to Play</h3>
+                    <ul>
+                        <li>Click on any scrambled word to start unscrambling</li>
+                        <li>Click on the available letters below to spell out the correct word</li>
+                        <li>Press BACKSPACE to remove the last letter</li>
+                        <li>You can also type letters on your keyboard</li>
+                        <li>Don't forget to unscramble the author's name!</li>
+                        <li>Complete all words to finish the puzzle</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="congrats" id="congrats">
+            <h2>🎉 Puzzle Complete! 🎉</h2>
+            <p>You've successfully solved today's quote puzzle!</p>
+        </div>
+        
+        <div class="quote-container">
+            <div class="quote-text" id="quoteText"></div>
+            <div class="author" id="quoteAuthor"></div>
+        </div>
+        
+        <div class="input-area" id="inputArea">
+            <div class="input-title" id="inputTitle">Unscramble Word</div>
+            <div class="letter-cells" id="letterCells"></div>
+            <div class="available-letters" id="availableLetters"></div>
+            
+            <div class="controls">
+                <button class="btn" id="resetBtn">
+                    <i class="fas fa-redo"></i> Reset
+                </button>
+                <button class="btn" id="backspaceBtn">
+                    <i class="fas fa-backspace"></i> Backspace
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Game data with corrected quotes
+        const quotes = [
+            {
+                text: "The only way to do great work is to love what you do.",
+                author: "Jobs",
+                scrambledAuthor: "bjos",
+                scrambledWords: [
+                    { original: "great", scrambled: "taerg", index: 5 },
+                    { original: "love", scrambled: "evol", index: 10 }
+                ]
+            },
+            {
+                text: "Life is what happens when you're busy making other plans.",
+                author: "Lennon", 
+                scrambledAuthor: "nonnel",
+                scrambledWords: [
+                    { original: "happens", scrambled: "sneppah", index: 3 },
+                    { original: "making", scrambled: "gnikam", index: 7 }
+                ]
+            },
+            {
+                text: "Be yourself; everyone else is already taken.",
+                author: "Wilde",
+                scrambledAuthor: "edliw",
+                scrambledWords: [
+                    { original: "yourself", scrambled: "flesruoy", index: 1 },
+                    { original: "taken", scrambled: "nekta", index: 6 }
+                ]
+            }
+        ];
+
+        // Game state
+        let currentQuote = quotes[Math.floor(Math.random() * quotes.length)];
+        let activeWord = null;
+        let solvedWords = new Set();
+        let authorSolved = false;
+        let userInput = '';
+        let availableLetters = [];
+        let usedLetters = [];
+        let gameComplete = false;
+
+        // DOM Elements
+        const quoteTextEl = document.getElementById('quoteText');
+        const quoteAuthorEl = document.getElementById('quoteAuthor');
+        const congratsEl = document.getElementById('congrats');
+        const inputAreaEl = document.getElementById('inputArea');
+        const inputTitleEl = document.getElementById('inputTitle');
+        const letterCellsEl = document.getElementById('letterCells');
+        const availableLettersEl = document.getElementById('availableLetters');
+        const resetBtnEl = document.getElementById('resetBtn');
+        const backspaceBtnEl = document.getElementById('backspaceBtn');
+        const helpTooltipEl = document.getElementById('helpTooltip');
+        const tooltipContentEl = document.getElementById('tooltipContent');
+
+        // Initialize game
+        function initGame() {
+            renderQuote();
+            
+            // Add event listeners
+            resetBtnEl.addEventListener('click', resetInput);
+            backspaceBtnEl.addEventListener('click', handleBackspace);
+            window.addEventListener('keydown', handleKeyDown);
+            
+            // Tooltip functionality
+            helpTooltipEl.addEventListener('click', () => {
+                tooltipContentEl.style.display = tooltipContentEl.style.display === 'block' ? 'none' : 'block';
+            });
+            
+            // Close tooltip when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!helpTooltipEl.contains(e.target)) {
+                    tooltipContentEl.style.display = 'none';
+                }
+            });
+            
+            // Activate the first word automatically
+            if (currentQuote.scrambledWords.length > 0) {
+                setTimeout(() => {
+                    handleWordClick(currentQuote.scrambledWords[0]);
+                }, 500);
+            }
+        }
+
+        // Render the quote with scrambled words
+        function renderQuote() {
+            const words = currentQuote.text.split(' ');
+            let html = '';
+            
+            words.forEach((word, index) => {
+                const scrambledWord = currentQuote.scrambledWords.find(sw => sw.index === index);
+                const isSolved = scrambledWord && solvedWords.has(scrambledWord.original);
+                
+                if (scrambledWord && !isSolved) {
+                    const isActive = activeWord && activeWord.original === scrambledWord.original;
+                    html += `<span class="quote-word scrambled ${isActive ? 'active' : ''}" 
+                                data-word-index="${index}">${scrambledWord.scrambled}</span> `;
+                } else {
+                    html += `<span class="quote-word">${isSolved ? scrambledWord.original : word}</span> `;
+                }
+            });
+            
+            quoteTextEl.innerHTML = html;
+            
+            // Add click listeners to scrambled words
+            document.querySelectorAll('.quote-word.scrambled').forEach(el => {
+                el.addEventListener('click', () => handleWordClick(
+                    currentQuote.scrambledWords.find(sw => sw.index === parseInt(el.dataset.wordIndex))
+                ));
+            });
+            
+            // Render author
+            if (authorSolved) {
+                quoteAuthorEl.textContent = `- ${currentQuote.author}`;
+                quoteAuthorEl.className = 'author';
+            } else {
+                const isActive = activeWord && activeWord.isAuthor;
+                quoteAuthorEl.innerHTML = `<span class="author scrambled ${isActive ? 'active' : ''}" 
+                                                id="authorScrambled">${currentQuote.scrambledAuthor}</span>`;
+                document.getElementById('authorScrambled').addEventListener('click', handleAuthorClick);
+            }
+        }
+
+        // Handle word click
+        function handleWordClick(wordData) {
+            if (solvedWords.has(wordData.original)) return;
+            
+            activeWord = wordData;
+            userInput = '';
+            availableLetters = wordData.scrambled.split('');
+            usedLetters = [];
+            
+            renderInputArea();
+            renderQuote();
+        }
+
+        // Handle author click
+        function handleAuthorClick() {
+            if (authorSolved) return;
+            
+            activeWord = { 
+                original: currentQuote.author.toLowerCase(), 
+                scrambled: currentQuote.scrambledAuthor,
+                isAuthor: true 
+            };
+            
+            userInput = '';
+            availableLetters = currentQuote.scrambledAuthor.split('');
+            usedLetters = [];
+            
+            renderInputArea();
+            renderQuote();
+        }
+
+        // Render input area
+        function renderInputArea() {
+            if (!activeWord) {
+                inputAreaEl.classList.remove('show');
+                return;
+            }
+            
+            inputAreaEl.classList.add('show');
+            inputTitleEl.textContent = activeWord.isAuthor 
+                ? 'Unscramble Author' 
+                : 'Unscramble Word';
+            
+            // Render letter cells
+            const targetLength = activeWord.original.length;
+            letterCellsEl.innerHTML = '';
+            
+            for (let i = 0; i < targetLength; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'letter-cell';
+                cell.textContent = userInput[i] || '';
+                letterCellsEl.appendChild(cell);
+            }
+            
+            // Render available letters
+            availableLettersEl.innerHTML = '';
+            
+            availableLetters.forEach((letter, index) => {
+                const btn = document.createElement('div');
+                btn.className = `letter-btn ${usedLetters.includes(index) ? 'used' : ''}`;
+                btn.textContent = letter;
+                btn.dataset.index = index;
+                
+                if (!usedLetters.includes(index)) {
+                    btn.addEventListener('click', () => handleLetterClick(letter, index));
+                }
+                
+                availableLettersEl.appendChild(btn);
+            });
+        }
+
+        // Handle letter click
+        function handleLetterClick(letter, index) {
+            if (usedLetters.includes(index)) return;
+            
+            userInput += letter;
+            usedLetters = [...usedLetters, index];
+            
+            renderInputArea();
+            
+            // Check if word is complete
+            if (userInput.length === activeWord.original.length) {
+                const inputWord = userInput.toLowerCase();
+                const targetWord = activeWord.original.toLowerCase();
+                
+                if (inputWord === targetWord) {
+                    // Correct!
+                    if (activeWord.isAuthor) {
+                        authorSolved = true;
+                    } else {
+                        solvedWords.add(activeWord.original);
+                    }
+                    
+                    // Auto-activate next word
+                    setTimeout(() => {
+                        activateNextWord();
+                    }, 500);
+                } else {
+                    // Wrong - reset after delay
+                    setTimeout(() => {
+                        resetInput();
+                    }, 1000);
+                }
+            }
+        }
+
+        // Activate next unsolved word
+        function activateNextWord() {
+            // Clear current input
+            activeWord = null;
+            userInput = '';
+            availableLetters = [];
+            usedLetters = [];
+            renderInputArea();
+            renderQuote();
+            
+            // Check if game is complete
+            if (solvedWords.size === currentQuote.scrambledWords.length && authorSolved) {
+                gameComplete = true;
+                congratsEl.classList.add('show');
+                return;
+            }
+            
+            // Try to find next unsolved word
+            if (!authorSolved && solvedWords.size === currentQuote.scrambledWords.length) {
+                // Activate author if all words are solved
+                setTimeout(() => {
+                    handleAuthorClick();
+                }, 300);
+            } else {
+                // Find next unsolved word
+                for (const word of currentQuote.scrambledWords) {
+                    if (!solvedWords.has(word.original)) {
+                        setTimeout(() => {
+                            handleWordClick(word);
+                        }, 300);
+                        return;
+                    }
+                }
+            }
+        }
+
+        // Handle keyboard input
+        function handleKeyDown(event) {
+            if (!activeWord || availableLetters.length === 0) return;
+            
+            // Backspace handling
+            if (event.key === 'Backspace') {
+                handleBackspace();
+                return;
+            }
+            
+            // Only process letter keys
+            if (event.key.length !== 1) return;
+            
+            const key = event.key.toLowerCase();
+            const availableIndex = availableLetters.findIndex((letter, index) => 
+                letter.toLowerCase() === key && !usedLetters.includes(index)
+            );
+            
+            if (availableIndex !== -1) {
+                handleLetterClick(availableLetters[availableIndex], availableIndex);
+            }
+        }
+
+        // Handle backspace
+        function handleBackspace() {
+            if (!activeWord || userInput.length === 0) return;
+            
+            // Remove last character from user input
+            userInput = userInput.slice(0, -1);
+            
+            // Remove last index from usedLetters
+            usedLetters = usedLetters.slice(0, -1);
+            
+            renderInputArea();
+        }
+
+        // Reset input
+        function resetInput() {
+            userInput = '';
+            usedLetters = [];
+            renderInputArea();
+        }
+
+        // Initialize the game when page loads
+        window.addEventListener('DOMContentLoaded', initGame);
+    </script>
+</body>
+</html>

@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Object Hunter - Semantic Word Game</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+        }
+        
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            color: white;
+            font-size: 1.2rem;
+        }
+        
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .game-title {
+            font-size: 4rem;
+            font-weight: 800;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradient-shift 3s ease-in-out infinite;
+        }
+        
+        @keyframes gradient-shift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .hover-lift {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .hover-lift:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+        
+        .guess-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            border-left: 5px solid;
+        }
+        
+        .guess-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+        }
+        
+        .perfect { border-left-color: #10b981; }
+        .very-close { border-left-color: #22c55e; }
+        .warm { border-left-color: #eab308; }
+        .similar { border-left-color: #f97316; }
+        .distant { border-left-color: #ef4444; }
+        .different { border-left-color: #6b7280; }
+        
+        @keyframes bounce {
+            0%, 20%, 53%, 80%, 100% { transform: translate3d(0, 0, 0); }
+            40%, 43% { transform: translate3d(0, -30px, 0); }
+            70% { transform: translate3d(0, -15px, 0); }
+            90% { transform: translate3d(0, -4px, 0); }
+        }
+        
+        .animate-bounce {
+            animation: bounce 1s;
+        }
+    </style>
+</head>
+<body>
+    <div id="loading-screen" class="loading-screen">
+        <div class="loading-spinner"></div>
+        <p>Loading Object Hunter...</p>
+    </div>
+    
+    <div id="game-app" style="display: none;"></div>
+
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <script>
+        // Game data embedded directly
+        const WORD_BANK = [
+            'apple', 'chair', 'bicycle', 'lamp', 'book', 'guitar', 'hammer', 'pillow',
+            'telephone', 'camera', 'scissors', 'umbrella', 'clock', 'mirror', 'candle',
+            'keyboard', 'backpack', 'toothbrush', 'wallet', 'headphones', 'pencil',
+            'bottle', 'shoe', 'flower', 'tree', 'rock', 'shell', 'coin', 'knife', 'cup'
+        ];
+
+        const PHYSICAL_ATTRIBUTES = {
+            apple: { size: 15, hardness: 30, weight: 20, temperature: 40, color: '#FF6B6B', material: 'Organic', shape: 'Round', texture: 'Smooth', category: 'Food', location: 'Kitchen', function: 'Eating' },
+            chair: { size: 70, hardness: 85, weight: 60, temperature: 35, color: '#8B4513', material: 'Wood', shape: 'Angular', texture: 'Hard', category: 'Furniture', location: 'Indoor', function: 'Sitting' },
+            bicycle: { size: 85, hardness: 90, weight: 75, temperature: 35, color: '#FF4500', material: 'Metal', shape: 'Complex', texture: 'Hard', category: 'Vehicle', location: 'Outdoor', function: 'Transportation' },
+            lamp: { size: 45, hardness: 75, weight: 40, temperature: 60, color: '#FFD700', material: 'Mixed', shape: 'Tall', texture: 'Smooth', category: 'Electronics', location: 'Indoor', function: 'Lighting' },
+            book: { size: 25, hardness: 40, weight: 30, temperature: 35, color: '#4169E1', material: 'Paper', shape: 'Rectangle', texture: 'Soft', category: 'Media', location: 'Indoor', function: 'Reading' },
+            guitar: { size: 80, hardness: 70, weight: 50, temperature: 35, color: '#D2691E', material: 'Wood', shape: 'Curved', texture: 'Smooth', category: 'Instrument', location: 'Indoor', function: 'Music' },
+            hammer: { size: 35, hardness: 95, weight: 70, temperature: 35, color: '#696969', material: 'Metal', shape: 'Long', texture: 'Hard', category: 'Tool', location: 'Workshop', function: 'Building' },
+            pillow: { size: 50, hardness: 10, weight: 15, temperature: 40, color: '#F0F8FF', material: 'Fabric', shape: 'Square', texture: 'Soft', category: 'Bedding', location: 'Bedroom', function: 'Comfort' },
+            telephone: { size: 30, hardness: 80, weight: 40, temperature: 35, color: '#000000', material: 'Plastic', shape: 'Rectangle', texture: 'Smooth', category: 'Electronics', location: 'Indoor', function: 'Communication' },
+            camera: { size: 40, hardness: 85, weight: 55, temperature: 35, color: '#2F2F2F', material: 'Plastic', shape: 'Rectangle', texture: 'Textured', category: 'Electronics', location: 'Portable', function: 'Photography' },
+            scissors: { size: 20, hardness: 90, weight: 25, temperature: 35, color: '#C0C0C0', material: 'Metal', shape: 'Sharp', texture: 'Hard', category: 'Tool', location: 'Office', function: 'Cutting' },
+            umbrella: { size: 60, hardness: 50, weight: 35, temperature: 35, color: '#4B0082', material: 'Fabric', shape: 'Round', texture: 'Smooth', category: 'Accessory', location: 'Portable', function: 'Protection' },
+            clock: { size: 35, hardness: 80, weight: 45, temperature: 35, color: '#FFFFFF', material: 'Plastic', shape: 'Round', texture: 'Smooth', category: 'Electronics', location: 'Indoor', function: 'Time' },
+            mirror: { size: 55, hardness: 95, weight: 60, temperature: 35, color: '#E6E6FA', material: 'Glass', shape: 'Rectangle', texture: 'Smooth', category: 'Furniture', location: 'Bathroom', function: 'Reflection' },
+            candle: { size: 15, hardness: 40, weight: 20, temperature: 70, color: '#FFFAF0', material: 'Wax', shape: 'Cylinder', texture: 'Smooth', category: 'Decoration', location: 'Indoor', function: 'Lighting' },
+            keyboard: { size: 45, hardness: 75, weight: 50, temperature: 35, color: '#2F2F2F', material: 'Plastic', shape: 'Rectangle', texture: 'Textured', category: 'Electronics', location: 'Office', function: 'Typing' },
+            backpack: { size: 65, hardness: 25, weight: 40, temperature: 35, color: '#006400', material: 'Fabric', shape: 'Bag', texture: 'Textured', category: 'Accessory', location: 'Portable', function: 'Carrying' },
+            toothbrush: { size: 18, hardness: 60, weight: 10, temperature: 35, color: '#00CED1', material: 'Plastic', shape: 'Long', texture: 'Textured', category: 'Hygiene', location: 'Bathroom', function: 'Cleaning' },
+            wallet: { size: 20, hardness: 50, weight: 15, temperature: 35, color: '#8B4513', material: 'Leather', shape: 'Rectangle', texture: 'Smooth', category: 'Accessory', location: 'Portable', function: 'Storage' },
+            headphones: { size: 35, hardness: 70, weight: 30, temperature: 35, color: '#1C1C1C', material: 'Plastic', shape: 'Curved', texture: 'Padded', category: 'Electronics', location: 'Portable', function: 'Audio' },
+            pencil: { size: 12, hardness: 60, weight: 5, temperature: 35, color: '#FFD700', material: 'Wood', shape: 'Cylinder', texture: 'Smooth', category: 'Tool', location: 'Office', function: 'Writing' },
+            bottle: { size: 35, hardness: 90, weight: 45, temperature: 40, color: '#87CEEB', material: 'Glass', shape: 'Cylinder', texture: 'Smooth', category: 'Container', location: 'Kitchen', function: 'Storage' },
+            shoe: { size: 30, hardness: 65, weight: 40, temperature: 35, color: '#8B4513', material: 'Leather', shape: 'Curved', texture: 'Textured', category: 'Clothing', location: 'Closet', function: 'Protection' },
+            flower: { size: 10, hardness: 15, weight: 5, temperature: 40, color: '#FF69B4', material: 'Organic', shape: 'Complex', texture: 'Soft', category: 'Plant', location: 'Garden', function: 'Beauty' },
+            tree: { size: 95, hardness: 85, weight: 90, temperature: 35, color: '#228B22', material: 'Wood', shape: 'Tall', texture: 'Rough', category: 'Plant', location: 'Outdoor', function: 'Oxygen' },
+            rock: { size: 25, hardness: 100, weight: 80, temperature: 30, color: '#696969', material: 'Stone', shape: 'Irregular', texture: 'Rough', category: 'Natural', location: 'Outdoor', function: 'Building' },
+            shell: { size: 8, hardness: 85, weight: 10, temperature: 35, color: '#F5DEB3', material: 'Calcium', shape: 'Curved', texture: 'Smooth', category: 'Natural', location: 'Beach', function: 'Protection' },
+            coin: { size: 3, hardness: 90, weight: 8, temperature: 35, color: '#FFD700', material: 'Metal', shape: 'Round', texture: 'Smooth', category: 'Currency', location: 'Wallet', function: 'Payment' },
+            knife: { size: 25, hardness: 95, weight: 30, temperature: 35, color: '#C0C0C0', material: 'Metal', shape: 'Sharp', texture: 'Hard', category: 'Tool', location: 'Kitchen', function: 'Cutting' },
+            cup: { size: 20, hardness: 85, weight: 25, temperature: 45, color: '#FFFFFF', material: 'Ceramic', shape: 'Cylinder', texture: 'Smooth', category: 'Container', location: 'Kitchen', function: 'Drinking' }
+        };
+
+        const SIMILARITY_LEVELS = {
+            perfect: { min: 100, max: 100, text: '🎯 Perfect!', color: 'emerald' },
+            veryClose: { min: 80, max: 99, text: '🔥 Very Close', color: 'green' },
+            warm: { min: 60, max: 79, text: '♨️ Getting Warm', color: 'yellow' },
+            similar: { min: 40, max: 59, text: '🌡️ Somewhat Similar', color: 'orange' },
+            distant: { min: 20, max: 39, text: '❄️ Distantly Related', color: 'red' },
+            different: { min: 0, max: 19, text: '🧊 Very Different', color: 'gray' }
+        };
+
+        // Game Logic
+        class GameLogic {
+            constructor() {
+                this.targetWord = '';
+                this.guesses = [];
+                this.gameWon = false;
+                this.guessCount = 0;
+            }
+
+            startNewGame() {
+                this.targetWord = WORD_BANK[Math.floor(Math.random() * WORD_BANK.length)];
+                this.guesses = [];
+                this.gameWon = false;
+                this.guessCount = 0;
+                console.log('New game started. Target word:', this.targetWord);
+                return this.targetWord;
+            }
+
+            calculateSimilarity(guessWord, target = this.targetWord) {
+                if (guessWord === target) return 100;
+
+                const targetData = PHYSICAL_ATTRIBUTES[target];
+                const guessData = PHYSICAL_ATTRIBUTES[guessWord];
+
+                if (!targetData) return Math.floor(Math.random() * 20) + 5;
+                if (!guessData) return Math.floor(Math.random() * 15) + 5;
+
+                const sizeDiff = Math.abs(targetData.size - guessData.size);
+                const hardnessDiff = Math.abs(targetData.hardness - guessData.hardness);
+                const weightDiff = Math.abs(targetData.weight - guessData.weight);
+                const temperatureDiff = Math.abs(targetData.temperature - guessData.temperature);
+
+                const physicalSimilarity = 100 - ((sizeDiff + hardnessDiff + weightDiff + temperatureDiff) / 4);
+
+                const categoryBonus = targetData.category === guessData.category ? 25 : 0;
+                const materialBonus = targetData.material === guessData.material ? 15 : 0;
+                const shapeBonus = targetData.shape === guessData.shape ? 10 : 0;
+                const locationBonus = targetData.location === guessData.location ? 10 : 0;
+                const functionBonus = targetData.function === guessData.function ? 15 : 0;
+
+                const totalSimilarity = physicalSimilarity + categoryBonus + materialBonus + 
+                                       shapeBonus + locationBonus + functionBonus;
+
+                return Math.min(95, Math.max(5, Math.round(totalSimilarity)));
+            }
+
+            processGuess(guessWord) {
+                if (!guessWord.trim() || this.gameWon) return null;
+
+                const cleanGuess = guessWord.toLowerCase().trim();
+                
+                if (this.guesses.find(g => g.word === cleanGuess)) {
+                    return { error: 'Already guessed!' };
+                }
+
+                const similarity = this.calculateSimilarity(cleanGuess);
+                const newGuess = {
+                    word: cleanGuess,
+                    similarity,
+                    id: Date.now(),
+                    attributes: PHYSICAL_ATTRIBUTES[cleanGuess] || null,
+                    guessNumber: this.guessCount + 1
+                };
+
+                this.guesses.push(newGuess);
+                this.guesses.sort((a, b) => b.similarity - a.similarity);
+                this.guessCount++;
+
+                if (similarity === 100) {
+                    this.gameWon = true;
+                }
+
+                return newGuess;
+            }
+
+            getSimilarityLevel(similarity) {
+                for (const [key, level] of Object.entries(SIMILARITY_LEVELS)) {
+                    if (similarity >= level.min && similarity <= level.max) {
+                        return { ...level, key };
+                    }
+                }
+                return SIMILARITY_LEVELS.different;
+            }
+
+            getGameState() {
+                return {
+                    targetWord: this.targetWord,
+                    guesses: this.guesses,
+                    gameWon: this.gameWon,
+                    guessCount: this.guessCount
+                };
+            }
+        }
+    </script>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        const GameApp = () => {
+            const [gameLogic] = useState(() => new GameLogic());
+            const [gameState, setGameState] = useState(gameLogic.getGameState());
+            const [guess, setGuess] = useState('');
+            const inputRef = useRef(null);
+
+            useEffect(() => {
+                gameLogic.startNewGame();
+                setGameState(gameLogic.getGameState());
+                
+                setTimeout(() => {
+                    inputRef.current?.focus();
+                }, 100);
+            }, []);
+
+            const handleSubmit = () => {
+                if (!guess.trim() || gameState.gameWon) return;
+
+                const result = gameLogic.processGuess(guess);
+                
+                if (result?.error) {
+                    alert(result.error);
+                    return;
+                }
+
+                if (result) {
+                    setGameState(gameLogic.getGameState());
+                }
+
+                setGuess('');
+                inputRef.current?.focus();
+            };
+
+            const handleKeyPress = (e) => {
+                if (e.key === 'Enter') {
+                    handleSubmit();
+                }
+            };
+
+            const startNewGame = () => {
+                gameLogic.startNewGame();
+                setGameState(gameLogic.getGameState());
+                setGuess('');
+                inputRef.current?.focus();
+            };
+
+            const getSimilarityText = (similarity) => {
+                return gameLogic.getSimilarityLevel(similarity).text;
+            };
+
+            const getSimilarityClass = (similarity) => {
+                const level = gameLogic.getSimilarityLevel(similarity);
+                return level.key.replace(/([A-Z])/g, '-$1').toLowerCase();
+            };
+
+            return (
+                <div className="min-h-screen bg-gradient-to-br from-purple-100 via-blue-50 to-indigo-100">
+                    <div className="max-w-6xl mx-auto p-6">
+                        {/* Header */}
+                        <div className="text-center mb-8 glass-effect p-6 rounded-2xl">
+                            <h1 className="game-title mb-4">Object Hunter</h1>
+                            <p className="text-gray-600 mb-6 text-lg">
+                                🔍 Find the hidden physical object by guessing similar things
+                            </p>
+                            
+                            <div className="flex justify-center gap-4 text-sm flex-wrap">
+                                <div className="glass-effect px-4 py-2 rounded-full">
+                                    <span className="font-semibold">Guesses:</span> {gameState.guessCount}
+                                </div>
+                                
+                                <button 
+                                    onClick={startNewGame}
+                                    className="px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-full hover:from-blue-600 hover:to-purple-700 shadow-lg hover-lift"
+                                >
+                                    🎲 New Object
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Win Message */}
+                        {gameState.gameWon && (
+                            <div className="bg-gradient-to-r from-green-400 to-emerald-500 text-white px-6 py-4 rounded-2xl mb-6 text-center shadow-lg animate-bounce">
+                                <div className="text-2xl mb-2">🎉 Found it!</div>
+                                <div>The object was "{gameState.targetWord}" - discovered in {gameState.guessCount} guesses!</div>
+                            </div>
+                        )}
+
+                        {/* Input Section */}
+                        <div className="mb-8">
+                            <div className="flex gap-3 max-w-md mx-auto">
+                                <input
+                                    ref={inputRef}
+                                    type="text"
+                                    value={guess}
+                                    onChange={(e) => setGuess(e.target.value)}
+                                    onKeyPress={handleKeyPress}
+                                    placeholder="Guess a physical object..."
+                                    className="flex-1 px-6 py-4 border-2 border-white/50 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-300 focus:border-blue-400 bg-white/70 backdrop-blur-sm text-lg shadow-lg"
+                                    disabled={gameState.gameWon}
+                                />
+                                <button
+                                    onClick={handleSubmit}
+                                    disabled={gameState.gameWon || !guess.trim()}
+                                    className="px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-2xl hover:from-blue-600 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed font-semibold shadow-lg hover-lift"
+                                >
+                                    🔍 Hunt
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Guesses List */}
+                        <div className="max-w-2xl mx-auto">
+                            <h3 className="text-2xl font-bold text-gray-800 mb-4 text-center">
+                                🎯 Your Objects
+                            </h3>
+                            <div className="space-y-3 max-h-96 overflow-y-auto">
+                                {gameState.guesses.map((g, index) => (
+                                    <div
+                                        key={g.id}
+                                        className={`guess-card ${getSimilarityClass(g.similarity)}`}
+                                    >
+                                        <div className="flex justify-between items-center">
+                                            <div className="flex items-center gap-3">
+                                                <span className="text-2xl font-bold">#{index + 1}</span>
+                                                <span className="text-xl font-semibold">{g.word}</span>
+                                                {g.attributes && (
+                                                    <div 
+                                                        className="w-4 h-4 rounded-full border-2 border-white shadow"
+                                                        style={{ backgroundColor: g.attributes.color }}
+                                                    />
+                                                )}
+                                            </div>
+                                            <div className="text-right">
+                                                <div className="text-sm opacity-90">
+                                                    {getSimilarityText(g.similarity)}
+                                                </div>
+                                                <div className="text-2xl font-bold">{g.similarity}%</div>
+                                            </div>
+                                        </div>
+                                        {g.attributes && (
+                                            <div className="mt-2 text-sm opacity-90">
+                                                {g.attributes.material} • {g.attributes.category} • Used for {g.attributes.function}
+                                            </div>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Instructions */}
+                        {gameState.guesses.length === 0 && (
+                            <div className="mt-8 text-center">
+                                <div className="glass-effect p-6 rounded-2xl shadow-lg border max-w-4xl mx-auto">
+                                    <p className="text-lg text-gray-700 mb-4">
+                                        🎮 Guess physical objects that exist in the real world!
+                                    </p>
+                                    <p className="text-sm text-gray-600 mb-4">
+                                        Examples: apple, chair, bicycle, book, hammer, flower...
+                                    </p>
+                                    <div className="grid grid-cols-2 md:grid-cols-6 gap-2 text-sm">
+                                        <div className="px-3 py-2 bg-gradient-to-r from-emerald-400 to-emerald-600 text-white rounded-lg">🎯 Perfect</div>
+                                        <div className="px-3 py-2 bg-gradient-to-r from-green-400 to-green-600 text-white rounded-lg">🔥 Very Close</div>
+                                        <div className="px-3 py-2 bg-gradient-to-r from-yellow-400 to-yellow-600 text-white rounded-lg">♨️ Getting Warm</div>
+                                        <div className="px-3 py-2 bg-gradient-to-r from-orange-400 to-orange-600 text-white rounded-lg">🌡️ Somewhat Similar</div>
+                                        <div className="px-3 py-2 bg-gradient-to-r from-red-400 to-red-600 text-white rounded-lg">❄️ Distantly Related</div>
+                                        <div className="px-3 py-2 bg-gradient-to-r from-gray-400 to-gray-600 text-white rounded-lg">🧊 Very Different</div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        };
+
+        // Initialize the game
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                document.getElementById('loading-screen').style.display = 'none';
+                
+                const root = ReactDOM.createRoot(document.getElementById('game-app'));
+                root.render(React.createElement(GameApp));
+                
+                document.getElementById('game-app').style.display = 'block';
+                
+                console.log('Object Hunter game loaded successfully! 🎯');
+            }, 1500);
+        });
+    </script>
+</body>
+</html>

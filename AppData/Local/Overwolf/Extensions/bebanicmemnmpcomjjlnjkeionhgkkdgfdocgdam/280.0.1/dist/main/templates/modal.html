@@ -1,0 +1,25 @@
+<section ng-id="popup--{{type}}" class="overlay-popup"
+         ng-class="{'active': active}">
+  <div class="overlay-popup__overlay"></div>
+  <div class="overlay-popup__popup">
+    <button class="button--icon button--icon--old window-control window-control--close" ng-click="closeModal()">
+      <svg class="svg-icon-fill">
+        <use xlink:href="/assets/svg/sprite.svg#window-control--close--old"></use>
+      </svg>
+    </button>
+    <h2>{{title}}</h2>
+    <p>{{message}}</p>
+    <div class="overlay-popup__popup__buttons">
+      <button
+        class="button--text button--text--small button--text--invisible"
+        ng-click="onClickCancel()"
+        ng-hide="hideCancel"
+      >{{'cancel' | translate}}</button>
+      <button
+        class="button--text button--text--cta"
+        ng-click="onClickConfirm()"
+        ng-class="{'disabled': buttonDisabled}"
+      >{{buttonText}}</button>
+    </div>
+  </div>
+</section>

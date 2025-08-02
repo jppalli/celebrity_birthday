@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Viral Icon - From Zero to Global Fame</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .game-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 20px;
+        }
+
+        .main-panel {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .stats-panel {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            height: fit-content;
+        }
+
+        .title {
+            text-align: center;
+            color: #5a67d8;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #667;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+
+        .story-section {
+            background: linear-gradient(45deg, #f093fb 0%, #f5576c 100%);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            color: white;
+            box-shadow: 0 5px 15px rgba(240, 147, 251, 0.3);
+        }
+
+        .chapter-title {
+            font-size: 1.4em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .story-text {
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .main-button {
+            background: linear-gradient(45deg, #ff6b6b, #ff8e53);
+            color: white;
+            border: none;
+            padding: 20px 40px;
+            font-size: 1.5em;
+            border-radius: 50px;
+            cursor: pointer;
+            display: block;
+            margin: 20px auto;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.3);
+        }
+
+        .main-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(255, 107, 107, 0.4);
+        }
+
+        .stats-item {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .stats-number {
+            font-size: 1.8em;
+            font-weight: bold;
+            display: block;
+        }
+
+        .stats-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .upgrades-section {
+            margin-top: 30px;
+        }
+
+        .upgrade-item {
+            background: linear-gradient(45deg, #a8edea, #fed6e3);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .upgrade-info {
+            flex: 1;
+        }
+
+        .upgrade-name {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .upgrade-desc {
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .upgrade-button {
+            background: linear-gradient(45deg, #4facfe, #00f2fe);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .upgrade-button:hover {
+            transform: scale(1.05);
+        }
+
+        .upgrade-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .progress-bar {
+            background: #e2e8f0;
+            border-radius: 10px;
+            height: 20px;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: linear-gradient(45deg, #ff6b6b, #ff8e53);
+            height: 100%;
+            transition: width 0.5s ease;
+            border-radius: 10px;
+        }
+
+        .achievement {
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            color: #333;
+            padding: 10px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-weight: bold;
+            text-align: center;
+            animation: glow 2s infinite alternate;
+        }
+
+        @keyframes glow {
+            from { box-shadow: 0 0 10px rgba(255, 215, 0, 0.5); }
+            to { box-shadow: 0 0 20px rgba(255, 215, 0, 0.8); }
+        }
+
+        .milestone {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+            font-size: 1.1em;
+        }
+
+        @media (max-width: 768px) {
+            .game-container {
+                grid-template-columns: 1fr;
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="main-panel">
+            <h1 class="title">📱 Viral Icon</h1>
+            <p class="subtitle">From Zero to Global Fame</p>
+            
+            <div class="story-section" id="storySection">
+                <div class="chapter-title" id="chapterTitle">Chapter 1: The First Post</div>
+                <div class="story-text" id="storyText">
+                    You're sitting in your small apartment, smartphone in hand. After months of watching others gain fame online, you decide it's your turn. You craft your first post - a simple photo with a heartfelt caption about following your dreams. Your finger hovers over the "Share" button. This could be the beginning of something incredible...
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 15px; justify-content: center; margin: 20px 0;">
+                <button class="main-button" onclick="createContent()" style="margin: 0; flex: 1;">
+                    📝 Create Content
+                </button>
+                <button class="main-button" onclick="work()" style="margin: 0; flex: 1; background: linear-gradient(45deg, #4facfe, #00f2fe);">
+                    💼 Work Job
+                </button>
+            </div>
+
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+            </div>
+
+            <div id="achievements"></div>
+            <div id="milestones"></div>
+
+            <div class="upgrades-section">
+                <h3 style="color: #5a67d8; margin-bottom: 20px;">🚀 Upgrades</h3>
+                <div id="upgradesContainer"></div>
+            </div>
+        </div>
+
+        <div class="stats-panel">
+            <div class="stats-item">
+                <span class="stats-number" id="followersCount">0</span>
+                <span class="stats-label">Followers</span>
+            </div>
+            
+            <div class="stats-item">
+                <span class="stats-number" id="moneyCount">$0</span>
+                <span class="stats-label">Money</span>
+            </div>
+            
+            <div class="stats-item">
+                <span class="stats-number" id="fameLevel">Unknown</span>
+                <span class="stats-label">Fame Level</span>
+            </div>
+            
+            <div class="stats-item">
+                <span class="stats-number" id="contentCount">0</span>
+                <span class="stats-label">Content Created</span>
+            </div>
+
+            <div class="stats-item">
+                <span class="stats-number" id="clickPower">1</span>
+                <span class="stats-label">Followers per Click</span>
+            </div>
+            
+            <div class="stats-item">
+                <span class="stats-number" id="workPower">$10</span>
+                <span class="stats-label">Money per Work</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Game state
+        let gameState = {
+            followers: 0,
+            money: 50, // Start with some money
+            contentCreated: 0,
+            clickPower: 1,
+            followersPerSecond: 0,
+            moneyPerSecond: 0,
+            currentChapter: 1,
+            achievements: [],
+            upgrades: {},
+            workPower: 10 // Money earned per work click
+        };
+
+        // Story chapters
+        const chapters = {
+            1: {
+                title: "Chapter 1: The First Post",
+                text: "You're sitting in your small apartment, smartphone in hand. After months of watching others gain fame online, you decide it's your turn. You craft your first post - a simple photo with a heartfelt caption about following your dreams. Your finger hovers over the 'Share' button. This could be the beginning of something incredible...",
+                requirement: 0
+            },
+            2: {
+                title: "Chapter 2: First Spark",
+                text: "Your first post gets a few likes from friends and family. The notification sound becomes addictive. You realize that timing, hashtags, and engaging content matter. You start researching social media strategies late into the night, determined to crack the code of virality.",
+                requirement: 50
+            },
+            3: {
+                title: "Chapter 3: The Algorithm Notices",
+                text: "Something changes. Your recent post about your morning routine suddenly gets picked up by the algorithm. Hundreds of new followers flood in overnight. You wake up to a phone buzzing with notifications. The intoxicating feeling of viral success hits you - this is just the beginning.",
+                requirement: 1000
+            },
+            4: {
+                title: "Chapter 4: Brand Deals Begin",
+                text: "Companies start reaching out. Your first brand partnership email arrives - a modest $100 for promoting a local coffee shop. You realize your influence has monetary value. You quit your part-time job and decide to pursue this full-time. The risk feels terrifying and exhilarating.",
+                requirement: 10000
+            },
+            5: {
+                title: "Chapter 5: The Media Spotlight",
+                text: "A major news outlet features you in an article about 'Rising Social Media Stars.' Your follower count explodes. Interview requests pour in. You hire your first assistant to manage the overwhelming demand. Fame brings opportunities, but also scrutiny you never expected.",
+                requirement: 100000
+            },
+            6: {
+                title: "Chapter 6: Global Recognition",
+                text: "Your content is being shared across continents. Fan art appears online. Major celebrities start following you. You launch your own product line, which sells out in minutes. You've become more than an influencer - you're a cultural phenomenon.",
+                requirement: 1000000
+            },
+            7: {
+                title: "Chapter 7: Icon Status",
+                text: "Museums want to exhibit your early posts as digital art. You're invited to speak at global conferences. Your autobiography becomes a bestseller. You've achieved what seemed impossible - transforming a single post into a lasting legacy that inspires millions worldwide.",
+                requirement: 10000000
+            }
+        };
+
+        // Fame levels
+        const fameLevels = [
+            { min: 0, max: 49, name: "Unknown" },
+            { min: 50, max: 499, name: "Newbie" },
+            { min: 500, max: 4999, name: "Rising Star" },
+            { min: 5000, max: 49999, name: "Influencer" },
+            { min: 50000, max: 499999, name: "Celebrity" },
+            { min: 500000, max: 4999999, name: "Superstar" },
+            { min: 5000000, max: 49999999, name: "Global Icon" },
+            { min: 50000000, max: Infinity, name: "Legend" }
+        ];
+
+        // Upgrades
+        const upgrades = [
+            {
+                id: 'betterPhone',
+                name: '📱 Better Phone',
+                description: '+2 followers per click',
+                baseCost: 50,
+                effect: () => gameState.clickPower += 2,
+                requirement: 0
+            },
+            {
+                id: 'workEthics',
+                name: '📚 Work Skills Course',
+                description: '+$10 per work click',
+                baseCost: 100,
+                effect: () => gameState.workPower += 10,
+                requirement: 0
+            },
+            {
+                id: 'ringLight',
+                name: '💡 Ring Light',
+                description: '+5 followers per click',
+                baseCost: 200,
+                effect: () => gameState.clickPower += 5,
+                requirement: 25
+            },
+            {
+                id: 'partTimeJob',
+                name: '⏰ Part-time Job',
+                description: '+$2 per second',
+                baseCost: 300,
+                effect: () => gameState.moneyPerSecond += 2,
+                requirement: 50
+            },
+            {
+                id: 'autoScheduler',
+                name: '📅 Auto Scheduler',
+                description: '+2 followers per second',
+                baseCost: 500,
+                effect: () => gameState.followersPerSecond += 2,
+                requirement: 100
+            },
+            {
+                id: 'betterJob',
+                name: '💼 Better Job',
+                description: '+$5 per second',
+                baseCost: 1000,
+                effect: () => gameState.moneyPerSecond += 5,
+                requirement: 200
+            },
+            {
+                id: 'contentManager',
+                name: '👥 Content Manager',
+                description: '+10 followers per second',
+                baseCost: 2000,
+                effect: () => gameState.followersPerSecond += 10,
+                requirement: 500
+            },
+            {
+                id: 'adCampaign',
+                name: '📢 Ad Campaign',
+                description: '+20 followers per click',
+                baseCost: 5000,
+                effect: () => gameState.clickPower += 20,
+                requirement: 1000
+            },
+            {
+                id: 'merchandise',
+                name: '👕 Merchandise Store',
+                description: '+$15 per second',
+                baseCost: 10000,
+                effect: () => gameState.moneyPerSecond += 15,
+                requirement: 5000
+            },
+            {
+                id: 'verifiedBadge',
+                name: '✅ Verified Badge',
+                description: '+100 followers per click',
+                baseCost: 25000,
+                effect: () => gameState.clickPower += 100,
+                requirement: 25000
+            },
+            {
+                id: 'mediaTeam',
+                name: '🎬 Media Team',
+                description: '+200 followers per second',
+                baseCost: 100000,
+                effect: () => gameState.followersPerSecond += 200,
+                requirement: 100000
+            }
+        ];
+
+        // Achievements
+        const achievements = [
+            { id: 'first_post', name: 'First Post', description: 'Create your first piece of content', requirement: 1, type: 'content' },
+            { id: 'hundred_followers', name: 'Hundred Club', description: 'Reach 100 followers', requirement: 100, type: 'followers' },
+            { id: 'first_thousand', name: 'Viral Moment', description: 'Reach 1,000 followers', requirement: 1000, type: 'followers' },
+            { id: 'ten_thousand', name: 'Micro-Celebrity', description: 'Reach 10,000 followers', requirement: 10000, type: 'followers' },
+            { id: 'hundred_thousand', name: 'Internet Famous', description: 'Reach 100,000 followers', requirement: 100000, type: 'followers' },
+            { id: 'first_dollar', name: 'First Paycheck', description: 'Earn your first dollar', requirement: 1, type: 'money' },
+            { id: 'content_creator', name: 'Content Machine', description: 'Create 100 pieces of content', requirement: 100, type: 'content' }
+        ];
+
+        function work() {
+            gameState.money += gameState.workPower;
+            updateDisplay();
+            checkAchievements();
+        }
+
+        function createContent() {
+            gameState.followers += gameState.clickPower;
+            gameState.contentCreated += 1;
+            
+            // Money generation based on followers (reduced since we have work button)
+            if (gameState.followers >= 500) {
+                gameState.money += Math.floor(gameState.followers / 2000);
+            }
+            
+            updateDisplay();
+            checkAchievements();
+            checkChapterProgress();
+        }
+
+        function buyUpgrade(upgradeId) {
+            const upgrade = upgrades.find(u => u.id === upgradeId);
+            if (!upgrade) return;
+            
+            const currentLevel = gameState.upgrades[upgradeId] || 0;
+            const cost = Math.floor(upgrade.baseCost * Math.pow(1.5, currentLevel));
+            
+            if (gameState.money >= cost) {
+                gameState.money -= cost;
+                gameState.upgrades[upgradeId] = currentLevel + 1;
+                upgrade.effect();
+                updateDisplay();
+                renderUpgrades();
+            }
+        }
+
+        function updateDisplay() {
+            document.getElementById('followersCount').textContent = formatNumber(gameState.followers);
+            document.getElementById('moneyCount').textContent = '$' + formatNumber(gameState.money);
+            document.getElementById('contentCount').textContent = formatNumber(gameState.contentCreated);
+            document.getElementById('workPower').textContent = '
+            
+            // Update fame level
+            const fameLevel = fameLevels.find(level => 
+                gameState.followers >= level.min && gameState.followers <= level.max
+            );
+            document.getElementById('fameLevel').textContent = fameLevel.name;
+            
+            // Update progress bar
+            const nextLevel = fameLevels.find(level => level.min > gameState.followers);
+            if (nextLevel) {
+                const currentLevel = fameLevels.find(level => 
+                    gameState.followers >= level.min && gameState.followers <= level.max
+                );
+                const progress = ((gameState.followers - currentLevel.min) / (nextLevel.min - currentLevel.min)) * 100;
+                document.getElementById('progressFill').style.width = Math.min(progress, 100) + '%';
+            } else {
+                document.getElementById('progressFill').style.width = '100%';
+            }
+        }
+
+        function formatNumber(num) {
+            if (num >= 1000000000) return (num / 1000000000).toFixed(1) + 'B';
+            if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+            if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+            return num.toString();
+        }
+
+        function checkAchievements() {
+            achievements.forEach(achievement => {
+                if (!gameState.achievements.includes(achievement.id)) {
+                    let currentValue = 0;
+                    switch(achievement.type) {
+                        case 'followers': currentValue = gameState.followers; break;
+                        case 'money': currentValue = gameState.money; break;
+                        case 'content': currentValue = gameState.contentCreated; break;
+                    }
+                    
+                    if (currentValue >= achievement.requirement) {
+                        gameState.achievements.push(achievement.id);
+                        showAchievement(achievement);
+                    }
+                }
+            });
+        }
+
+        function showAchievement(achievement) {
+            const achievementDiv = document.createElement('div');
+            achievementDiv.className = 'achievement';
+            achievementDiv.innerHTML = `🏆 ${achievement.name}: ${achievement.description}`;
+            document.getElementById('achievements').appendChild(achievementDiv);
+            
+            setTimeout(() => {
+                achievementDiv.remove();
+            }, 5000);
+        }
+
+        function checkChapterProgress() {
+            for (let chapterNum in chapters) {
+                if (parseInt(chapterNum) > gameState.currentChapter && 
+                    gameState.followers >= chapters[chapterNum].requirement) {
+                    gameState.currentChapter = parseInt(chapterNum);
+                    updateStory();
+                    showMilestone(chapters[chapterNum].title);
+                    break;
+                }
+            }
+        }
+
+        function updateStory() {
+            const chapter = chapters[gameState.currentChapter];
+            document.getElementById('chapterTitle').textContent = chapter.title;
+            document.getElementById('storyText').textContent = chapter.text;
+        }
+
+        function showMilestone(title) {
+            const milestoneDiv = document.createElement('div');
+            milestoneDiv.className = 'milestone';
+            milestoneDiv.innerHTML = `📖 New Chapter Unlocked: ${title}`;
+            document.getElementById('milestones').appendChild(milestoneDiv);
+            
+            setTimeout(() => {
+                milestoneDiv.remove();
+            }, 8000);
+        }
+
+        function renderUpgrades() {
+            const container = document.getElementById('upgradesContainer');
+            container.innerHTML = '';
+            
+            upgrades.forEach(upgrade => {
+                if (gameState.followers >= upgrade.requirement) {
+                    const currentLevel = gameState.upgrades[upgrade.id] || 0;
+                    const cost = Math.floor(upgrade.baseCost * Math.pow(1.3, currentLevel));
+                    const canAfford = gameState.money >= cost;
+                    
+                    const upgradeDiv = document.createElement('div');
+                    upgradeDiv.className = 'upgrade-item';
+                    upgradeDiv.innerHTML = `
+                        <div class="upgrade-info">
+                            <div class="upgrade-name">${upgrade.name} (Level ${currentLevel})</div>
+                            <div class="upgrade-desc">${upgrade.description}</div>
+                        </div>
+                        <button class="upgrade-button" 
+                                onclick="buyUpgrade('${upgrade.id}')" 
+                                ${!canAfford ? 'disabled' : ''}>
+                            ${formatNumber(cost)}
+                        </button>
+                    `;
+                    container.appendChild(upgradeDiv);
+                }
+            });
+        }
+
+        // Passive income generation
+        setInterval(() => {
+            gameState.followers += gameState.followersPerSecond;
+            gameState.money += gameState.moneyPerSecond;
+            updateDisplay();
+            checkAchievements();
+            checkChapterProgress();
+        }, 1000);
+
+        // Initialize game
+        updateDisplay();
+        renderUpgrades();
+    </script>
+</body>
+</html> + formatNumber(gameState.workPower);
+            
+            // Update fame level
+            const fameLevel = fameLevels.find(level => 
+                gameState.followers >= level.min && gameState.followers <= level.max
+            );
+            document.getElementById('fameLevel').textContent = fameLevel.name;
+            
+            // Update progress bar
+            const nextLevel = fameLevels.find(level => level.min > gameState.followers);
+            if (nextLevel) {
+                const currentLevel = fameLevels.find(level => 
+                    gameState.followers >= level.min && gameState.followers <= level.max
+                );
+                const progress = ((gameState.followers - currentLevel.min) / (nextLevel.min - currentLevel.min)) * 100;
+                document.getElementById('progressFill').style.width = Math.min(progress, 100) + '%';
+            } else {
+                document.getElementById('progressFill').style.width = '100%';
+            }
+        }
+
+        function formatNumber(num) {
+            if (num >= 1000000000) return (num / 1000000000).toFixed(1) + 'B';
+            if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+            if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+            return num.toString();
+        }
+
+        function checkAchievements() {
+            achievements.forEach(achievement => {
+                if (!gameState.achievements.includes(achievement.id)) {
+                    let currentValue = 0;
+                    switch(achievement.type) {
+                        case 'followers': currentValue = gameState.followers; break;
+                        case 'money': currentValue = gameState.money; break;
+                        case 'content': currentValue = gameState.contentCreated; break;
+                    }
+                    
+                    if (currentValue >= achievement.requirement) {
+                        gameState.achievements.push(achievement.id);
+                        showAchievement(achievement);
+                    }
+                }
+            });
+        }
+
+        function showAchievement(achievement) {
+            const achievementDiv = document.createElement('div');
+            achievementDiv.className = 'achievement';
+            achievementDiv.innerHTML = `🏆 ${achievement.name}: ${achievement.description}`;
+            document.getElementById('achievements').appendChild(achievementDiv);
+            
+            setTimeout(() => {
+                achievementDiv.remove();
+            }, 5000);
+        }
+
+        function checkChapterProgress() {
+            for (let chapterNum in chapters) {
+                if (parseInt(chapterNum) > gameState.currentChapter && 
+                    gameState.followers >= chapters[chapterNum].requirement) {
+                    gameState.currentChapter = parseInt(chapterNum);
+                    updateStory();
+                    showMilestone(chapters[chapterNum].title);
+                    break;
+                }
+            }
+        }
+
+        function updateStory() {
+            const chapter = chapters[gameState.currentChapter];
+            document.getElementById('chapterTitle').textContent = chapter.title;
+            document.getElementById('storyText').textContent = chapter.text;
+        }
+
+        function showMilestone(title) {
+            const milestoneDiv = document.createElement('div');
+            milestoneDiv.className = 'milestone';
+            milestoneDiv.innerHTML = `📖 New Chapter Unlocked: ${title}`;
+            document.getElementById('milestones').appendChild(milestoneDiv);
+            
+            setTimeout(() => {
+                milestoneDiv.remove();
+            }, 8000);
+        }
+
+        function renderUpgrades() {
+            const container = document.getElementById('upgradesContainer');
+            container.innerHTML = '';
+            
+            upgrades.forEach(upgrade => {
+                if (gameState.followers >= upgrade.requirement) {
+                    const currentLevel = gameState.upgrades[upgrade.id] || 0;
+                    const cost = Math.floor(upgrade.baseCost * Math.pow(1.3, currentLevel));
+                    const canAfford = gameState.money >= cost;
+                    
+                    const upgradeDiv = document.createElement('div');
+                    upgradeDiv.className = 'upgrade-item';
+                    upgradeDiv.innerHTML = `
+                        <div class="upgrade-info">
+                            <div class="upgrade-name">${upgrade.name} (Level ${currentLevel})</div>
+                            <div class="upgrade-desc">${upgrade.description}</div>
+                        </div>
+                        <button class="upgrade-button" 
+                                onclick="buyUpgrade('${upgrade.id}')" 
+                                ${!canAfford ? 'disabled' : ''}>
+                            $${formatNumber(cost)}
+                        </button>
+                    `;
+                    container.appendChild(upgradeDiv);
+                }
+            });
+        }
+
+        // Passive income generation
+        setInterval(() => {
+            gameState.followers += gameState.followersPerSecond;
+            gameState.money += gameState.moneyPerSecond;
+            updateDisplay();
+            checkAchievements();
+            checkChapterProgress();
+        }, 1000);
+
+        // Initialize game
+        updateDisplay();
+        renderUpgrades();
+    </script>
+</body>
+</html>

@@ -1,0 +1,120 @@
+
+<section id="main-content" ng-init="
+                slides = [{
+                    img: 'images/temp/music-player-bg.jpg',
+                    logo: 'images/temp/music-player-logo.png',
+                    link: '#link1',
+                    style: 'app'
+                }, {
+                    img: 'images/temp/live-rounds-bg.jpg',
+                    logo: 'images/temp/live-rounds-logo.png',
+                    link: '#link1',
+                    style: 'app'
+                }, {
+                    img: 'images/temp/twitch-bg.jpg',
+                    logo: 'images/temp/twitch-logo.png',
+                    link: '#link1',
+                    style: 'app'
+                }, {
+                    img: 'images/temp/faceit-bg.jpg',
+                    logo: 'images/temp/faceit-logo.png',
+                    link: '#link1',
+                    style: 'app'
+                }, {
+                    img: 'images/temp/heroes-of-newerth-bg.jpg',
+                    logo: 'images/temp/heroes-of-newerth-logo.png',
+                    link: '#link1'
+                }, {
+                    img: 'images/temp/world-of-tanks-bg.jpg',
+                    logo: 'images/temp/world-of-tanks-logo.png',
+                    link: '#link1'
+                }, {
+                    img: 'images/temp/world-of-warplanes-bg.jpg',
+                    logo: 'images/temp/world-of-warplanes-logo.png',
+                    link: '#link1'
+                }, {
+                    img: 'images/temp/smite-bg.jpg',
+                    logo: 'images/temp/smite-logo.png',
+                    link: '#link1'
+                }, {
+                    img: 'images/temp/robocraft-bg.jpg',
+                    logo: 'images/temp/robocraft-logo.png',
+                    link: '#link1'
+                },];
+            ">
+    <div ow-slider="slides">
+        <div class="bg-slide" ng-repeat="slide in owSlider.slides track by $index" ow-slide ow-slide-data="slide" ow-slide-active="slide.active" ng-show="slide.active"></div>
+        <div class="bg-slide-dimming" ow-dimming="250"></div>
+
+        <div class="main-content-inner">
+
+            <div id="slider-container">
+                <a href="#" class="slider-nav-arrow prev" ng-click="owSlider.prev($event)" ng-mouseenter="owSlider.stopAutoRotate()" ng-mouseleave="owSlider.startAutoRotate()"><i>&#xe60b;</i></a>
+                <a href="#" class="slider-nav-arrow next" ng-click="owSlider.next($event)" ng-mouseenter="owSlider.stopAutoRotate()" ng-mouseleave="owSlider.startAutoRotate()"><i>&#xe608;</i></a>
+
+                <div class="container">
+                    <div class="slide" ng-repeat="slide in owSlider.slides track by $index" ng-show="slide.active">
+                                    <span>
+                                        <img ng-src="{{ slide.logo }}" />
+                                    </span>
+                        <a ng-href="{{ slide.link }}" class="btn-carousel" ng-style="{marginLeft : slide.left}" ng-class="slide.style" ng-mouseenter="owSlider.stopAutoRotate()" ng-mouseleave="owSlider.startAutoRotate()"></a>
+                    </div>
+                </div>
+
+                <ul class="slider-nav-circles" ng-mouseenter="owSlider.stopAutoRotate()" ng-mouseleave="owSlider.startAutoRotate()">
+                    <li ng-repeat="slide in owSlider.slides track by $index" ng-class="{'current': slide.active}" ng-click="owSlider.select(slide)"></li>
+                </ul>
+            </div>
+
+            <div id="dvInfiniscroll" infinite-scroll='loadNextPage()' infinite-scroll-distance='1' >
+            <section class="tiles">
+                <header>
+                    <h1>Featured
+                        <a href="#" class="js-view-all-tiles">View all<i>&#xe60a;</i></a>
+                    </h1>
+                </header>
+
+                <div class="tiles-inner">
+                    <div class="tiles-row cf">
+                        <article>
+                            <span><img src="images/temp/img-1.png" alt=""></span>
+                        </article>
+
+                        <article>
+                            <span><img src="images/temp/img-2.png" alt=""></span>
+                        </article>
+
+                        <article>
+                            <span><img src="images/temp/img-3.png" alt=""></span>
+                        </article>
+
+                        <article>
+                            <span><img src="images/temp/img-4.png" alt=""></span>
+                        </article>
+
+                        <article>
+                            <span><img src="images/temp/img-5.png" alt=""></span>
+                        </article>
+                    </div>
+                </div>
+
+                <div class="tiles-inner">
+                    <div class="tiles-row tiles-row-banner cf">
+                        <article>
+                            <span><img src="images/temp/img-9.png" alt=""></span>
+                        </article>
+
+                        <article>
+                            <span><img src="images/temp/img-7.png" alt=""></span>
+                        </article>
+
+                        <article>
+                            <span><img src="images/temp/img-8.png" alt=""></span>
+                        </article>
+                    </div>
+                </div>
+            </section>
+            </div>
+        </div>
+    </div>
+</section>

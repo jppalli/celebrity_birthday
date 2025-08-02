@@ -1,0 +1,21 @@
+define({
+  "55": "Frag Grenade",
+  "54": "Thermite Grenade",
+  "33": "Phoenix Kit",
+  "37": "Shield Cell",
+  "35": "Syringe",
+  "28": "Light Ammo",
+  "29": "Energy Ammo",
+  "30": "Shotgun Shells",
+  "31": "Heavy Ammo",
+  "85": "Sniper Stock L3",
+  "82": "Standard Stock L3",
+  "76": "Extended Heavy Mag L3",
+  "89": "Skullpiercer Rifiling",
+  "61": "1x Digital Threat",
+  "63": "2x-4x Variable AOG",
+  "65": "4x-8x Variable Sniper",
+  "66": "4x-10x Digital Sniper Threat",
+  "69": "Barrel Stabilizer L3",
+  "79": "Shotgun Bolt L3"
+})

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coffee Pour Game</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="game-container">
+        <h1 class="game-title"><span class="coffee-icon">☕</span>Coffee Pour Game</h1>
+        <div class="score-container">Score: <span id="score">0</span></div>
+        <canvas id="gameCanvas" width="400" height="500"></canvas>
+        <div class="controls">
+            <button id="startButton">Start Game</button>
+            <button id="resetButton">Reset Game</button>
+        </div>
+        <div class="instructions">
+            Control the coffee pour to fill the cups precisely! Use left and right arrow keys or tap the screen edges.
+        </div>
+    </div>
+    
+    <script src="game.js"></script>
+</body>
+</html>

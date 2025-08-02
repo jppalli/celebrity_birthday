@@ -1,0 +1,87 @@
+<h2>{{'titleExerciseYourRights' | translate}}</h2>
+
+<div class="">
+  <p>
+    <span ng-bind-html="'exerciseYourRightsText' | translate"></span>
+  </p>
+
+
+    <div class="expanded-action-panel">
+
+      <button 
+        ng-click="handleExerciseRightsAdditionalExpandedContainer($event)" 
+        class="expand-btn">
+
+        <span ng-bind-html="'subTitleExerciseYourRights' | translate"></span>
+        <svg>
+          <use xlink:href="/assets/svg/sprite.svg#dropdown-icon"></use>
+        </svg>
+      </button>
+
+      <div class="expanded-container">
+        <div class="how-we-use-your-data-item">
+  
+          <div class="toggle toggle--multiline">
+            <input id="amazon-publisher"
+                    type="checkbox"
+                    hidden
+                    ng-model="form.amazonPublisher"
+                    ng-change="handleAmazonPublisher()"/>
+            <label for="amazon-publisher">
+              <span>
+                <span ng-bind-html="'amazonPublisher' | translate"></span>
+                <span
+                  class="ng-more-info"
+                  ng-mouseover="toolTipHoverIn($event)"
+                  ng-mouseleave="toolTipHoverOut($event)">
+                  <div class="ng-tooltip">
+                    <p ng-bind-html="'amazonPublisherToolTipText' | translate"></p>
+                  </div>
+                </span>
+              </span>
+              <b></b>
+            </label>
+          </div>
+        </div>
+        <div class="how-we-use-your-data-item" ng-hide="!showUsvp1">
+  
+          <div class="toggle toggle--multiline">
+            <input id="uspv1"
+                    type="checkbox"
+                    hidden
+                    ng-model="form.uspv1"
+                    ng-change="handleUspv1()"/>
+            <label for="uspv1">
+              <span ng-bind-html="'doNotSellOrShareMyPersonalInformationTitle' | translate"></span>
+              <b></b>
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+
+    </div>
+
+    <!-- <div class="how-we-use-your-data-item">
+
+      <h3>{{'subtitleHowWeUseYourDataPerformance' | translate}}</h3>
+      <div class="toggle toggle--multiline">
+        <input id="use-your-data-performance"
+               type="checkbox"
+               hidden
+               ng-model="form.performance"
+               ng-change="handlePerformanceChecked()"/>
+        <label for="use-your-data-performance">
+          <span>{{'textHowWeUseYourDataPerformance' | translate}}</span>
+          <b></b>
+        </label>
+      </div>
+      <span ng-bind-html="'learnMoreHowWeUseYourDataPerformance' | translate"></span>
+      <div id="use-your-data-performance__error" class="error-box">
+      </div>
+    </div> -->
+
+  </div>
+</div>

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Test</title>
+</head>
+<body>
+    <h1>Debug Test</h1>
+    <div id="status">Loading...</div>
+    
+    <script>
+        console.log('Debug script starting...');
+        document.getElementById('status').textContent = 'Script loaded successfully';
+        
+        // Test if main.js loads without errors
+        const script = document.createElement('script');
+        script.src = 'main.js';
+        script.onload = () => {
+            console.log('main.js loaded successfully');
+            document.getElementById('status').textContent = 'main.js loaded successfully';
+        };
+        script.onerror = (error) => {
+            console.error('Error loading main.js:', error);
+            document.getElementById('status').textContent = 'Error loading main.js: ' + error;
+        };
+        document.head.appendChild(script);
+    </script>
+</body>
+</html>

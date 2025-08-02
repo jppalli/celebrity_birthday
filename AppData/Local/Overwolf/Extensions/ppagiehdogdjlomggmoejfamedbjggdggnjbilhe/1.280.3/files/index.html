@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+	<title>Overwolf Remote Configurations</title>
+	<script>
+	</script>
+</head>
+
+<body style="background:transparent;">
+	<script>
+		try {
+			// NOTE: This is related to bug OW-4559 and is here just to cause the
+			// client to create a leveldb for game settings
+			[5426].forEach(id => {
+				overwolf.games.getGameInfo(id, function(info) {
+          console.log(JSON.stringify(info));
+        });
+			});
+		} catch (e) {
+		}
+	</script>
+	<script type="text/javascript" src="./lor.js"></script>
+	<script type="text/javascript" src="./fortnite.js"></script>
+	<script type="text/javascript" src="./diablo4.js"></script>
+	<script type="text/javascript" src="./lolpbe.js"></script>
+	<script type="text/javascript" src="./utils/io-plugin.js"></script>
+	<script type="text/javascript" src="./vulkan-patch.js"></script>
+  <script type="text/javascript" src="./experiment-patch.js"></script>
+  <script type="text/javascript" src="./index/index.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,46 @@
+
+<!-- in order to work properly this section must be above the main-content-inner div, and below the breadcrumbs div -->
+<section class="seo-content-section">
+  <h1 id="seo-content-section-title">APPS FOR VALORANT</h1>
+  <div class="seo-content-collapse" id="seo-content-section-txt">
+    <p>Valorant is a team-based first-person hero shooter set in the near future.[4][5][6][7] Players play as one of a set of Agents, characters based on several countries and cultures around the world.[7] In the main game mode, players are assigned to either the attacking or defending team with each team having five players on it. Agents have unique abilities, each requiring charges, as well as a unique ultimate ability that requires charging through kills, deaths, orbs, or objectives. Every player starts each round with a "classic" pistol and one or more "signature ability" charges.[5] Other weapons and ability charges can be purchased using an in-game economic system that awards money based on the outcome of the previous round, any kills the player is responsible for, and any objectives completed. The game has an assortment of weapons including secondary guns like sidearms and primary guns like submachine guns, shotguns, machine guns, assault rifles and sniper rifles.[8][9] There are automatic and semi-automatic weapons that each have a unique shooting pattern that has to be controlled by the player to be able to shoot accurately.[9] It currently offers 19 agents to choose from.[10][11] They are Brimstone, Viper, Omen, Cypher, Sova, Sage, Phoenix, Jett, Raze, Breach, Reyna, Killjoy, Skye, Yoru, Astra, KAY/O, Chamber, Neon, and Fade.</p>
+  </div>
+  <button class="expend-content-btn" id="seo-content-section-btn">
+    <span class="r-more">Read More</span>
+    <span class="r-less">Read Less</span>
+  </button>
+</section>
+
+<script>
+
+    //hide the read more button if the text is less than 2 lines
+    (function() {
+      const elmScrollHight = document.querySelector('.seo-content-section p').scrollHeight;
+      const elmClientHeight = document.querySelector('.seo-content-section p').clientHeight;
+
+      if(elmScrollHight <= elmClientHeight) {
+        document.querySelector('#seo-content-section-btn').style.display = 'none';
+      } else {
+        document.querySelector('#seo-content-section-btn').style.display = null;
+      }
+    })();
+
+    //show hide the seo content
+    document.querySelector('#seo-content-section-btn').addEventListener("click", function() {
+      const seoContentContainer = document.querySelector('#seo-content-section-txt');
+      const txtParagraph = seoContentContainer.querySelector('p');
+
+      if (seoContentContainer.style.maxHeight) {
+        seoContentContainer.style.maxHeight = null;
+
+        setTimeout(() => {
+          seoContentContainer.classList.toggle("is-open");
+        }, 200)
+
+      } else {
+        seoContentContainer.style.maxHeight = txtParagraph.scrollHeight + "px";
+        seoContentContainer.classList.toggle("is-open");
+      }
+
+    });
+</script>

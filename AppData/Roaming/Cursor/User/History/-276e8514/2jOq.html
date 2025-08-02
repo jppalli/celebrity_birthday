@@ -1,0 +1,1091 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Word Weaver Chronicles - Daily Challenge</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Special+Elite&display=swap">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/7.2.4/pixi.min.js"></script>
+    <style>
+        :root {
+            --paper-color: #f9f3e9;
+            --ink-color: #1a1a1a;
+            --accent-color: #8b0000;
+            --border-color: #d4c5a3;
+            --input-bg: #fffdf5;
+            --label-color: #5a5a5a;
+            --tab-bg: #e0d4bb;
+            --active-tab-bg: #d4c5a3;
+            --bronze: #cd7f32;
+            --silver: #c0c0c0;
+            --gold: #ffd700;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Special Elite', cursive;
+            background: #e6d9c1 url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="%23e6d9c1"/><path d="M0,0 L100,100 M100,0 L0,100" stroke="%23d4c5a3" stroke-width="0.5" opacity="0.3"/></svg>');
+            color: var(--ink-color);
+            line-height: 1.4;
+            padding: 10px;
+            min-height: 100vh;
+            letter-spacing: 0.5px;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .newspaper-container {
+            width: 100%;
+            max-width: 900px;
+            height: 95vh;
+            max-height: 800px;
+            margin: 0 auto;
+            background-color: var(--paper-color);
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+            border: 2px solid var(--border-color);
+            position: relative;
+            overflow: hidden;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .date-stamp {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: var(--accent-color);
+            color: white;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 0.8rem;
+            font-weight: normal;
+        }
+        
+        .game-area {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            overflow: hidden;
+        }
+        
+        .navigation {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 20px;
+            flex-shrink: 0;
+        }
+        
+        .nav-link {
+            padding: 12px 25px;
+            background: var(--tab-bg);
+            color: var(--ink-color);
+            text-decoration: none;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: 'Special Elite', cursive;
+            letter-spacing: 1px;
+            transition: all 0.3s;
+            font-weight: normal;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .nav-link:hover {
+            background: var(--active-tab-bg);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .nav-link.current {
+            background: var(--accent-color);
+            color: white;
+            border-color: var(--accent-color);
+        }
+        
+        .content-container {
+            flex-grow: 1;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            border: 1px dashed var(--border-color);
+            background: rgba(255, 255, 255, 0.7);
+            position: relative;
+        }
+        
+        .story-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            flex-shrink: 0;
+        }
+        
+        .story-title {
+            color: var(--accent-color);
+            font-size: 1.3rem;
+            font-weight: normal;
+            letter-spacing: 1px;
+        }
+        
+        .instructions {
+            font-style: italic;
+            color: #666;
+            font-size: 0.9rem;
+            font-weight: normal;
+            text-align: center;
+            margin-bottom: 10px;
+            flex-shrink: 0;
+        }
+        
+        .story-container {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 5px;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.05);
+            margin-bottom: 10px;
+        }
+        
+        .story-line {
+            margin-bottom: 15px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .story-text-part {
+            margin-right: 5px;
+            white-space: nowrap;
+            font-weight: normal;
+            font-size: 1rem;
+        }
+        
+        .inline-input {
+            display: inline-block;
+            position: relative;
+            margin: 0 3px;
+            vertical-align: middle;
+            min-width: 80px;
+            text-align: center;
+        }
+        
+        .word-input {
+            width: 100%;
+            padding: 4px 0;
+            border: none;
+            background: transparent;
+            font-size: 1rem;
+            text-align: center;
+            transition: all 0.3s;
+            outline: none;
+            color: var(--accent-color);
+            font-family: 'Special Elite', cursive;
+            font-weight: normal;
+            border-radius: 3px;
+            background: rgba(255, 255, 255, 0.5);
+            box-shadow: 0 0 0 1px rgba(139, 0, 0, 0.2);
+        }
+        
+        .word-input:focus {
+            box-shadow: 0 0 0 2px var(--accent-color);
+            background: rgba(255, 255, 255, 0.9);
+        }
+        
+        .word-type-label {
+            position: absolute;
+            bottom: -16px;
+            left: 0;
+            width: 100%;
+            font-size: 0.65rem;
+            color: var(--label-color);
+            text-align: center;
+            font-style: italic;
+            white-space: nowrap;
+            font-weight: normal;
+        }
+        
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 10px;
+            flex-shrink: 0;
+        }
+        
+        button {
+            padding: 8px 15px;
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+            font-family: 'Special Elite', cursive;
+            letter-spacing: 1px;
+            border-radius: 2px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            font-weight: normal;
+            flex: 1;
+            max-width: 180px;
+        }
+        
+        button:hover {
+            background: #6d0000;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+        
+        button.secondary {
+            background: #5a5a5a;
+        }
+        
+        button.secondary:hover {
+            background: #444;
+        }
+        
+        .result-section {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 15px;
+            border: 1px solid var(--border-color);
+            display: none;
+            animation: fadeIn 0.8s;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 10;
+            overflow-y: auto;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .completed-story {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            font-style: italic;
+            padding: 15px;
+            background: rgba(249, 243, 233, 0.7);
+            border-left: 3px solid var(--accent-color);
+            font-weight: normal;
+            margin-bottom: 15px;
+        }
+        
+        .result-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .highlight {
+            background-color: #ffeb3b;
+            padding: 0 3px;
+            color: var(--accent-color);
+            border-bottom: 1px dashed var(--accent-color);
+            font-weight: normal;
+        }
+        
+        .pixi-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: auto;
+            padding-top: 10px;
+            border-top: 1px solid var(--border-color);
+            font-size: 0.8rem;
+            color: #777;
+            font-weight: normal;
+            flex-shrink: 0;
+        }
+        
+        .ink-splotch {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            background: radial-gradient(circle, rgba(139,0,0,0.1) 0%, rgba(139,0,0,0) 70%);
+            z-index: 1;
+            pointer-events: none;
+        }
+        
+        .close-result {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: var(--accent-color);
+            color: white;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        
+        .result-content {
+            position: relative;
+            padding: 10px;
+        }
+        
+        /* Score display styles */
+        .score-display {
+            text-align: center;
+            margin: 15px 0;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 5px;
+            box-shadow: 0 0 5px rgba(0,0,0,0.1);
+            font-size: 1.2rem;
+        }
+        
+        .score-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--accent-color);
+            display: inline-block;
+            margin: 0 5px;
+        }
+        
+        .medal {
+            display: inline-block;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            margin-left: 8px;
+            position: relative;
+            top: 5px;
+        }
+        
+        .medal.gold {
+            background: linear-gradient(145deg, #ffd700, #daa520);
+            box-shadow: 0 0 5px rgba(218, 165, 32, 0.8);
+        }
+        
+        .medal.silver {
+            background: linear-gradient(145deg, #c0c0c0, #a9a9a9);
+            box-shadow: 0 0 5px rgba(169, 169, 169, 0.8);
+        }
+        
+        .medal.bronze {
+            background: linear-gradient(145deg, #cd7f32, #8b4513);
+            box-shadow: 0 0 5px rgba(139, 69, 19, 0.8);
+        }
+        
+        .score-details {
+            font-size: 0.9rem;
+            margin-top: 10px;
+            color: #555;
+        }
+        
+        .total-score-display {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 20px 0;
+            font-size: 1.2rem;
+        }
+        
+        .score-breakdown {
+            background: white;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            box-shadow: 0 0 5px rgba(0,0,0,0.1);
+        }
+        
+        .breakdown-header {
+            color: var(--accent-color);
+            margin-bottom: 10px;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .word-score {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px;
+            border-bottom: 1px dashed var(--border-color);
+        }
+        
+        .word-score:last-child {
+            border-bottom: none;
+        }
+        
+        .score-pill {
+            background: #8b0000;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+        }
+        
+        .badge-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 15px 0;
+        }
+        
+        .badge {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2rem;
+            background: #f9f3e9;
+            border: 2px solid var(--border-color);
+            box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+            position: relative;
+        }
+        
+        .badge::after {
+            content: attr(data-title);
+            position: absolute;
+            bottom: -25px;
+            font-size: 0.7rem;
+            color: var(--accent-color);
+            white-space: nowrap;
+        }
+        
+        .badge.gold {
+            background: radial-gradient(circle at 30% 30%, #ffd700, #daa520);
+            border-color: #daa520;
+        }
+        
+        .badge.silver {
+            background: radial-gradient(circle at 30% 30%, #c0c0c0, #a9a9a9);
+            border-color: #a9a9a9;
+        }
+        
+        .badge.bronze {
+            background: radial-gradient(circle at 30% 30%, #cd7f32, #8b4513);
+            border-color: #8b4513;
+        }
+    </style>
+</head>
+<body>
+    <div class="pixi-container" id="pixiCanvas"></div>
+    
+    <div class="newspaper-container">
+        <div class="date-stamp" id="currentDate">August 1, 2025</div>
+        
+        <div class="game-area">
+            
+            <div class="content-container">
+                <div class="story-header">
+                    <div class="story-title" id="storyTitle">The Mysterious Quest</div>
+                    <div class="score-display">
+                        Total Score: <span class="score-value" id="totalScore">0</span>
+                        <span class="medal bronze" id="bronzeMedal"></span>
+                        <span class="medal silver" id="silverMedal"></span>
+                        <span class="medal gold" id="goldMedal"></span>
+                    </div>
+                </div>
+                
+                <div class="instructions" id="instructions">
+                    Fill in the blanks with your own words to create a unique story! Earn points for originality and complexity.
+                </div>
+                
+                <div class="story-container" id="storyContainer">
+                    <!-- Story content will be generated here -->
+                </div>
+                
+                <div class="buttons">
+                    <button id="weaveBtn">Weave Your Story</button>
+                    <button class="secondary" id="randomBtn">Random Words</button>
+                </div>
+            </div>
+            
+            <div class="result-section" id="resultSection">
+                <div class="result-content">
+                    <div class="close-result" id="closeResult">✕</div>
+                    <h2>Your Chronicle</h2>
+                    
+                    <div class="total-score-display">
+                        Total Score: <span class="score-value" id="resultScore">0</span>
+                        <span class="medal" id="resultMedal"></span>
+                    </div>
+                    
+                    <div class="badge-container">
+                        <div class="badge bronze" data-title="Bronze Wordsmith">🥉</div>
+                        <div class="badge silver" data-title="Silver Scribe">🥈</div>
+                        <div class="badge gold" data-title="Gold Bard">🥇</div>
+                    </div>
+                    
+                    <div class="score-breakdown">
+                        <div class="breakdown-header">Score Breakdown</div>
+                        <div id="scoreDetails">
+                            <!-- Score details will be added here -->
+                        </div>
+                    </div>
+                    
+                    <div class="completed-story" id="completedStory"></div>
+                    
+                    <div class="result-buttons">
+                        <button id="newStoryBtn">Create Another</button>
+                        <button class="secondary" id="saveStoryBtn">Save to Archive</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>Word Weaver Chronicles • Est. 2023 • All stories are your own creations</p>
+        </div>
+    </div>
+
+    <script>
+        // Story database
+        const stories = [
+            {
+                id: 1,
+                title: "The Mysterious Quest",
+                date: "August 1, 2025",
+                lines: [
+                    { text: "In the heart of the", inputs: [{type: "adjective"}] },
+                    { text: "forest, a brave", inputs: [{type: "noun"}] },
+                    { text: "named", inputs: [{type: "person's name"}] },
+                    { text: "embarked on a quest to find the legendary", inputs: [
+                        {type: "adjective"}, 
+                        {type: "object"}
+                    ]},
+                    { text: "Along the way, they encountered a", inputs: [
+                        {type: "adjective"}, 
+                        {type: "animal"}
+                    ]},
+                    { text: "who spoke in", inputs: [
+                        {type: "adverb"}, 
+                        {type: "plural noun"}
+                    ]},
+                    { text: "\"To find what you seek,\" the creature", inputs: [{type: "verb, past tense"}] },
+                    { text: "\"you must solve the riddle of the", inputs: [
+                        {type: "adjective"}, 
+                        {type: "object"}
+                    ]},
+                    { text: "After", inputs: [{type: "verb ending in -ing"}] },
+                    { text: "for what felt like", inputs: [{type: "number"}] },
+                    { text: "days,", inputs: [{type: "person's name"}] },
+                    { text: "finally discovered the", inputs: [{type: "object"}] },
+                    { text: "hidden beneath a", inputs: [
+                        {type: "adjective"}, 
+                        {type: "plant"}
+                    ]},
+                    { text: "They returned to their village as a", inputs: [{type: "adjective"}] },
+                    { text: "hero, forever changed by their", inputs: [{type: "adjective"}] },
+                    { text: "adventure." }
+                ]
+            }
+        ];
+
+        // Player data
+        let playerData = {
+            totalScore: 0,
+            storiesCompleted: 0,
+            medals: {
+                bronze: 0,
+                silver: 0,
+                gold: 0
+            },
+            playerName: "WordSmith"
+        };
+
+        // Word database for originality scoring
+        let wordDatabase = {
+            "adjective": {},
+            "noun": {},
+            "verb, past tense": {},
+            "adverb": {},
+            "person's name": {},
+            "object": {},
+            "animal": {},
+            "plant": {},
+            "number": {},
+            "cool ship name": {},
+            "planet name": {},
+            "space object": {},
+            "planet type": {},
+            "device": {},
+            "pirate name": {},
+            "treasure item": {},
+            "insulting plural noun": {},
+            "island name": {},
+            "wizard name": {},
+            "magical place": {},
+            "plural noun": {},
+            "magical creature": {},
+            "element": {},
+            "spell name": {},
+            "color": {},
+            "small object": {}
+        };
+
+        // Load word database from localStorage
+        function loadWordDatabase() {
+            const savedDB = localStorage.getItem('wordDatabase');
+            if (savedDB) {
+                wordDatabase = JSON.parse(savedDB);
+            }
+        }
+
+        // Save word database to localStorage
+        function saveWordDatabase() {
+            localStorage.setItem('wordDatabase', JSON.stringify(wordDatabase));
+        }
+
+        // Load player data
+        function loadPlayerData() {
+            const savedData = localStorage.getItem('playerData');
+            if (savedData) {
+                playerData = JSON.parse(savedData);
+                updateScoreDisplay();
+            }
+        }
+
+        // Save player data
+        function savePlayerData() {
+            localStorage.setItem('playerData', JSON.stringify(playerData));
+        }
+
+        // Update score display
+        function updateScoreDisplay() {
+            document.getElementById('totalScore').textContent = playerData.totalScore;
+            
+            // Show medals based on achievements
+            document.getElementById('bronzeMedal').style.display = playerData.medals.bronze ? 'inline-block' : 'none';
+            document.getElementById('silverMedal').style.display = playerData.medals.silver ? 'inline-block' : 'none';
+            document.getElementById('goldMedal').style.display = playerData.medals.gold ? 'inline-block' : 'none';
+        }
+
+        // Initialize PixiJS for subtle animations
+        const initPixi = () => {
+            const app = new PIXI.Application({
+                width: window.innerWidth,
+                height: window.innerHeight,
+                backgroundAlpha: 0,
+                antialias: true,
+                resolution: window.devicePixelRatio || 1
+            });
+            
+            document.getElementById('pixiCanvas').appendChild(app.view);
+            
+            // Create some floating letters for background effect
+            const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            const floatingTexts = [];
+            
+            for (let i = 0; i < 15; i++) {
+                const style = new PIXI.TextStyle({
+                    fontFamily: 'Special Elite',
+                    fontSize: Math.random() * 24 + 16,
+                    fill: ['#d4c5a3'],
+                    opacity: 0.3
+                });
+                
+                const letter = letters[Math.floor(Math.random() * letters.length)];
+                const text = new PIXI.Text(letter, style);
+                text.x = Math.random() * app.screen.width;
+                text.y = Math.random() * app.screen.height;
+                text.anchor.set(0.5);
+                text.direction = Math.random() > 0.5 ? 1 : -1;
+                text.speed = Math.random() * 0.5 + 0.1;
+                
+                app.stage.addChild(text);
+                floatingTexts.push(text);
+            }
+            
+            // Animation loop
+            app.ticker.add((delta) => {
+                floatingTexts.forEach(text => {
+                    text.rotation += 0.01 * text.direction * delta;
+                    text.y += text.speed * delta;
+                    
+                    if (text.y > app.screen.height + 50) {
+                        text.y = -50;
+                    }
+                });
+            });
+            
+            // Handle window resize
+            window.addEventListener('resize', () => {
+                app.renderer.resize(window.innerWidth, window.innerHeight);
+            });
+            
+            // Create ink splotches
+            for (let i = 0; i < 5; i++) {
+                const splotch = document.createElement('div');
+                splotch.className = 'ink-splotch';
+                splotch.style.top = `${Math.random() * 100}%`;
+                splotch.style.left = `${Math.random() * 100}%`;
+                splotch.style.opacity = Math.random() * 0.2 + 0.1;
+                splotch.style.transform = `scale(${Math.random() * 0.8 + 0.5}) rotate(${Math.random() * 360}deg)`;
+                document.querySelector('.newspaper-container').appendChild(splotch);
+            }
+        };
+        
+        // Render story template
+        function renderStory(story) {
+            const storyContainer = document.getElementById('storyContainer');
+            const storyTitle = document.getElementById('storyTitle');
+            
+            // Clear previous content
+            storyContainer.innerHTML = '';
+            storyTitle.textContent = story.title;
+            
+            // Create the story elements
+            story.lines.forEach(line => {
+                const lineDiv = document.createElement('div');
+                lineDiv.className = 'story-line';
+                
+                // Add text part
+                if (line.text) {
+                    const textPart = document.createElement('span');
+                    textPart.className = 'story-text-part';
+                    textPart.textContent = line.text;
+                    lineDiv.appendChild(textPart);
+                }
+                
+                // Add inputs
+                if (line.inputs) {
+                    line.inputs.forEach(input => {
+                        const inputContainer = document.createElement('div');
+                        inputContainer.className = 'inline-input';
+                        
+                        const inputEl = document.createElement('input');
+                        inputEl.type = 'text';
+                        inputEl.className = 'word-input';
+                        inputEl.dataset.type = input.type;
+                        
+                        const label = document.createElement('div');
+                        label.className = 'word-type-label';
+                        label.textContent = `(${input.type})`;
+                        
+                        inputContainer.appendChild(inputEl);
+                        inputContainer.appendChild(label);
+                        lineDiv.appendChild(inputContainer);
+                    });
+                }
+                
+                storyContainer.appendChild(lineDiv);
+            });
+            
+            // Set current story
+            currentStory = story;
+            
+            // Add event listeners to inputs
+            document.querySelectorAll('.word-input').forEach(input => {
+                input.addEventListener('focus', function() {
+                    this.style.boxShadow = "0 0 0 2px var(--accent-color)";
+                    this.style.background = "rgba(255, 255, 255, 0.9)";
+                });
+                
+                input.addEventListener('blur', function() {
+                    this.style.boxShadow = "0 0 0 1px rgba(139, 0, 0, 0.2)";
+                    this.style.background = "rgba(255, 255, 255, 0.5)";
+                });
+            });
+        }
+        
+        // Calculate word complexity
+        function calculateComplexity(word) {
+            // Longer words get more points
+            let score = Math.min(20, word.length * 2);
+            
+            // Words with uncommon letters get bonus
+            const uncommonLetters = ['z', 'x', 'q', 'j', 'k', 'v', 'b', 'y', 'f', 'w'];
+            const uncommonCount = [...word].filter(char => uncommonLetters.includes(char)).length;
+            score += uncommonCount * 3;
+            
+            // Words with uppercase letters (proper nouns) get bonus
+            if (/[A-Z]/.test(word)) {
+                score += 5;
+            }
+            
+            // Words with apostrophes or hyphens get bonus
+            if (/['-]/.test(word)) {
+                score += 4;
+            }
+            
+            return Math.round(score);
+        }
+        
+        // Calculate word originality
+        function calculateOriginality(word, type) {
+            // Check if word exists in our database
+            const wordLower = word.toLowerCase();
+            const usageCount = wordDatabase[type][wordLower] || 0;
+            
+            // Less used words get higher scores
+            if (usageCount === 0) return 30; // Brand new word!
+            if (usageCount === 1) return 25;
+            if (usageCount === 2) return 20;
+            if (usageCount <= 5) return 15;
+            if (usageCount <= 10) return 10;
+            return 5; // Very common word
+        }
+        
+        // Update word database
+        function updateWordDatabase(word, type) {
+            const wordLower = word.toLowerCase();
+            
+            if (!wordDatabase[type][wordLower]) {
+                wordDatabase[type][wordLower] = 0;
+            }
+            
+            wordDatabase[type][wordLower]++;
+            saveWordDatabase();
+        }
+        
+        // Initialize game
+        document.addEventListener('DOMContentLoaded', () => {
+            let currentStory = stories[0];
+            
+            // Load data
+            loadWordDatabase();
+            loadPlayerData();
+            
+            initPixi();
+            
+            // Set current date
+            const now = new Date();
+            document.getElementById('currentDate').textContent = 
+                now.toLocaleDateString('en-US', { 
+                    month: 'long', 
+                    day: 'numeric', 
+                    year: 'numeric' 
+                });
+            
+            // Check if a story was selected from archive
+            const selectedStory = localStorage.getItem('selectedStory');
+            if (selectedStory) {
+                currentStory = JSON.parse(selectedStory);
+                localStorage.removeItem('selectedStory'); // Clear after loading
+            }
+            
+            // Render the story
+            renderStory(currentStory);
+            
+            // Random word generator
+            document.getElementById('randomBtn').addEventListener('click', () => {
+                const inputs = document.querySelectorAll('.word-input');
+                const wordTypes = {
+                    'adjective': ['mysterious', 'sparkling', 'ancient', 'gigantic', 'tiny', 'magical', 'whispering', 'glowing'],
+                    'noun': ['dragon', 'wizard', 'treasure', 'castle', 'forest', 'ocean', 'mountain', 'artifact'],
+                    'verb, past tense': ['ran', 'jumped', 'sang', 'discovered', 'created', 'whispered', 'flew', 'vanished'],
+                    'adverb': ['silently', 'quickly', 'mysteriously', 'happily', 'bravely', 'foolishly', 'elegantly', 'suddenly'],
+                    'person\'s name': ['Elara', 'Thorn', 'Alder', 'Lyra', 'Finn', 'Rowan', 'Sorin', 'Kael'],
+                    'object': ['crown', 'sword', 'mirror', 'key', 'map', 'crystal', 'lantern', 'amulet'],
+                    'animal': ['owl', 'fox', 'raven', 'lion', 'wolf', 'dolphin', 'eagle', 'serpent'],
+                    'plant': ['oak', 'willow', 'rose', 'fern', 'mushroom', 'ivy', 'lotus', 'cactus'],
+                    'number': ['three', 'seven', 'twelve', 'forty', 'two dozen', 'a hundred', 'five', 'nine']
+                };
+                
+                inputs.forEach(input => {
+                    const type = input.dataset.type;
+                    if (wordTypes[type]) {
+                        const words = wordTypes[type];
+                        const word = words[Math.floor(Math.random() * words.length)];
+                        input.value = word;
+                        
+                        // Animation effect
+                        input.style.transform = "scale(1.1)";
+                        input.style.boxShadow = "0 0 0 2px var(--accent-color)";
+                        setTimeout(() => {
+                            input.style.transform = "scale(1)";
+                            input.style.boxShadow = "0 0 0 1px rgba(139, 0, 0, 0.2)";
+                        }, 300);
+                    }
+                });
+            });
+            
+            // Weave story functionality
+            document.getElementById('weaveBtn').addEventListener('click', () => {
+                const inputs = document.querySelectorAll('.word-input');
+                const values = Array.from(inputs).map(input => input.value.trim());
+                
+                // Check if all fields are filled
+                let allFilled = true;
+                inputs.forEach(input => {
+                    if (input.value.trim() === '') {
+                        input.style.boxShadow = "0 0 0 2px red";
+                        allFilled = false;
+                    }
+                });
+                
+                if (!allFilled) {
+                    alert('Please fill in all the blanks to weave your story!');
+                    return;
+                }
+                
+                // Create the completed story
+                let completedStory = '';
+                let inputIndex = 0;
+                
+                currentStory.lines.forEach(line => {
+                    let lineText = '';
+                    
+                    if (line.text) {
+                        lineText += line.text;
+                    }
+                    
+                    if (line.inputs) {
+                        line.inputs.forEach(() => {
+                            lineText += ` <span class="highlight">${values[inputIndex]}</span> `;
+                            inputIndex++;
+                        });
+                    }
+                    
+                    completedStory += `<p>${lineText}</p>`;
+                });
+                
+                // Calculate score
+                let totalScore = 0;
+                const scoreDetails = [];
+                
+                inputs.forEach((input, index) => {
+                    const word = input.value.trim();
+                    const type = input.dataset.type;
+                    
+                    if (word === '') return;
+                    
+                    // Update word database
+                    updateWordDatabase(word, type);
+                    
+                    // Calculate scores
+                    const complexity = calculateComplexity(word);
+                    const originality = calculateOriginality(word, type);
+                    const wordScore = complexity + originality;
+                    
+                    totalScore += wordScore;
+                    
+                    // Add to details
+                    scoreDetails.push({
+                        word,
+                        type,
+                        complexity,
+                        originality,
+                        wordScore
+                    });
+                });
+                
+                // Update player data
+                playerData.totalScore += totalScore;
+                playerData.storiesCompleted++;
+                
+                // Award medals based on score
+                if (totalScore > 250) {
+                    playerData.medals.gold++;
+                } else if (totalScore > 180) {
+                    playerData.medals.silver++;
+                } else if (totalScore > 120) {
+                    playerData.medals.bronze++;
+                }
+                
+                // Save player data
+                savePlayerData();
+                updateScoreDisplay();
+                
+                // Display the result
+                document.getElementById('completedStory').innerHTML = completedStory;
+                document.getElementById('resultScore').textContent = totalScore;
+                
+                // Set medal display
+                const medalEl = document.getElementById('resultMedal');
+                medalEl.className = 'medal';
+                if (totalScore > 250) {
+                    medalEl.classList.add('gold');
+                } else if (totalScore > 180) {
+                    medalEl.classList.add('silver');
+                } else if (totalScore > 120) {
+                    medalEl.classList.add('bronze');
+                } else {
+                    medalEl.style.display = 'none';
+                }
+                
+                // Display score breakdown
+                const scoreDetailsEl = document.getElementById('scoreDetails');
+                scoreDetailsEl.innerHTML = '';
+                
+                scoreDetails.forEach(detail => {
+                    const wordScoreEl = document.createElement('div');
+                    wordScoreEl.className = 'word-score';
+                    
+                    wordScoreEl.innerHTML = `
+                        <div>
+                            <strong>${detail.word}</strong> (${detail.type})
+                        </div>
+                        <div>
+                            Complexity: <span class="score-pill">${detail.complexity}</span>
+                            Originality: <span class="score-pill">${detail.originality}</span>
+                            Total: <span class="score-pill">${detail.wordScore}</span>
+                        </div>
+                    `;
+                    
+                    scoreDetailsEl.appendChild(wordScoreEl);
+                });
+                
+                // Add total score row
+                const totalScoreEl = document.createElement('div');
+                totalScoreEl.className = 'word-score';
+                totalScoreEl.style.fontWeight = 'bold';
+                totalScoreEl.style.marginTop = '10px';
+                totalScoreEl.style.borderTop = '2px solid var(--accent-color)';
+                totalScoreEl.style.paddingTop = '10px';
+                totalScoreEl.innerHTML = `
+                    <div>Total Score</div>
+                    <div>${totalScore}</div>
+                `;
+                
+                scoreDetailsEl.appendChild(totalScoreEl);
+                
+                // Show the result section
+                document.getElementById('resultSection').style.display = 'block';
+            });
+            
+            // Close result overlay
+            document.getElementById('closeResult').addEventListener('click', () => {
+                document.getElementById('resultSection').style.display = 'none';
+            });
+            
+            // New story button
+            document.getElementById('newStoryBtn').addEventListener('click', () => {
+                document.querySelectorAll('.word-input').forEach(input => {
+                    input.value = '';
+                    input.style.boxShadow = "0 0 0 1px rgba(139, 0, 0, 0.2)";
+                });
+                document.getElementById('resultSection').style.display = 'none';
+            });
+            
+            // Save story button
+            document.getElementById('saveStoryBtn').addEventListener('click', () => {
+                alert('Story saved to your archive!');
+                document.getElementById('resultSection').style.display = 'none';
+            });
+        });
+    </script>
+</body>
+</html>

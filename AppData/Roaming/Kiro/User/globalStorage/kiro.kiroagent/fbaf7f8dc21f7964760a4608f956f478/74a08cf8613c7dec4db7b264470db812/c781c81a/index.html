@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Object Hunter - Semantic Word Game</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/animations.css">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="game-container">
+        <div id="loading-screen" class="loading-screen">
+            <div class="loading-spinner"></div>
+            <p>Loading Object Hunter...</p>
+        </div>
+        
+        <div id="game-app" style="display: none;"></div>
+    </div>
+
+    <!-- Audio elements for sound effects -->
+    <audio id="correct-sound" preload="auto">
+        <source src="assets/sounds/correct.mp3" type="audio/mpeg">
+        <source src="assets/sounds/correct.wav" type="audio/wav">
+    </audio>
+    
+    <audio id="close-sound" preload="auto">
+        <source src="assets/sounds/close.mp3" type="audio/mpeg">
+        <source src="assets/sounds/close.wav" type="audio/wav">
+    </audio>
+    
+    <audio id="wrong-sound" preload="auto">
+        <source src="assets/sounds/wrong.mp3" type="audio/mpeg">
+        <source src="assets/sounds/wrong.wav" type="audio/wav">
+    </audio>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <script src="js/gameData.js"></script>
+    <script src="js/gameLogic.js"></script>
+    <script src="js/audioManager.js"></script>
+    <script src="js/animationManager.js"></script>
+    <script type="text/babel" src="js/components/GameApp.jsx"></script>
+    <script type="text/babel" src="js/main.js"></script>
+</body>
+</html>

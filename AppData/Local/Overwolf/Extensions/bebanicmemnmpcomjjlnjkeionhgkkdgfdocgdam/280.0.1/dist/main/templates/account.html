@@ -1,0 +1,93 @@
+<h2>{{'privacyPrefs' | translate}}</h2>
+
+<!-- login -->
+<section id="account__login">
+
+  <!-- state logged out -->
+  <section id="login-state--need-login"
+           ng-class="{'active': state === 'loggedOut'}">
+    <div class="need-login-box">
+      <span>{{'loginText' | translate}}</span>
+      <button class="button--text button--text--small"
+              ng-click="openLogin()">{{'logIn' |
+        translate}}</button>
+    </div>
+  </section>
+
+  <!-- state logged in -->
+  <section id="login-state--logged-in"
+           ng-class="{'active': state === 'loggedIn' || state === 'unverified'}">
+    
+           <!-- state unverified -->
+    <div class="info-box info-box--verification-required"
+         ng-class="{'active': state === 'unverified'}">
+      <span>{{'pleaseVerify' | translate}}</span>
+      <a href="#" ng-click="onClickSendVerificationEmail()">{{'verify' |
+        translate}}</a>
+    </div>
+
+    <div class="account-info">
+      <img ng-src="{{form.account.avatar}}"/>
+      <div class="account-info__user">
+        <div class="name">
+          <span class="displayname">{{form.account.nickname}}</span>
+        </div>
+          <div class="info">
+            <span class="username">{{form.account.username}}</span>
+            <span class="email">{{form.account.email}}</span>
+          </div>
+      </div>
+      <button class="button--text account-info__switch"
+              ng-click="switchAccounts()">{{'switchAccount' | translate }}</button>
+    </div>
+
+  </section>
+</section>
+
+<!-- account options -->
+<section id="account__options"
+         ng-class="{'disabled': state === 'loggedOut' || state === 'unverified'}">
+
+  <!-- email updates -->
+  <section id="email-options">
+    <h3>{{'emailOptions' | translate}}</h3>
+    <div class="toggle toggle--multiline">
+      <input id="email-me" type="checkbox" ng-model="form.sendUpdates" hidden />
+      <label for="email-me">
+        <span>{{'emailMe' | translate}}</span>
+        <b></b>
+      </label>
+    </div>
+    <div id="email-options__error" class="error-box"
+         ng-class="{'active': emailOptionsError}">
+      {{'generalError' | translate}}
+    </div>
+  </section>
+
+  <!-- request data -->
+  <section id="request-data">
+    <h3>{{'requestYourDataTitle' | translate}}</h3>
+    <p>{{'requestYourDataText' | translate}}<br/>
+      <span ng-bind-html="'requestDatalearnMore' | translate"></span>
+    </p>
+    
+    <div class="request-data-actions">
+      <button id="button--request-data"
+              class="button--text"
+              ng-class="{'disabled': isProcessingData}"
+              ng-click="showModal('requestData')"
+      >{{'requestYourDataBtn' | translate}}</button>
+
+      <div id="processing-data" class="processing-data"
+          ng-class="{'active': isProcessingData}">
+        <span>{{'requestYourDataProcessing' | translate:'fulldate':processingfulldate:'day':processingday:'month':processingmonth:'year':processingyear}}</span>
+      </div>
+      <div id="request-data__error" class="error-box"
+          ng-class="{'active': requestDataError}">
+        {{'generalError' | translate}}
+      </div>
+    </div>
+    
+  </section>
+
+</section>

@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Word Weaver Chronicles - Leaderboard</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Special+Elite&display=swap">
+    <style>
+        :root {
+            --paper-color: #f9f3e9;
+            --ink-color: #1a1a1a;
+            --accent-color: #8b0000;
+            --border-color: #d4c5a3;
+            --tab-bg: #e0d4bb;
+            --active-tab-bg: #d4c5a3;
+            --bronze: #cd7f32;
+            --silver: #c0c0c0;
+            --gold: #ffd700;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Special Elite', cursive;
+            background: #e6d9c1 url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="%23e6d9c1"/><path d="M0,0 L100,100 M100,0 L0,100" stroke="%23d4c5a3" stroke-width="0.5" opacity="0.3"/></svg>');
+            color: var(--ink-color);
+            line-height: 1.4;
+            padding: 10px;
+            min-height: 100vh;
+            letter-spacing: 0.5px;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .newspaper-container {
+            width: 100%;
+            max-width: 900px;
+            height: 95vh;
+            max-height: 800px;
+            margin: 0 auto;
+            background-color: var(--paper-color);
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+            border: 2px solid var(--border-color);
+            position: relative;
+            overflow: hidden;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .date-stamp {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: var(--accent-color);
+            color: white;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 0.8rem;
+            font-weight: normal;
+        }
+        
+        .game-area {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            overflow: hidden;
+        }
+        
+
+        
+        .content-container {
+            flex-grow: 1;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            border: 1px dashed var(--border-color);
+            background: rgba(255, 255, 255, 0.7);
+            position: relative;
+            padding: 20px;
+        }
+        
+        .leaderboard-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .leaderboard-title {
+            font-size: 2rem;
+            color: var(--accent-color);
+            margin-bottom: 10px;
+            font-weight: normal;
+            letter-spacing: 2px;
+        }
+        
+        .leaderboard-subtitle {
+            font-style: italic;
+            color: #666;
+            font-size: 1rem;
+        }
+        
+        .leaderboard-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+        
+        .leaderboard-entry {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 10px;
+            border-bottom: 1px solid var(--border-color);
+            transition: all 0.3s;
+        }
+        
+        .leaderboard-entry:last-child {
+            border-bottom: none;
+        }
+        
+        .leaderboard-entry:nth-child(1) {
+            background: linear-gradient(90deg, rgba(255, 215, 0, 0.1), rgba(255, 215, 0, 0.05));
+            border-left: 4px solid var(--gold);
+        }
+        
+        .leaderboard-entry:nth-child(2) {
+            background: linear-gradient(90deg, rgba(192, 192, 192, 0.1), rgba(192, 192, 192, 0.05));
+            border-left: 4px solid var(--silver);
+        }
+        
+        .leaderboard-entry:nth-child(3) {
+            background: linear-gradient(90deg, rgba(205, 127, 50, 0.1), rgba(205, 127, 50, 0.05));
+            border-left: 4px solid var(--bronze);
+        }
+        
+        .rank {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #5a5a5a;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-right: 15px;
+        }
+        
+        .leaderboard-entry:nth-child(1) .rank {
+            background: var(--gold);
+            color: #333;
+        }
+        
+        .leaderboard-entry:nth-child(2) .rank {
+            background: var(--silver);
+            color: #333;
+        }
+        
+        .leaderboard-entry:nth-child(3) .rank {
+            background: var(--bronze);
+            color: white;
+        }
+        
+        .player-info {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .player-name {
+            font-size: 1.1rem;
+            font-weight: normal;
+            margin-bottom: 3px;
+        }
+        
+        .player-stats {
+            font-size: 0.8rem;
+            color: #666;
+        }
+        
+        .player-score {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: var(--accent-color);
+            margin-left: 15px;
+        }
+        
+        .player-you {
+            background: rgba(139, 0, 0, 0.1) !important;
+            border-left: 4px solid var(--accent-color) !important;
+            box-shadow: 0 0 10px rgba(139, 0, 0, 0.2);
+        }
+        
+        .stats-summary {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .stats-title {
+            color: var(--accent-color);
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            font-weight: normal;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--accent-color);
+        }
+        
+        .stat-label {
+            font-size: 0.8rem;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: auto;
+            padding-top: 10px;
+            border-top: 1px solid var(--border-color);
+            font-size: 0.8rem;
+            color: #777;
+            font-weight: normal;
+            flex-shrink: 0;
+        }
+        
+        .ink-splotch {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            background: radial-gradient(circle, rgba(139,0,0,0.1) 0%, rgba(139,0,0,0) 70%);
+            z-index: 1;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="newspaper-container">
+        <div class="date-stamp" id="currentDate">August 1, 2025</div>
+        
+        <div class="game-area">
+            
+            <div class="content-container">
+                <div class="leaderboard-header">
+                    <h1 class="leaderboard-title">Word Weaver Leaderboard</h1>
+                    <p class="leaderboard-subtitle">See how your word-weaving skills rank against other storytellers</p>
+                </div>
+                
+                <div class="stats-summary">
+                    <div class="stats-title">Your Statistics</div>
+                    <div class="stats-grid" id="statsGrid">
+                        <!-- Stats will be generated here -->
+                    </div>
+                </div>
+                
+                <div class="leaderboard-container">
+                    <div id="leaderboardList">
+                        <!-- Leaderboard will be generated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>Word Weaver Chronicles • Est. 2023 • All stories are your own creations</p>
+        </div>
+    </div>
+
+    <script src="js/leaderboard.js"></script>
+</body>
+</html> 

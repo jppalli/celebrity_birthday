@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Día de los Muertos Match 3</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Creepster&family=Griffy:wght@400&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Griffy', cursive;
+            background: linear-gradient(135deg, #1a0033, #4a0080, #ff6b35);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+        
+        .game-container {
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 0 50px rgba(255, 107, 53, 0.5);
+            border: 3px solid #ff6b35;
+        }
+        
+        .game-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .game-title {
+            font-family: 'Creepster', cursive;
+            font-size: 2.5em;
+            color: #ff6b35;
+            text-shadow: 3px 3px 0px #000, 0 0 20px #ff6b35;
+            margin-bottom: 10px;
+        }
+        
+        .score-board {
+            display: flex;
+            justify-content: space-between;
+            color: #ffd700;
+            font-size: 1.2em;
+            margin-bottom: 20px;
+        }
+        
+        .score-item {
+            background: rgba(255, 215, 0, 0.2);
+            padding: 10px 15px;
+            border-radius: 10px;
+            border: 2px solid #ffd700;
+        }
+        
+        .game-board {
+            display: grid;
+            grid-template-columns: repeat(8, 60px);
+            grid-template-rows: repeat(8, 60px);
+            gap: 3px;
+            background: rgba(255, 107, 53, 0.3);
+            padding: 10px;
+            border-radius: 15px;
+            border: 3px solid #ff6b35;
+        }
+        
+        .cell {
+            width: 60px;
+            height: 60px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            border: 2px solid transparent;
+        }
+        
+        .cell:hover {
+            transform: scale(1.1);
+            border-color: #ffd700;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+        }
+        
+        .cell.selected {
+            border-color: #ff6b35;
+            box-shadow: 0 0 20px rgba(255, 107, 53, 0.8);
+            transform: scale(1.15);
+        }
+        
+        .cell.matching {
+            animation: pulse 0.5s ease-in-out;
+        }
+        
+        .symbol {
+            font-size: 2.5em;
+            transition: all 0.3s ease;
+            filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.5));
+        }
+        
+        .combo-indicator {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: #ffd700;
+            color: #000;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 0.8em;
+            font-weight: bold;
+            animation: bounce 0.6s ease-in-out;
+        }
+        
+        .particle {
+            position: absolute;
+            pointer-events: none;
+            font-size: 1.5em;
+            animation: particle-float 1s ease-out forwards;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+        
+        @keyframes particle-float {
+            0% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-50px) scale(0.5);
+            }
+        }
+        
+        .special-effect {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 3em;
+            color: #ffd700;
+            pointer-events: none;
+            animation: special-burst 1s ease-out forwards;
+        }
+        
+        @keyframes special-burst {
+            0% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(0.5);
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.5);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(2);
+            }
+        }
+        
+        .controls {
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .btn {
+            background: linear-gradient(45deg, #ff6b35, #ffd700);
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            color: #000;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+            margin: 0 10px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(255, 107, 53, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="game-header">
+            <h1 class="game-title">Día de los Muertos</h1>
+            <div class="score-board">
+                <div class="score-item">Score: <span id="score">0</span></div>
+                <div class="score-item">Moves: <span id="moves">30</span></div>
+                <div class="score-item">Level: <span id="level">1</span></div>
+            </div>
+        </div>
+        
+        <div class="game-board" id="gameBoard"></div>
+        
+        <div class="controls">
+            <button class="btn" onclick="resetGame()">New Game</button>
+            <button class="btn" onclick="shuffleBoard()">Shuffle</button>
+        </div>
+    </div>
+
+    <script>
+        class DayOfDeadMatch3 {
+            constructor() {
+                this.symbols = ['💀', '🌺', '🕯️', '🌙', '⭐', '🍂', '🎭', '🌻'];
+                this.board = [];
+                this.selectedCell = null;
+                this.score = 0;
+                this.moves = 30;
+                this.level = 1;
+                this.isAnimating = false;
+                this.comboCount = 0;
+                
+                this.initializeBoard();
+                this.renderBoard();
+                this.updateUI();
+            }
+            
+            initializeBoard() {
+                this.board = [];
+                for (let row = 0; row < 8; row++) {
+                    this.board[row] = [];
+                    for (let col = 0; col < 8; col++) {
+                        do {
+                            this.board[row][col] = this.symbols[Math.floor(Math.random() * this.symbols.length)];
+                        } while (this.wouldCreateMatch(row, col));
+                    }
+                }
+            }
+            
+            wouldCreateMatch(row, col) {
+                const symbol = this.board[row][col];
+                
+                // Check horizontal
+                let horizontalCount = 1;
+                for (let c = col - 1; c >= 0 && this.board[row][c] === symbol; c--) horizontalCount++;
+                for (let c = col + 1; c < 8 && this.board[row][c] === symbol; c++) horizontalCount++;
+                
+                // Check vertical
+                let verticalCount = 1;
+                for (let r = row - 1; r >= 0 && this.board[r][col] === symbol; r--) verticalCount++;
+                for (let r = row + 1; r < 8 && this.board[r][col] === symbol; r++) verticalCount++;
+                
+                return horizontalCount >= 3 || verticalCount >= 3;
+            }
+            
+            renderBoard() {
+                const gameBoard = document.getElementById('gameBoard');
+                gameBoard.innerHTML = '';
+                
+                for (let row = 0; row < 8; row++) {
+                    for (let col = 0; col < 8; col++) {
+                        const cell = document.createElement('div');
+                        cell.className = 'cell';
+                        cell.dataset.row = row;
+                        cell.dataset.col = col;
+                        
+                        const symbol = document.createElement('div');
+                        symbol.className = 'symbol';
+                        symbol.textContent = this.board[row][col];
+                        
+                        cell.appendChild(symbol);
+                        cell.addEventListener('click', () => this.handleCellClick(row, col));
+                        gameBoard.appendChild(cell);
+                    }
+                }
+            }
+            
+            handleCellClick(row, col) {
+                if (this.isAnimating || this.moves <= 0) return;
+                
+                const cell = document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
+                
+                if (this.selectedCell === null) {
+                    this.selectedCell = { row, col };
+                    cell.classList.add('selected');
+                } else {
+                    const prevCell = document.querySelector(`[data-row="${this.selectedCell.row}"][data-col="${this.selectedCell.col}"]`);
+                    prevCell.classList.remove('selected');
+                    
+                    if (this.selectedCell.row === row && this.selectedCell.col === col) {
+                        this.selectedCell = null;
+                        return;
+                    }
+                    
+                    if (this.isAdjacent(this.selectedCell.row, this.selectedCell.col, row, col)) {
+                        this.swapCells(this.selectedCell.row, this.selectedCell.col, row, col);
+                    }
+                    
+                    this.selectedCell = null;
+                }
+            }
+            
+            isAdjacent(row1, col1, row2, col2) {
+                const rowDiff = Math.abs(row1 - row2);
+                const colDiff = Math.abs(col1 - col2);
+                return (rowDiff === 1 && colDiff === 0) || (rowDiff === 0 && colDiff === 1);
+            }
+            
+            swapCells(row1, col1, row2, col2) {
+                const temp = this.board[row1][col1];
+                this.board[row1][col1] = this.board[row2][col2];
+                this.board[row2][col2] = temp;
+                
+                const matches = this.findMatches();
+                if (matches.length > 0) {
+                    this.moves--;
+                    this.processMatches();
+                } else {
+                    // Swap back if no matches
+                    this.board[row1][col1] = this.board[row2][col2];
+                    this.board[row2][col2] = temp;
+                }
+                
+                this.renderBoard();
+                this.updateUI();
+            }
+            
+            findMatches() {
+                const matches = [];
+                
+                // Check horizontal matches
+                for (let row = 0; row < 8; row++) {
+                    let count = 1;
+                    for (let col = 1; col < 8; col++) {
+                        if (this.board[row][col] === this.board[row][col - 1]) {
+                            count++;
+                        } else {
+                            if (count >= 3) {
+                                for (let c = col - count; c < col; c++) {
+                                    matches.push({ row, col: c });
+                                }
+                            }
+                            count = 1;
+                        }
+                    }
+                    if (count >= 3) {
+                        for (let c = 8 - count; c < 8; c++) {
+                            matches.push({ row, col: c });
+                        }
+                    }
+                }
+                
+                // Check vertical matches
+                for (let col = 0; col < 8; col++) {
+                    let count = 1;
+                    for (let row = 1; row < 8; row++) {
+                        if (this.board[row][col] === this.board[row - 1][col]) {
+                            count++;
+                        } else {
+                            if (count >= 3) {
+                                for (let r = row - count; r < row; r++) {
+                                    matches.push({ row: r, col });
+                                }
+                            }
+                            count = 1;
+                        }
+                    }
+                    if (count >= 3) {
+                        for (let r = 8 - count; r < 8; r++) {
+                            matches.push({ row: r, col });
+                        }
+                    }
+                }
+                
+                return matches;
+            }
+            
+            processMatches() {
+                this.isAnimating = true;
+                const matches = this.findMatches();
+                
+                if (matches.length === 0) {
+                    this.isAnimating = false;
+                    this.comboCount = 0;
+                    return;
+                }
+                
+                this.comboCount++;
+                
+                // Animate matching cells
+                matches.forEach(match => {
+                    const cell = document.querySelector(`[data-row="${match.row}"][data-col="${match.col}"]`);
+                    cell.classList.add('matching');
+                    
+                    if (this.comboCount > 1) {
+                        const comboIndicator = document.createElement('div');
+                        comboIndicator.className = 'combo-indicator';
+                        comboIndicator.textContent = this.comboCount;
+                        cell.appendChild(comboIndicator);
+                    }
+                    
+                    this.createParticleEffect(cell);
+                });
+                
+                // Calculate score
+                const baseScore = matches.length * 10;
+                const comboBonus = this.comboCount > 1 ? baseScore * (this.comboCount - 1) : 0;
+                this.score += baseScore + comboBonus;
+                
+                if (matches.length >= 5) {
+                    this.createSpecialEffect();
+                }
+                
+                setTimeout(() => {
+                    this.removeMatches(matches);
+                    this.dropPieces();
+                    this.fillBoard();
+                    this.renderBoard();
+                    this.updateUI();
+                    
+                    setTimeout(() => {
+                        this.processMatches();
+                    }, 300);
+                }, 500);
+            }
+            
+            createParticleEffect(cell) {
+                const rect = cell.getBoundingClientRect();
+                const particles = ['💫', '✨', '🌟', '⭐'];
+                
+                for (let i = 0; i < 3; i++) {
+                    const particle = document.createElement('div');
+                    particle.className = 'particle';
+                    particle.textContent = particles[Math.floor(Math.random() * particles.length)];
+                    particle.style.left = (rect.left + Math.random() * 60) + 'px';
+                    particle.style.top = (rect.top + Math.random() * 60) + 'px';
+                    particle.style.position = 'fixed';
+                    
+                    document.body.appendChild(particle);
+                    
+                    setTimeout(() => {
+                        document.body.removeChild(particle);
+                    }, 1000);
+                }
+            }
+            
+            createSpecialEffect() {
+                const gameBoard = document.getElementById('gameBoard');
+                const effect = document.createElement('div');
+                effect.className = 'special-effect';
+                effect.textContent = '💥';
+                gameBoard.appendChild(effect);
+                
+                setTimeout(() => {
+                    gameBoard.removeChild(effect);
+                }, 1000);
+            }
+            
+            removeMatches(matches) {
+                matches.forEach(match => {
+                    this.board[match.row][match.col] = null;
+                });
+            }
+            
+            dropPieces() {
+                for (let col = 0; col < 8; col++) {
+                    let writeRow = 7;
+                    for (let row = 7; row >= 0; row--) {
+                        if (this.board[row][col] !== null) {
+                            this.board[writeRow][col] = this.board[row][col];
+                            if (writeRow !== row) {
+                                this.board[row][col] = null;
+                            }
+                            writeRow--;
+                        }
+                    }
+                }
+            }
+            
+            fillBoard() {
+                for (let row = 0; row < 8; row++) {
+                    for (let col = 0; col < 8; col++) {
+                        if (this.board[row][col] === null) {
+                            this.board[row][col] = this.symbols[Math.floor(Math.random() * this.symbols.length)];
+                        }
+                    }
+                }
+            }
+            
+            updateUI() {
+                document.getElementById('score').textContent = this.score;
+                document.getElementById('moves').textContent = this.moves;
+                document.getElementById('level').textContent = this.level;
+                
+                if (this.moves <= 0) {
+                    setTimeout(() => {
+                        alert(`Game Over! Final Score: ${this.score}`);
+                    }, 100);
+                }
+                
+                if (this.score >= this.level * 1000) {
+                    this.level++;
+                    this.moves += 10;
+                }
+            }
+            
+            shuffle() {
+                this.initializeBoard();
+                this.renderBoard();
+            }
+            
+            reset() {
+                this.score = 0;
+                this.moves = 30;
+                this.level = 1;
+                this.comboCount = 0;
+                this.selectedCell = null;
+                this.initializeBoard();
+                this.renderBoard();
+                this.updateUI();
+            }
+        }
+        
+        let game = new DayOfDeadMatch3();
+        
+        function resetGame() {
+            game.reset();
+        }
+        
+        function shuffleBoard() {
+            if (game.moves > 0) {
+                game.shuffle();
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,16 @@
+<div class="tooltip tooltip-bordered" ng-class="['pos_' + owShareTooltip.position]">
+    <h4>Share</h4>
+
+    <div class="copy">
+        <input type="text" spellcheck="false" readonly="true" value="{{ owShareTooltip.shareLink }}" ng-click="owShareTooltip.selectAll($event)">
+        <a href="#" class="btn-copy" ow-clipboard="{{ owShareTooltip.shareLink }}">copy</a>
+    </div>
+
+    <ul class="share-icons">
+        <li><a href="#"><i class="icon-ui_share-facebook"></i></a></li>
+        <li><a href="#"><i class="icon-ui_share-twitter"></i></a></li>
+        <li><a href="#"><i class="icon-ui_share-google"></i></a></li>
+        <li><a href="#"><i class="icon-ui_share-reddit"></i></a></li>
+        <li><a href="#"><i class="icon-ui_share-vkontakte"></i></a></li>
+    </ul>
+</div>

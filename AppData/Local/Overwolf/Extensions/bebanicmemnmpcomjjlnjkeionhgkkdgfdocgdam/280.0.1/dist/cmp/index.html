@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Overwolf Settings</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimal-ui">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<script>
+		function getLanguage() {
+			return new Promise(resolve => {
+      	overwolf.settings.getCurrentOverwolfLanguage(result => {
+        	return resolve(result.language);
+      	});
+    	});
+		}
+
+		(async function(window) {
+			let lang= 'en';
+			try {
+				lang = await getLanguage();
+			} catch  {}
+
+			window.__tcfapi = (function() {
+				var listen = window.attachEvent || window.addEventListener;
+				listen('message', function(event) {
+					window.__tcfapi.receiveMessage(event);
+				});
+
+				var commandQueue = [];
+				var tcfapi = function(command, parameter, callback) {
+					commandQueue.push({
+						command: command,
+						parameter: parameter,
+						callback: callback
+					});
+				};
+				tcfapi.commandQueue = commandQueue;
+				tcfapi.receiveMessage = function(event) {
+					var data = event && event.data && event.data.__tcfapiCall;
+					if (data) {
+						commandQueue.push({
+							callId: data.callId,
+							command: data.command,
+							parameter: data.parameter,
+							event: event
+						});
+					}
+				};
+				tcfapi.config = {
+					popup: {
+						showCloseButton: false
+					},
+					theme: {
+						overlayBackground: "transparent",
+						backgroundColor: "#0D0D0D",
+						textColor: "#E5E5E5",
+						textLinkColor: "#B2B2B2",
+						primaryColor: "#D34037",
+						secondaryColor: "#484266",
+						primaryTextColor: "#F4F2FF",
+						secondaryTextColor: "#F4F2FF",
+						textLightColor: "#B2B2B2",
+						dividerColor: "#333333"
+					},
+					forceLocale: lang
+				};
+				return tcfapi;
+			}());
+		})(window);
+	</script>
+</head>
+<body>
+<script type="text/javascript" src="../cmp/index.js"></script></body>
+</html>

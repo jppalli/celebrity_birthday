@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Outrun JS</title>
+  <style>
+    canvas { border: 1px solid #444; background: black; }
+    body { display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background: #111; overflow: hidden; }
+  </style>
+</head>
+<body>
+  <canvas id="gameCanvas" width="800" height="600"></canvas>
+  <script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+
+    // Player car
+    let carX = 400;
+    const carY = 500;
+    const carWidth = 40;
+    const carHeight = 20;
+    let speed = 1;
+    let baseSpeed = 1;
+    let maxSpeed = 12;
+
+    // Input handling
+    let leftPressed = false;
+    let rightPressed = false;
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft') leftPressed = true;
+      if (e.key === 'ArrowRight') rightPressed = true;
+    });
+    document.addEventListener('keyup', (e) => {
+      if (e.key === 'ArrowLeft') leftPressed = false;
+      if (e.key === 'ArrowRight') rightPressed = false;
+    });
+
+    // Road configuration
+    const segmentHeight = 50;
+    const maxSegments = Math.ceil(canvas.height / segmentHeight) + 2;
+    let roadOffset = 0;
+    let curveOffset = 0;
+    const roadSegments = [];
+
+    // Initialize road with continuous z-index
+    function initRoad() {
+      for (let i = 0; i < maxSegments; i++) {
+        roadSegments.push({
+          z: i,
+          y: i * segmentHeight,
+          curve: 0
+        });
+      }
+    }
+    initRoad();
+
+    // Improved perspective calculation
+    function getRoadWidth(z) {
+      const progress = z / 50;
+      return canvas.width * 0.8 * (1 - Math.exp(-progress * 2));
+    }
+
+    // Game loop functions
+    function update() {
+      // Car movement with momentum
+      if (leftPressed) carX -= 8 * (speed / maxSpeed);
+      if (rightPressed) carX += 8 * (speed / maxSpeed);
+
+      // Speed management
+      speed = baseSpeed + (maxSpeed - baseSpeed) * (roadOffset / 5000);
+      speed = Math.min(speed, maxSpeed);
+
+      // Road animation
+      roadOffset += speed;
+      curveOffset += speed * 0.002;
+
+      // Update road segments
+      roadSegments.forEach((segment, i) => {
+        segment.y -= speed;
+        segment.curve = Math.sin(curveOffset + segment.z * 0.1) * 150 * (speed / maxSpeed);
+
+        // Recycle segments
+        if (segment.y < -segmentHeight) {
+          const last = roadSegments[roadSegments.length - 1];
+          segment.y = last.y + segmentHeight;
+          segment.z = last.z + 1;
+          roadSegments.push(roadSegments.shift());
+        }
+      });
+
+      // Constrain car to road
+      const currentSegment = roadSegments[roadSegments.length - 1];
+      const roadWidth = getRoadWidth(50);
+      const roadLeft = (canvas.width - roadWidth) / 2 + currentSegment.curve;
+      const roadRight = roadLeft + roadWidth;
+      carX = Math.max(roadLeft, Math.min(carX, roadRight - carWidth));
+    }
+
+    function draw() {
+      // Gradient background
+      const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+      gradient.addColorStop(0, '#1a1a2e');
+      gradient.addColorStop(1, '#16213e');
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Draw road
+      roadSegments.forEach((segment, i) => {
+        const nextSegment = roadSegments[i + 1];
+        if (!nextSegment) return;
+
+        // Dynamic width calculation
+        const width = getRoadWidth(segment.z);
+        const nextWidth = getRoadWidth(nextSegment.z);
+
+        const x1 = canvas.width/2 - width/2 + segment.curve;
+        const x2 = canvas.width/2 + width/2 + segment.curve;
+        const nx1 = canvas.width/2 - nextWidth/2 + nextSegment.curve;
+        const nx2 = canvas.width/2 + nextWidth/2 + nextSegment.curve;
+
+        // Road gradient
+        const roadGradient = ctx.createLinearGradient(0, segment.y, 0, nextSegment.y);
+        roadGradient.addColorStop(0, '#00ffff');
+        roadGradient.addColorStop(1, '#006666');
+        
+        ctx.beginPath();
+        ctx.moveTo(x1, segment.y);
+        ctx.lineTo(x2, segment.y);
+        ctx.lineTo(nx2, nextSegment.y);
+        ctx.lineTo(nx1, nextSegment.y);
+        ctx.closePath();
+        
+        // Road styling
+        ctx.fillStyle = '#1a1a1a';
+        ctx.fill();
+        ctx.strokeStyle = roadGradient;
+        ctx.lineWidth = 4;
+        ctx.stroke();
+      });
+
+      // Draw car with styling
+      ctx.fillStyle = '#ff4444';
+      ctx.shadowColor = '#ff0000';
+      ctx.shadowBlur = 20;
+      ctx.beginPath();
+      ctx.roundRect(carX, carY, carWidth, carHeight, 5);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+
+      // Draw UI
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '20px "Press Start 2P"';
+      ctx.fillText(`SPEED: ${Math.floor(speed * 10)}KMH`, 20, 40);
+      ctx.fillText(`DISTANCE: ${Math.floor(roadOffset/10)}M`, 20, 80);
+    }
+
+    function gameLoop() {
+      update();
+      draw();
+      requestAnimationFrame(gameLoop);
+    }
+
+    gameLoop();
+  </script>
+</body>
+</html>

@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Object Hunter - Test</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            color: white;
+            font-size: 1.2rem;
+        }
+        
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div id="loading-screen" class="loading-screen">
+        <div class="loading-spinner"></div>
+        <p>Loading Object Hunter...</p>
+        <div id="debug-info" style="margin-top: 20px; font-size: 0.8rem;"></div>
+    </div>
+    
+    <div id="game-app" style="display: none;">
+        <div class="min-h-screen bg-gradient-to-br from-purple-100 via-blue-50 to-indigo-100 p-8">
+            <div class="max-w-4xl mx-auto text-center">
+                <h1 class="text-6xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent mb-4">
+                    Object Hunter
+                </h1>
+                <p class="text-xl text-gray-600 mb-8">🎯 Game loaded successfully!</p>
+                <button onclick="startGame()" class="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
+                    Start Game
+                </button>
+                <div id="game-content" class="mt-8"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let debugInfo = document.getElementById('debug-info');
+        
+        function log(message) {
+            console.log(message);
+            debugInfo.innerHTML += '<div>' + message + '</div>';
+        }
+        
+        log('Starting to load scripts...');
+        
+        // Test if we can load external scripts
+        function loadScript(src, callback) {
+            const script = document.createElement('script');
+            script.src = src;
+            script.onload = callback;
+            script.onerror = () => log('Failed to load: ' + src);
+            document.head.appendChild(script);
+        }
+        
+        // Load React
+        log('Loading React...');
+        loadScript('https://unpkg.com/react@18/umd/react.development.js', () => {
+            log('React loaded successfully');
+            
+            // Load ReactDOM
+            log('Loading ReactDOM...');
+            loadScript('https://unpkg.com/react-dom@18/umd/react-dom.development.js', () => {
+                log('ReactDOM loaded successfully');
+                
+                // Test local files
+                log('Testing local file access...');
+                fetch('js/gameData.js')
+                    .then(response => {
+                        if (response.ok) {
+                            log('Local files accessible');
+                            initializeGame();
+                        } else {
+                            log('Local files not accessible - Status: ' + response.status);
+                            showError('Cannot access local files. Make sure you\'re running from a web server.');
+                        }
+                    })
+                    .catch(error => {
+                        log('Fetch error: ' + error.message);
+                        showError('Cannot access local files. Try running from a local web server.');
+                    });
+            });
+        });
+        
+        function showError(message) {
+            document.getElementById('loading-screen').innerHTML = 
+                '<div style="color: red; text-align: center; padding: 20px; max-width: 600px;">' +
+                '<h2>⚠️ Loading Error</h2>' +
+                '<p>' + message + '</p>' +
+                '<p style="font-size: 0.9rem; margin-top: 20px;">To fix this:</p>' +
+                '<ul style="text-align: left; font-size: 0.8rem;">' +
+                '<li>Use a local web server (like Live Server in VS Code)</li>' +
+                '<li>Or use Python: <code>python -m http.server 8000</code></li>' +
+                '<li>Or use Node.js: <code>npx serve .</code></li>' +
+                '</ul>' +
+                '</div>';
+        }
+        
+        function initializeGame() {
+            log('Initializing game...');
+            
+            setTimeout(() => {
+                document.getElementById('loading-screen').style.display = 'none';
+                document.getElementById('game-app').style.display = 'block';
+                log('Game UI shown');
+            }, 1000);
+        }
+        
+        function startGame() {
+            document.getElementById('game-content').innerHTML = 
+                '<div class="bg-white p-6 rounded-lg shadow-lg">' +
+                '<h2 class="text-2xl font-bold mb-4">🎮 Game Ready!</h2>' +
+                '<p>The basic structure is working. Now we can load the full game components.</p>' +
+                '</div>';
+        }
+    </script>
+</body>
+</html>

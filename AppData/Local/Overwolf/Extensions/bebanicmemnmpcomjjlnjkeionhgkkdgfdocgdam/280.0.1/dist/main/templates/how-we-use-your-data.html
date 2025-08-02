@@ -1,0 +1,49 @@
+<h2>{{'titleHowWeUseYourData' | translate}}</h2>
+
+<div class="how-we-use-your-data-item">
+  <span class="how-we-use-your-data-disclaimer">{{'disclaimerHowWeUseYourData' | translate}}</span>
+</div>
+
+<div class="how-we-use-your-data-item">
+
+  <h3>{{'subtitleHowWeUseYourDataPerformance' | translate}}</h3>
+  <div class="toggle toggle--multiline">
+    <input id="use-your-data-performance"
+           type="checkbox"
+           hidden
+           ng-model="form.performance"
+           ng-change="handlePerformanceChecked()"/>
+    <label for="use-your-data-performance">
+      <span>{{'textHowWeUseYourDataPerformance' | translate}}</span>
+      <b></b>
+    </label>
+  </div>
+  <span ng-bind-html="'learnMoreHowWeUseYourDataPerformance' | translate"></span>
+  <div id="use-your-data-performance__error" class="error-box">
+    <!-- {{'generalError' | translate}} -->
+  </div>
+</div>
+
+<div class="how-we-use-your-data-item">
+  <h3>{{'subtitleHowWeUseYourDataUsage' | translate}}</h3>
+  <div class="toggle toggle--multiline">
+    <input id="use-your-data-usage"
+           type="checkbox"
+           hidden
+           ng-model="form.usage"
+           ng-change="handleUsageChecked()"/>
+    <label for="use-your-data-usage">
+      <span>{{'textHowWeUseYourDataUsage' | translate}}</span>
+      <b></b>
+    </label>
+  </div>
+  <span ng-bind-html="'learnMoreHowWeUseYourDataUsage' | translate"></span>
+  <div id="use-your-data-usage__error" class="error-box">
+    <!-- {{'generalError' | translate}} -->
+  </div>
+</div>
+
+<div class="how-we-use-your-data-item">
+  <h3>{{'subtitleHowWeUseYourDataEssential' | translate}}</h3>
+  <p>{{'textHowWeUseYourDataEssential' | translate}}</p>
+</div>

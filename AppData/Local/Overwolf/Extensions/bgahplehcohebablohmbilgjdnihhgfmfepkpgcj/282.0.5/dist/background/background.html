@@ -1,0 +1,31 @@
+<!doctype html><html lang="en"><head><meta charset="UTF-8"/><title>Overwolf Promotions - Background</title><script defer="defer" src="../background/background.js"></script></head><body><script>const kAdUnitDisplayedPrefix = 'adUnitPromotion_';
+      function getUrlParam(paramName) {
+        paramName = paramName.replace(/[[]/, '\\[').replace(/[\]]/, '\\]');
+        const regex = new RegExp(`[\\?&]${paramName}=([^&#]*)`);
+        const results = regex.exec(location.search);
+
+        return results === null
+          ? ''
+          : decodeURIComponent(results[1].replace(/\+/g, ' '));
+      }
+
+      function setLocalStorage() {
+        var promotionId = getUrlParam('promotionId');
+        if (!promotionId) {
+          return;
+        }
+
+        const localStorageItemName = `${kAdUnitDisplayedPrefix}${promotionId}`;
+
+        const adUnitsCount = localStorage.getItem(localStorageItemName);
+
+        if (!adUnitsCount) {
+          localStorage.setItem(localStorageItemName, '1');
+          return;
+        }
+
+        let adUnitsCountInt = parseInt(adUnitsCount);
+        localStorage.setItem(localStorageItemName, `${adUnitsCountInt + 1}`);
+      }
+
+      setLocalStorage();</script></body></html>

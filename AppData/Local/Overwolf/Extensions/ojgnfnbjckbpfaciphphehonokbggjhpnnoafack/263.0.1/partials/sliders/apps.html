@@ -1,0 +1,55 @@
+<section ng-init="
+                slides = [{
+                    img: 'images/temp/music-player-bg.jpg',
+                    blurredImg: 'images/temp/music-player-bg-blurred.jpg',
+                    logo: 'images/temp/music-player-logo.png',
+                    link: 'ContentExtract/SingleAppPage/app-editor/Overwolf-MusicPlayer',
+                    style: 'app btn-music-player',
+                    tileIcon: $root.serverBase + '/.galleries/app-icons/Overwolf-MusicPlayer.png',
+                    title: 'Music Player',
+                    description: 'Play your favorite songs while playing your favorite game! Simple, clean, cool, easy to use, Overwolf style… You can play a file or folder from your HD, or use the app as a remote control for your favorite players like VLC and iTunes!',
+                    buttonStyle: {'margin-left':'83px'}
+                }, {
+                    img: 'images/temp/live-rounds-bg.jpg',
+                    blurredImg: 'images/temp/live-rounds-bg-blurred.jpg',
+                    logo: 'images/temp/live-rounds-logo.png',
+                    link: 'ContentExtract/SingleAppPage/app-editor/Rounds_Entertainment-Live_Rounds',
+                    style: 'app btn-live-rounds',
+                    tileIcon: $root.serverBase + '/.galleries/app-icons/live-rounds.png',
+                    title: 'Live Rounds',
+                    description: 'Live Rounds allows you to instantly create video and voice chats with your teammates from within your games.',
+                    buttonStyle: {'margin-left':'-353px'}
+                }, {
+                    img: 'images/temp/twitch-bg.jpg',
+                    blurredImg: 'images/temp/twitch-bg-blurred.jpg',
+                    logo: 'images/temp/twitch-logo.png',
+                    link: 'ContentExtract/SingleAppPage/app-editor/Overwolf-Twitch',
+                    style: 'app btn-twitch',
+                    tileIcon: $root.serverBase + '/.galleries/app-icons/Overwolf-Twitch.png',
+                    title: 'Twitch',
+                    description: 'Broadcast your favorite games through Twitch.tv! Add a webcam, integrate the Twitch chat into your game, interact with your viewers through polls and so much more.',
+                    buttonStyle: {'margin-left':'133px'}
+                }, {
+                    img: 'images/temp/zam-search-bg.jpg',
+                    blurredImg: 'images/temp/zam-search-bg-blurred.jpg',
+                    logo: 'images/temp/zam-search-logo.png',
+                    link: 'ContentExtract/SingleAppPage/app-editor/Overwolf-Zam-Search-Ctrl-Z',
+                    style: 'app btn-zam-search',
+                    tileIcon: $root.serverBase + '/.galleries/app-icons/zam-search.png',
+                    title: 'Zam Search (Ctrl+Z)',
+                    description: 'Use Ctrl + Z in your game to load up the ZAM Search and find whatever you need in any of the ZAM Network websites.',
+                    buttonStyle: {'margin-left':'133px'}
+                }, {
+                    img: 'images/temp/faceit-bg.jpg',
+                    blurredImg: 'images/temp/faceit-bg-blurred.jpg',
+                    logo: 'images/temp/faceit-logo.png',
+                    link: 'ContentExtract/SingleAppPage/app-editor/Faceit-Faceit',
+                    style: 'app btn-faceit',
+                    tileIcon: $root.serverBase + '/.galleries/app-icons/Faceit-Faceit.png',
+                    title: 'FACEIT',
+                    description: 'Win prizes while playing your favourite games with Faceit!',
+                    buttonStyle: {'margin-left':'64px'}
+                },];
+            ">
+    <ng-include src="'partials/sliders/slider-common.html'" ng-init="getText = 'Get this app'"></ng-include>
+</section>

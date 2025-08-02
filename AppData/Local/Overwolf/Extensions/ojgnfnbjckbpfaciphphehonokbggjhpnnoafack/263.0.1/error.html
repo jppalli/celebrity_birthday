@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>
+<html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>
+<html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>
+<html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<!--(if target dev)><!-->
+
+<html class="no-js">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Overwolf</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <base href="/"/>
+
+
+    <link rel="stylesheet" href="styles/main.css">
+
+</head>
+<body ng-app="overwolf">
+
+<nav id="top-menu" ow-menu="horizontal" ow-menu-border-size="60" ng-controller="WindowController"
+     ng-mousedown="onMouseDown()" ng-mouseup="onMouseUp()" ng-mousemove="onMouseMove($event)">
+    <div class="inner">
+        <ul class="rf">
+            <li class="window-controls" ng-cloak>
+                <ul class="cf">
+                    <li><a ng-click="minimize()"><i class="icon-window-controls_minimize"></i></a></li>
+                    <li><a ng-click="toggleMaximize()"><i class="icon-window-controls_maximize"></i></a></li>
+                    <li><a ng-click="close()"><i class="icon-window-controls_close"></i></a></li>
+                </ul>
+            </li>
+        </ul>
+
+
+    </div>
+</nav>
+
+<article id="main-wrapper">
+
+    <div>
+        <section id="main-content-wide" class="starting-background" style="height:100vh;">
+
+            <div class="main-content">
+                <div class="no-result" style="height:80vh">
+                    <img src="images/global/no_results.png" style="margin-left: 50px;">
+                    <span>Sorry, an error has occurred:</span>
+
+                    <p id="error-message-body"></p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+
+</article>
+
+<script src="vendors/angular.min.js"></script>
+<script>
+
+    var searchObject = null;
+
+    (function (angular) {
+        'use strict';
+
+        var app = angular.module('overwolf', []);
+        app.config(['$compileProvider',
+            function ($compileProvider) {
+                $compileProvider.imgSrcSanitizationWhitelist(/^\s*(https?|overwolf-store|overwolf-store-resource):|data:image\//);
+            }]);
+    })(angular);
+
+    function getQueryVariable(variable) {
+        var parts = window.location.href.split('?');
+        if (parts.length > 1) {
+            var query = parts[1];
+            var vars = query.split('&');
+            for (var i = 0; i < vars.length; i++) {
+                var pair = vars[i].split('=');
+                if (decodeURIComponent(pair[0]) == variable) {
+                    return decodeURIComponent(pair[1]);
+                }
+            }
+        }
+        return null;
+    }
+
+    window.onload = function () {
+        var msgBodyElement = document.getElementById("error-message-body");
+        var msgText = getQueryVariable("msg");
+        msgBodyElement.innerHTML = msgText;
+    };
+</script>
+<script src="scripts/controllers/window.js"></script>
+</body>
+</html>

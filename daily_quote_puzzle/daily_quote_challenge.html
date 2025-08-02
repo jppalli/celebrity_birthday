@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Daily Quote Challenge</title>
+  <style>
+    :root {
+      --bg-color: #121213;
+      --text-color: #ffffff;
+      --accent-color: #888888;
+      --highlight-color: #ffffff;
+      --border-color: #3a3a3c;
+      --box-size: 40px;
+      --box-font-size: 1.2em;
+    }
+
+    body {
+      font-family: 'Clear Sans', 'Helvetica Neue', Arial, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 2em;
+      min-height: 100vh;
+    }
+
+    h1 {
+      font-size: 2em;
+      margin-bottom: 1em;
+    }
+
+    .quote {
+      font-size: 1.5em;
+      margin-bottom: 2em;
+      max-width: 800px;
+      line-height: 1.5;
+      text-align: center;
+    }
+
+    .scrambled {
+      font-weight: bold;
+      color: var(--accent-color);
+      cursor: pointer;
+      text-decoration: underline;
+    }
+
+    .scrambled.active {
+      color: var(--highlight-color);
+      background-color: #2a2a2a;
+      padding: 2px 4px;
+      border-radius: 4px;
+    }
+
+    .solve-box {
+      margin-top: 2em;
+    }
+
+    .letter-boxes {
+      display: flex;
+      justify-content: center;
+      gap: 5px;
+      margin-bottom: 15px;
+    }
+
+    .letter-boxes div {
+      border: 2px solid var(--border-color);
+      background-color: #121213;
+      color: var(--text-color);
+      width: var(--box-size);
+      height: var(--box-size);
+      font-size: var(--box-font-size);
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-transform: uppercase;
+      box-sizing: border-box;
+    }
+
+    .scrambled-letters {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 5px;
+    }
+
+    .scrambled-letters span {
+      border: 2px solid var(--border-color);
+      background-color: #3a3a3c;
+      color: var(--text-color);
+      width: var(--box-size);
+      height: var(--box-size);
+      font-size: var(--box-font-size);
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      text-transform: uppercase;
+      box-sizing: border-box;
+      transition: background-color 0.2s ease;
+    }
+
+    .scrambled-letters span:hover {
+      background-color: #555;
+    }
+  </style>
+</head>
+<body>
+  <h1>Daily Quote Challenge</h1>
+  <div class="quote" id="quote">
+    "The only <span class="scrambled" data-word="limit">litmi</span> to our <span class="scrambled" data-word="realization">aitalreoizn</span> of tomorrow is our <span class="scrambled" data-word="imagination">ietmaganon</span>."<br />
+    — Roosevelt
+  </div>
+
+  <div class="solve-box" id="solveBox" style="display: none;">
+    <div class="letter-boxes" id="letterBoxes"></div>
+    <div class="scrambled-letters" id="scrambledLetters"></div>
+  </div>
+
+  <script>
+    const scrambledElements = document.querySelectorAll('.scrambled');
+    const solveBox = document.getElementById('solveBox');
+    const letterBoxes = document.getElementById('letterBoxes');
+    const scrambledLetters = document.getElementById('scrambledLetters');
+
+    let currentCorrectWord = '';
+    let currentFilled = [];
+    let currentElement = null;
+    let currentLetterSpans = [];
+
+    function activateElement(el) {
+      if (currentElement) {
+        currentElement.classList.remove('active');
+      }
+
+      currentElement = el;
+      currentElement.classList.add('active');
+      currentCorrectWord = el.dataset.word.toUpperCase();
+      currentFilled = Array(currentCorrectWord.length).fill('');
+
+      letterBoxes.innerHTML = '';
+      scrambledLetters.innerHTML = '';
+      solveBox.style.display = 'block';
+
+      for (let i = 0; i < currentCorrectWord.length; i++) {
+        const box = document.createElement('div');
+        box.textContent = '_';
+        letterBoxes.appendChild(box);
+      }
+
+      const shuffled = currentCorrectWord.split('').sort(() => 0.5 - Math.random());
+      currentLetterSpans = [];
+      shuffled.forEach((ch) => {
+        const span = document.createElement('span');
+        span.textContent = ch;
+        span.addEventListener('click', () => handleLetterInput(ch, span));
+        scrambledLetters.appendChild(span);
+        currentLetterSpans.push(span);
+      });
+    }
+
+    function handleLetterInput(ch, span = null) {
+      const nextEmpty = currentFilled.indexOf('');
+      if (nextEmpty !== -1) {
+        currentFilled[nextEmpty] = ch;
+        letterBoxes.children[nextEmpty].textContent = ch;
+        if (span) span.style.visibility = 'hidden';
+      }
+
+      if (!currentFilled.includes('')) {
+        if (currentFilled.join('') === currentCorrectWord) {
+          setTimeout(() => {
+            currentElement.textContent = currentCorrectWord;
+            currentElement.classList.remove('active');
+            solveBox.style.display = 'none';
+            const nextIndex = Array.from(scrambledElements).indexOf(currentElement) + 1;
+            if (nextIndex < scrambledElements.length) {
+              activateElement(scrambledElements[nextIndex]);
+            }
+          }, 300);
+        } else {
+          setTimeout(() => alert('❌ Try again!'), 100);
+        }
+      }
+    }
+
+    function handleBackspace() {
+      for (let i = currentFilled.length - 1; i >= 0; i--) {
+        if (currentFilled[i] !== '') {
+          const removedChar = currentFilled[i];
+          currentFilled[i] = '';
+          letterBoxes.children[i].textContent = '_';
+          const span = currentLetterSpans.find(s => s.textContent === removedChar && s.style.visibility === 'hidden');
+          if (span) span.style.visibility = 'visible';
+          break;
+        }
+      }
+    }
+
+    function handleReset() {
+      activateElement(currentElement);
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (!solveBox.style.display || solveBox.style.display === 'none') return;
+      const key = e.key.toUpperCase();
+      if (/^[A-Z]$/.test(key)) {
+        const span = currentLetterSpans.find(s => s.textContent === key && s.style.visibility !== 'hidden');
+        if (span) handleLetterInput(key, span);
+      } else if (e.key === 'Backspace') {
+        handleBackspace();
+      } else if (e.key === 'Escape') {
+        handleReset();
+      }
+    });
+
+    if (scrambledElements.length > 0) {
+      activateElement(scrambledElements[0]);
+    }
+
+    scrambledElements.forEach(el => {
+      el.addEventListener('click', () => activateElement(el));
+    });
+  </script>
+</body>
+</html>

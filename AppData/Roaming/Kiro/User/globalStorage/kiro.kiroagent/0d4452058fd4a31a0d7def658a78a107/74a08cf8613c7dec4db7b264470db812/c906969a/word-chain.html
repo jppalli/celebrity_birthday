@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Word Chain - Daily Challenge</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'NYTimes', 'Helvetica Neue', Arial, sans-serif;
+            background: #ffffff;
+            color: #1a1a1a;
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            line-height: 1.4;
+        }
+
+        .container {
+            background: #ffffff;
+            border: 1px solid #d3d6da;
+            border-radius: 0;
+            box-shadow: none;
+            padding: 15px;
+            width: 100%;
+            max-width: 480px;
+            height: 95vh;
+            max-height: 650px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 12px;
+            flex-shrink: 0;
+            border-bottom: 1px solid #e6e6e6;
+            padding-bottom: 10px;
+        }
+
+        .title {
+            font-size: 2.25rem;
+            color: #1a1a1a;
+            margin-bottom: 4px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .subtitle {
+            color: #787c7e;
+            font-size: 0.875rem;
+            margin-bottom: 0;
+            font-weight: 400;
+        }
+
+        /* Game Status */
+        .status-bar {
+            text-align: center;
+            margin-bottom: 10px;
+            flex-shrink: 0;
+        }
+
+        .status-message {
+            font-size: 0.875rem;
+            color: #1a1a1a;
+            margin-bottom: 2px;
+            font-weight: 500;
+        }
+
+        .sdk-status {
+            font-size: 0.7rem;
+            color: #787c7e;
+            font-style: normal;
+            height: 14px; /* Fixed height to prevent layout shifts */
+        }
+
+        /* Game Area */
+        .game-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+
+        /* Word Chain Display */
+        .word-chain {
+            background: #fafafa;
+            border: 1px solid #d3d6da;
+            border-radius: 4px;
+            padding: 12px;
+            margin-bottom: 12px;
+            min-height: 80px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            align-items: flex-start;
+            align-content: flex-start;
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
+
+        .word-bubble {
+            background: #6aaa64;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            animation: popIn 0.2s ease;
+            letter-spacing: 0.5px;
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0); }
+            100% { transform: scale(1); }
+        }
+
+        /* Current Word Input */
+        .input-area {
+            background: #ffffff;
+            border: 1px solid #d3d6da;
+            border-radius: 4px;
+            padding: 12px;
+            margin-bottom: 12px;
+            flex-shrink: 0;
+        }
+
+        .current-word {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 3px;
+            margin-bottom: 12px;
+            min-height: 48px;
+        }
+
+        .letter-slot {
+            width: 48px;
+            height: 48px;
+            border: 2px solid #d3d6da;
+            border-radius: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: white;
+            transition: all 0.1s ease;
+            text-transform: uppercase;
+        }
+
+        .letter-slot.filled {
+            border-color: #787c7e;
+            background: #ffffff;
+            color: #1a1a1a;
+        }
+
+        .letter-slot.active {
+            border-color: #1a1a1a;
+            border-width: 3px;
+        }
+
+        /* Available Letters */
+        .available-letters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            justify-content: center;
+            margin-bottom: 16px;
+        }
+
+        .letter-btn {
+            width: 40px;
+            height: 40px;
+            border: 1px solid #d3d6da;
+            border-radius: 4px;
+            background: #ffffff;
+            color: #1a1a1a;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.1s ease;
+            text-transform: uppercase;
+        }
+
+        .letter-btn:hover {
+            background: #f6f7f8;
+            border-color: #787c7e;
+        }
+
+        .letter-btn:active {
+            background: #d3d6da;
+        }
+
+        .letter-btn:disabled {
+            background: #f6f7f8;
+            color: #d3d6da;
+            cursor: not-allowed;
+            border-color: #e6e6e6;
+        }
+
+        /* Controls */
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            margin-bottom: 10px;
+            flex-shrink: 0;
+        }
+
+        .btn {
+            background: #1a1a1a;
+            color: white;
+            border: 1px solid #1a1a1a;
+            border-radius: 4px;
+            padding: 12px 16px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.1s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn:hover {
+            background: #787c7e;
+            border-color: #787c7e;
+        }
+
+        .btn:active {
+            background: #565758;
+        }
+
+        .btn:disabled {
+            background: #f6f7f8;
+            color: #d3d6da;
+            border-color: #e6e6e6;
+            cursor: not-allowed;
+        }
+
+        .btn-clear {
+            background: #ffffff;
+            color: #1a1a1a;
+            border-color: #d3d6da;
+        }
+
+        .btn-clear:hover {
+            background: #f6f7f8;
+            border-color: #787c7e;
+        }
+
+        /* Challenge Info */
+        .challenge-info {
+            background: #f6f7f8;
+            border: 1px solid #e6e6e6;
+            border-radius: 4px;
+            padding: 12px;
+            text-align: center;
+            font-size: 0.75rem;
+            color: #787c7e;
+            flex-shrink: 0;
+        }
+
+        .target-info {
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 4px;
+        }
+
+        /* Responsive */
+        @media (max-height: 600px) {
+            .container {
+                height: 98vh;
+                padding: 10px;
+            }
+            
+            .title {
+                font-size: 1.5rem;
+            }
+            
+            .word-chain {
+                min-height: 60px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="title">WORD CHAIN</div>
+            <div class="subtitle">Build words using the given letters</div>
+        </div>
+
+        <div class="status-bar">
+            <div class="status-message" id="status-message">Find words using the letters below!</div>
+            <div class="sdk-status" id="sdk-status"></div>
+        </div>
+
+        <div class="game-area">
+            <div class="word-chain" id="word-chain">
+                <div style="color: #999; font-style: italic; width: 100%; text-align: center;">Your words will appear here...</div>
+            </div>
+
+            <div class="input-area">
+                <div class="current-word" id="current-word">
+                    <!-- Letter slots will be generated by JavaScript -->
+                </div>
+
+                <div class="available-letters" id="available-letters">
+                    <!-- Available letters will be generated by JavaScript -->
+                </div>
+
+                <div class="controls">
+                    <button class="btn btn-clear" id="clear-btn">Clear</button>
+                    <button class="btn" id="submit-btn">Submit</button>
+                    <button class="btn" id="hint-btn">Hint</button>
+                    <button class="btn" id="past-challenges-btn">Past</button>
+                </div>
+            </div>
+
+            <div class="challenge-info">
+                <div class="target-info" id="target-info">Daily Challenge: Find 10 words to complete!</div>
+                <div id="progress-info">Progress: 0/10 words found</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Arkadium SDK -->
+    <script src="https://developers.arkadium.com/cdn/sdk/v2/sdk.js"></script>
+    <script src="word-chain-game.js"></script>
+</body>
+</html>

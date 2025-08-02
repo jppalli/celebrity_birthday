@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minimal Arkadium SDK Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .status {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 10px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .success { border-left: 4px solid #4CAF50; }
+        .error { border-left: 4px solid #f44336; }
+        .warning { border-left: 4px solid #ff9800; }
+        .info { border-left: 4px solid #2196F3; }
+        pre {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Minimal Arkadium SDK Test</h1>
+    <p>This page tests basic SDK loading and communication with the Arkadium sandbox.</p>
+    
+    <div id="status-container">
+        <div class="status info">
+            <strong>Status:</strong> <span id="status">Initializing...</span>
+        </div>
+    </div>
+    
+    <div class="status">
+        <h3>Test Results:</h3>
+        <div id="test-results"></div>
+    </div>
+    
+    <div class="status">
+        <h3>Console Log:</h3>
+        <pre id="console-log"></pre>
+    </div>
+
+    <!-- Arkadium SDK -->
+    <script src="https://developers.arkadium.com/cdn/sdk/v2/sdk.js"></script>
+    
+    <script>
+        const statusEl = document.getElementById('status');
+        const resultsEl = document.getElementById('test-results');
+        const consoleEl = document.getElementById('console-log');
+        
+        let logMessages = [];
+        
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logMessage = `[${timestamp}] ${message}`;
+            logMessages.push(logMessage);
+            consoleEl.textContent = logMessages.join('\n');
+            console.log(message);
+            
+            // Update status
+            statusEl.textContent = message;
+            statusEl.parentElement.className = `status ${type}`;
+        }
+        
+        function addResult(test, result, details = '') {
+            const resultDiv = document.createElement('div');
+            resultDiv.innerHTML = `
+                <strong>${test}:</strong> 
+                <span style="color: ${result ? 'green' : 'red'}">
+                    ${result ? '✅ PASS' : '❌ FAIL'}
+                </span>
+                ${details ? `<br><small>${details}</small>` : ''}
+            `;
+            resultDiv.style.marginBottom = '10px';
+            resultsEl.appendChild(resultDiv);
+        }
+        
+        async function runTests() {
+            log('Starting SDK tests...', 'info');
+            
+            // Test 1: Check if SDK script loaded
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            if (typeof window.ArkadiumGameSDK !== 'undefined') {
+                addResult('SDK Script Loading', true, 'ArkadiumGameSDK is available');
+                log('✅ SDK script loaded successfully', 'success');
+            } else {
+                addResult('SDK Script Loading', false, 'ArkadiumGameSDK not found');
+                log('❌ SDK script failed to load', 'error');
+                return;
+            }
+            
+            // Test 2: Initialize SDK
+            try {
+                log('Initializing SDK instance...', 'info');
+                const sdk = await window.ArkadiumGameSDK.getInstance({
+                    gameId: 'minimal-test',
+                    version: '1.0.0',
+                    debug: true
+                });
+                
+                addResult('SDK Initialization', true, 'SDK instance created');
+                log('✅ SDK initialized successfully', 'success');
+                
+                // Store globally for sandbox access
+                window.testSDK = sdk;
+                window.testGame = { 
+                    status: 'ready',
+                    getState: () => ({ test: 'working' })
+                };
+                
+                // Test 3: Call lifecycle methods
+                if (sdk.lifecycle) {
+                    if (sdk.lifecycle.onLoading) {
+                        sdk.lifecycle.onLoading();
+                        addResult('onLoading() call', true, 'Loading signal sent');
+                        log('✅ onLoading() called', 'success');
+                    }
+                    
+                    setTimeout(() => {
+                        if (sdk.lifecycle.onTestReady) {
+                            sdk.lifecycle.onTestReady();
+                            addResult('onTestReady() call', true, 'Ready signal sent');
+                            log('✅ onTestReady() called - Game ready for sandbox!', 'success');
+                        }
+                    }, 1000);
+                } else {
+                    addResult('Lifecycle Methods', false, 'sdk.lifecycle not available');
+                    log('⚠️ Lifecycle methods not available', 'warning');
+                }
+                
+            } catch (error) {
+                addResult('SDK Initialization', false, error.message);
+                log(`❌ SDK initialization failed: ${error.message}`, 'error');
+            }
+        }
+        
+        // Start tests when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            log('Page loaded, waiting for SDK...', 'info');
+            setTimeout(runTests, 500);
+        });
+        
+        // Handle any uncaught errors
+        window.addEventListener('error', (event) => {
+            log(`❌ JavaScript Error: ${event.message}`, 'error');
+        });
+        
+        // Log when SDK script loads
+        window.addEventListener('load', () => {
+            log('All resources loaded', 'info');
+        });
+    </script>
+</body>
+</html>

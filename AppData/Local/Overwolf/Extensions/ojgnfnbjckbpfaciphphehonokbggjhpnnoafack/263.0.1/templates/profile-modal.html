@@ -1,0 +1,20 @@
+<!-- profile edit for default username from social login -->
+<!-- add class "is-active" to show ot just leave it if rendering window on the spot -->
+<section class="profile-username-edit-window ng-scope">
+  <div class="profile-username-edit-modal">
+    <button class="control-close" ng-click="closeModal($event)">
+      <svg class="icon">
+        <use xlink:href=".content/assets/svg/sprite.svg#window-control_close" />
+      </svg>
+    </button>
+
+    <img src="images/global/edit-profile-laceholder.webp" alt="username"/>
+    <h1>Welcome [default.username]</h1>
+    <p>You can edit your display name and profile image, or continue to Overwolf.</p>
+    <div class="actions-box">
+      <button class="btn-secondary" ng-click="closeModal($event)">Continue</button>
+      <button class="btn-primary" ng-click="manageUserAccount()">Edit Profile</button>
+    </div>
+  </div>
+  <div class="bg" ng-click="closeModal()"></div>
+</section>
