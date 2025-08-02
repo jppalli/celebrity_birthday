@@ -4,7 +4,7 @@ A daily word puzzle game where you guess which celebrity has their birthday toda
 
 ## 🎮 Play the Game
 
-**[Play Celebrity Birthday Challenge](https://your-username.github.io/celebrity_birthday_kiro)**
+**[Play Celebrity Birthday Challenge](https://jppalli.github.io/celebrity_birthday)**
 
 ## 🎯 How to Play
 
